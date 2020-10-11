@@ -39,6 +39,15 @@ LoadFileButton.propTypes = {
 };
 
 export class PageLoadFile extends Component {
+    componentDidMount() {
+        const { loadGedcomUrl } = this.props;
+        const environment = process.env.NODE_ENV;
+        const isDevelopment = !environment || environment === 'development';
+        if(isDevelopment) {
+            loadGedcomUrl('./test.ged');
+        }
+    }
+
     renderError = () => {
         const { error, clearNotifications } = this.props;
         return error !== null && (
@@ -80,9 +89,11 @@ export class PageLoadFile extends Component {
 }
 
 PageLoadFile.propTypes = {
+    /* Redux */
     loading: PropTypes.bool.isRequired,
     error: PropTypes.string,
     loadGedcomFile: PropTypes.func.isRequired,
+    loadGedcomUrl: PropTypes.func.isRequired,
     clearNotifications: PropTypes.func.isRequired,
 };
 

@@ -1,10 +1,9 @@
 import { connect } from 'react-redux';
-import { clearNotifications, loadGedcomFile, loadGedcomUrl } from '../../gedcom/actions';
-import { Page as PageComponent } from './Page';
+import { clearNotifications, loadGedcomFile, loadGedcomUrl } from '../../../gedcom/actions';
+import { PageLoadFile as PageLoadFileComponent } from './PageLoadFile';
 
 const mapStateToProps = state => ({
     loading: state.gedcomFile.loading,
-    file: state.gedcomFile.data,
     error: state.gedcomFile.error,
 });
 
@@ -14,7 +13,7 @@ const mapDispatchToProps = dispatch => ({
     clearNotifications: () => dispatch(clearNotifications()),
 });
 
-export const Page = connect(
+export const PageLoadFile = connect(
     mapStateToProps,
     mapDispatchToProps,
-)(PageComponent);
+)(PageLoadFileComponent);

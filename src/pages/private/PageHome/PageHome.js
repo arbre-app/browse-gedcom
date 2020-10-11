@@ -3,8 +3,10 @@ import React, { Component } from 'react';
 import { Card, Container, Table } from 'react-bootstrap';
 import { CodeSlash, FileEarmarkText, HouseDoor } from 'react-bootstrap-icons';
 import { Gedcom } from 'read-gedcom';
+import { NormalLink } from '../../../components';
+import { AppRoutes } from '../../../routes';
 
-export class PageBrowseFile extends Component {
+export class PageHome extends Component {
     getOrUnknown = option => {
         return option.length > 0 ? option[0] : undefined;
     };
@@ -47,7 +49,9 @@ export class PageBrowseFile extends Component {
                             <HouseDoor className="mr-2" />
                             Root individual
                         </Card.Title>
-                        {this.getOrUnknown(individual.getName().valueAsParts().map(v => v.filter(s => s).join(' ')))}
+                        <NormalLink to={AppRoutes.individualFor(this.getOrUnknown(individual.pointer()))}>
+                            {this.getOrUnknown(individual.getName().valueAsParts().map(v => v.filter(s => s).join(' ')))}
+                        </NormalLink>
                     </Card.Body>
                 </Card>
             </Container>
@@ -55,6 +59,6 @@ export class PageBrowseFile extends Component {
     }
 }
 
-PageBrowseFile.propTypes = {
+PageHome.propTypes = {
     file: PropTypes.instanceOf(Gedcom).isRequired,
 };

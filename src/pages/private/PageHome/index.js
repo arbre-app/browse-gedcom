@@ -1,0 +1,1 @@
+export { PageHome } from './PageHome';

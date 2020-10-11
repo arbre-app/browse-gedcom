@@ -1,11 +1,11 @@
 import { connect } from 'react-redux';
-import { RedirectWall as RedirectWallComponent } from './RedirectWall';
+import { PublicRoute as PublicRouteComponent } from './PublicRoute';
 
 const mapStateToProps = state => ({
     isFileLoaded: !!state.gedcomFile.data,
 });
 
-export const RedirectWall = connect(
+export const PublicRoute = connect(
     mapStateToProps,
     null,
-)(RedirectWallComponent);
+)(PublicRouteComponent);
