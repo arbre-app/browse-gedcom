@@ -8,3 +8,12 @@ body {
 
     background-color: #f8f9fa;
 }
+
+.btn-load-more {
+    padding: 0 0.25rem;
+    font-size: 75%;
+}
+
+.list-style-simple {
+    list-style-type: none;
+}
