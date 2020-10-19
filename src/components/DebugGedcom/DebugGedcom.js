@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { BugFill } from 'react-bootstrap-icons';
+import { Bug } from 'react-bootstrap-icons';
 import { Node as GedcomNode } from 'read-gedcom';
-import { Button, Modal } from 'react-bootstrap';
+import { Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { NodeTree } from './NodeTree';
 
 export class DebugGedcom extends Component {
@@ -19,9 +19,16 @@ export class DebugGedcom extends Component {
         const { visible } = this.state;
         return (
             <>
-                <Button variant="info" onClick={this.handleShow} {...buttonProps}>
-                    <BugFill />
-                </Button>
+                <OverlayTrigger
+                    placement="left"
+                    overlay={
+                        <Tooltip>
+                            Debug Gedcom structure
+                        </Tooltip>
+                    }
+                >
+                    <Bug className="hoverable" onClick={this.handleShow} {...buttonProps} />
+                </OverlayTrigger>
 
                 <Modal size="lg" show={visible} onHide={this.handleClose}>
                     <Modal.Header closeButton>

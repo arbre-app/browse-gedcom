@@ -17,3 +17,15 @@ body {
 .list-style-simple {
     list-style-type: none;
 }
+
+.flip-vertical {
+    transform: scaleY(-1);
+}
+
+.flip-horizontal {
+    transform: scaleX(-1);
+}
+
+.hoverable {
+    cursor: pointer;
+}

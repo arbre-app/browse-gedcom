@@ -1,24 +1,18 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Card, Container } from 'react-bootstrap';
-import { Person } from 'react-bootstrap-icons';
+import { Card, Col, Container, Row } from 'react-bootstrap';
+import { Diagram2, Person } from 'react-bootstrap-icons';
 import { Gedcom } from 'read-gedcom';
 import { DebugGedcom, NormalLink } from '../../../components';
+import { AncestorsTreeChart } from '../../../components/AncestorsTreeChart';
 import { AppRoutes } from '../../../routes';
 import { PageNotFound } from '../../public/PageNotFound';
-import { displayEvent } from '../../../util';
+import { displayEvent, displayName } from '../../../util';
 
 export class PageIndividual extends Component {
     placeholderString = '?';
 
-    renderFullname = individual => {
-        const name = individual
-            .getName()
-            .valueAsParts()
-            .filter(v => v !== undefined)
-            .map(v => v.filter(s => s).join(' '))[0];
-        return name ? name : this.placeholderString;
-    };
+    renderFullname = individual => displayName(individual, this.placeholderString);
 
     renderIndividualLink = (individualOpt, isDetailed) => {
         if (individualOpt.isEmpty()) {
@@ -79,8 +73,10 @@ export class PageIndividual extends Component {
             <>
                 With {this.renderIndividualLink(other, false)}{strMarriage ? ` (${strMarriage})` : ''}:
                 <ul>
-                    {children.isEmpty() ? <li key={-1}><em className="text-muted">(no children recorded)</em></li> : null}
-                    {children.array().map((child, i) => <li key={i}>{this.renderIndividualLink(child.option(), true)}</li>)}
+                    {children.isEmpty() ?
+                        <li key={-1}><em className="text-muted">(no children recorded)</em></li> : null}
+                    {children.array().map((child, i) =>
+                        <li key={i}>{this.renderIndividualLink(child.option(), true)}</li>)}
                 </ul>
             </>
         );
@@ -114,35 +110,59 @@ export class PageIndividual extends Component {
         );
     };
 
-    renderTree = () => {
-
+    renderAncestorsCard = individual => {
+        return !individual.getFamilyAsChild().isEmpty() && (
+            <Card className="mt-3">
+                <Card.Body>
+                    <h5>
+                        <Diagram2 className="flip-vertical mr-2"/>
+                        Ancestors chart
+                    </h5>
+                    <Row>
+                        <Col className="d-none d-lg-block">
+                            <AncestorsTreeChart individual={individual.first()} maxDepth={3}/>
+                        </Col>
+                        <Col className="d-none d-sm-block d-lg-none">
+                            <AncestorsTreeChart individual={individual.first()} maxDepth={2}/>
+                        </Col>
+                        <Col className="d-block d-sm-none">
+                            <AncestorsTreeChart individual={individual.first()} maxDepth={1}/>
+                        </Col>
+                    </Row>
+                </Card.Body>
+            </Card>
+        );
     };
 
     render() {
         const { file, match: { params: { individualId } } } = this.props;
-        const individual = file.getIndividualRecord(individualId).option();
-        if (individual.isEmpty()) {
+        const individualOpt = file.getIndividualRecord(individualId).option();
+        if (individualOpt.isEmpty()) {
             return <PageNotFound/>;
         }
+        const individual = individualOpt.first();
         return (
             <Container className="mt-4">
                 <Card>
                     <Card.Header>
                         <Card.Title>
                             <Person className="mr-1"/>
-                            {this.renderFullname(individual)}
-                            <DebugGedcom node={individual.first()} style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }} />
+                            {this.renderFullname(individualOpt)}
+                            <DebugGedcom node={individual}
+                                         style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}/>
                         </Card.Title>
                         <Card.Subtitle className="text-muted text-monospace">
                             {individualId}
                         </Card.Subtitle>
                     </Card.Header>
                     <Card.Body>
-                        {this.renderGeneral(individual)}
-                        {this.renderParents(individual)}
-                        {this.renderUnions(individual)}
+                        {this.renderGeneral(individualOpt)}
+                        {this.renderParents(individualOpt)}
+                        {this.renderUnions(individualOpt)}
                     </Card.Body>
                 </Card>
+
+                {this.renderAncestorsCard(individual)}
             </Container>
         );
     }

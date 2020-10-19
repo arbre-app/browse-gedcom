@@ -20,8 +20,14 @@ class NodeLi extends Component {
 
     renderTag = () => {
         const { node, synthetic } = this.props;
-        return <Badge variant={synthetic ? 'primary' : 'secondary'}
-                      className="text-monospace mr-2">{node.tag()}</Badge>;
+        return <Badge variant={synthetic ? 'info' : 'secondary'}
+                      className="text-monospace">{node.tag()}</Badge>;
+    };
+
+    renderPointer = () => {
+        const { node } = this.props;
+        const pointer = node.pointer();
+        return pointer && <Badge variant="success" className="text-monospace">{pointer}</Badge>;
     };
 
     renderValue = () => {
@@ -78,7 +84,8 @@ class NodeLi extends Component {
         const { xRefResolved } = this.state;
         return (
             <li>
-                {this.renderTag()}
+                {this.renderTag()}{' '}
+                {this.renderPointer()}{' '}
                 {this.renderValue()}
                 <NodeTree node={node.children()} maxDepth={maxDepth - 1} {...otherProps}>
                     {xRefResolved && this.renderResolvedNode()}
