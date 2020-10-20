@@ -6,11 +6,11 @@ import { AppRoutes } from '../urls';
 export class PublicRoute extends Component {
     render() {
         const { component: Component, restricted, isFileLoaded, ...rest } = this.props;
-        if(restricted && isFileLoaded) {
-            return <Redirect to={AppRoutes.home} />
+        if (restricted && isFileLoaded) {
+            return <Redirect to={AppRoutes.home}/>;
         } else {
             return (
-                <Route {...rest} render={props => <Component {...props} />} />
+                <Route {...rest} render={props => <Component {...props} />}/>
             );
         }
     }
@@ -25,4 +25,4 @@ PublicRoute.propTypes = {
 
 PublicRoute.defaultProps = {
     restricted: false,
-}
+};

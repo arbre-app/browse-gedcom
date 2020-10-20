@@ -5,21 +5,36 @@ import { CodeSlash, FileEarmarkText, HouseDoor } from 'react-bootstrap-icons';
 import { Gedcom } from 'read-gedcom';
 import { NormalLink } from '../../../components';
 import { AppRoutes } from '../../../routes';
+import { displayName } from '../../../util';
 
 export class PageHome extends Component {
     getOrUnknown = option => {
         return option.length > 0 ? option[0] : undefined;
     };
 
+    renderRootIndividual = () => {
+        const { settings: { rootIndividual } } = this.props;
+        return rootIndividual && (
+            <>
+                <Card.Title>
+                    <HouseDoor className="mr-2"/>
+                    Root individual
+                </Card.Title>
+                <NormalLink to={AppRoutes.individualFor(rootIndividual.pointer())}>
+                    {displayName(rootIndividual, '?')}
+                </NormalLink>
+            </>
+        );
+    };
+
     render() {
         const { file } = this.props;
-        const individual = file.getIndividualRecord('@I0000@');
         return (
             <Container className="mt-4">
                 <Card>
                     <Card.Body>
                         <Card.Title>
-                            <CodeSlash className="mr-2" />
+                            <CodeSlash className="mr-2"/>
                             Welcome!
                         </Card.Title>
                         This application is under development, some features may be missing or not fully working.
@@ -30,28 +45,22 @@ export class PageHome extends Component {
                 <Card className="mt-3">
                     <Card.Body>
                         <Card.Title>
-                            <FileEarmarkText className="mr-2" />
+                            <FileEarmarkText className="mr-2"/>
                             File metadata
                         </Card.Title>
                         <Table borderless size="sm">
                             <tbody>
-                            <tr>
-                                <td>Provider:</td>
-                                <td>{this.getOrUnknown(file.getHeader().getSourceSystem().value())}</td>
-                            </tr>
-                            <tr>
-                                <td>Version:</td>
-                                <td>{this.getOrUnknown(file.getHeader().getSourceSystem().getVersion().value())}</td>
-                            </tr>
+                                <tr>
+                                    <td>Provider:</td>
+                                    <td>{this.getOrUnknown(file.getHeader().getSourceSystem().value())}</td>
+                                </tr>
+                                <tr>
+                                    <td>Version:</td>
+                                    <td>{this.getOrUnknown(file.getHeader().getSourceSystem().getVersion().value())}</td>
+                                </tr>
                             </tbody>
                         </Table>
-                        <Card.Title>
-                            <HouseDoor className="mr-2" />
-                            Root individual
-                        </Card.Title>
-                        <NormalLink to={AppRoutes.individualFor(this.getOrUnknown(individual.pointer()))}>
-                            {this.getOrUnknown(individual.getName().valueAsParts().map(v => v.filter(s => s).join(' ')))}
-                        </NormalLink>
+                        {this.renderRootIndividual()}
                     </Card.Body>
                 </Card>
             </Container>
@@ -61,4 +70,5 @@ export class PageHome extends Component {
 
 PageHome.propTypes = {
     file: PropTypes.instanceOf(Gedcom).isRequired,
+    settings: PropTypes.object.isRequired,
 };

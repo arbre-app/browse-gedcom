@@ -1,4 +1,5 @@
 import { readGedcom } from 'read-gedcom';
+import { createInitialSettings } from '../util/settings';
 
 export const LOADING = 'gedcomFile/LOADING';
 export const SUCCESS = 'gedcomFile/SUCCESS';
@@ -13,9 +14,13 @@ export const loadGedcomUrl = url => async dispatch => {
         const result = await fetch(url);
         const buffer = await result.arrayBuffer();
         const root = readGedcom(buffer);
+        const settings = createInitialSettings(root);
         dispatch({
             type: SUCCESS,
-            data: root,
+            data: {
+                root,
+                settings,
+            },
         });
     } catch (error) {
         dispatch({
@@ -43,9 +48,13 @@ export const loadGedcomFile = file => async dispatch => {
     try {
         const buffer = await promise;
         const root = readGedcom(buffer);
+        const settings = createInitialSettings(root);
         dispatch({
             type: SUCCESS,
-            data: root,
+            data: {
+                root,
+                settings,
+            },
         });
     } catch (error) {
         dispatch({
