@@ -1,6 +1,6 @@
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
 
-export function displayDate(dateGedcom) {
+export function displayDate(dateGedcom, isShort) {
     const first = dateGedcom.first();
     const obj = first.valueAsDate();
     if (obj !== null) {
@@ -9,8 +9,8 @@ export function displayDate(dateGedcom) {
             const strApproximationOpt = obj.isDateApproximate ? 'about ' : '';
             const strBceOpt = date.year.isBce ? ' BCE' : '';
             const strYear = date.year.value;
-            const strMonthOpt = date.month !== undefined ? `${MONTHS[date.month - 1]} ` : '';
-            const strDayOpt = date.day !== undefined ? `${date.day} ` : '';
+            const strMonthOpt = date.month !== undefined && !isShort ? `${MONTHS[date.month - 1]} ` : '';
+            const strDayOpt = date.day !== undefined && !isShort ? `${date.day} ` : '';
 
             return `${strApproximationOpt}${strDayOpt}${strMonthOpt}${strYear}${strBceOpt}`;
         } else {
@@ -23,7 +23,7 @@ export function displayDate(dateGedcom) {
 
 export function displayEvent(eventGedcom, eventAction, withNameIfEmpty) {
     const first = eventGedcom.first();
-    const eventDate = first.getDate().option().array().map(displayDate)[0];
+    const eventDate = first.getDate().option().array().map(displayDate, false)[0];
     const eventPlace = first.getPlace().value()[0];
     let strEvent;
     if (eventDate && eventPlace) {

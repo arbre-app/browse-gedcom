@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Node as GedcomNode } from 'read-gedcom';
 import { Badge, Button } from 'react-bootstrap';
+import Linkify from 'react-linkify';
 
 class NodeLi extends Component {
     state = {
@@ -13,6 +14,7 @@ class NodeLi extends Component {
         '\n': '\\n',
         '\t': '\\t',
     };
+    rSpecialCharacters = new RegExp(`[${Object.keys(this.characterSubstitution).join('')}]`);
 
     rXRef = /^@[A-Za-z0-9]+@$/;
 
@@ -30,18 +32,33 @@ class NodeLi extends Component {
         return pointer && <Badge variant="success" className="text-monospace">{pointer}</Badge>;
     };
 
+    linkComponentDecorator = (decoratedHref, decoratedText, key) => (
+        <a target="blank" href={decoratedHref} key={key}>
+            {decoratedText}
+        </a>
+    );
+
     renderValue = () => {
         const { node } = this.props;
         const { xRefResolved } = this.state;
         const value = node.value();
         if (value) {
-            let cleanedValue = value;
-            for (const currentChar in this.characterSubstitution) { // Blank characters
-                const substitution = this.characterSubstitution[currentChar];
-                cleanedValue = cleanedValue.replaceAll(currentChar, `<kbd>${substitution}</kbd>`);
-            }
-            cleanedValue = cleanedValue.replaceAll(this.rUrl, `<a href="$&" target="_blank">$&</a>`);
-            const span = <span className="text-monospace" dangerouslySetInnerHTML={{ __html: cleanedValue }}/>;
+            let k = 0;
+            let cleanedValue = value.split(this.rSpecialCharacters).map((text, i) => {
+                const fragment = (
+                    <React.Fragment key={i}>
+                        {i > 0 && (<kbd>{this.characterSubstitution[value[k - 1]]}</kbd>)}
+                        {text}
+                    </React.Fragment>
+                );
+                k += text.length + 1;
+                return fragment;
+            });
+            const span = (
+                <span className="text-monospace">
+                    <Linkify componentDecorator={this.linkComponentDecorator}>{cleanedValue}</Linkify>
+                </span>
+            );
             if (this.rXRef.exec(value) !== null && !xRefResolved) {
                 return (
                     <u
@@ -65,18 +82,17 @@ class NodeLi extends Component {
         const { node, synthetic, maxDepth, ...otherProps } = this.props;
         const root = node.getGedcom();
         const pointer = node.value();
-        const byTagPointers = root._data.tree.by_tag_pointer; // TODO: API for that
-        for (const tag in byTagPointers) {
-            const pointers = byTagPointers[tag];
-            if (pointers[pointer] !== undefined) { // Found
-                const syntheticNode = root.getByTagPointer(tag, pointer).first();
-                return (
-                    <NodeLi node={syntheticNode} synthetic maxDepth={maxDepth - 1} {...otherProps} />
-                );
-            }
+        const recordOpt = root.getRecord(null, pointer).option();
+        if (recordOpt.isUnique()) {
+            const syntheticNode = recordOpt.first();
+            return (
+                <NodeLi node={syntheticNode} synthetic maxDepth={maxDepth - 1} {...otherProps} />
+            );
+        } else if (recordOpt.isEmpty()) {
+            return <li><Badge variant="danger" className="text-monospace">Not found: {pointer}</Badge></li>;
+        } else {
+            return <li><Badge variant="danger" className="text-monospace">Ambiguous resolution: {pointer}</Badge></li>;
         }
-        // Not found
-        return <li><Badge variant="danger" className="text-monospace">Not found: {pointer}</Badge></li>;
     };
 
     render() {

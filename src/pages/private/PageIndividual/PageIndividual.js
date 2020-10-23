@@ -7,30 +7,42 @@ import { DebugGedcom, NormalLink } from '../../../components';
 import { AncestorsTreeChart } from '../../../components/AncestorsTreeChart';
 import { AppRoutes } from '../../../routes';
 import { PageNotFound } from '../../public/PageNotFound';
-import { displayEvent, displayName } from '../../../util';
+import { displayDate, displayEvent, displayName } from '../../../util';
 
 export class PageIndividual extends Component {
     placeholderString = '?';
 
     renderFullname = individual => displayName(individual, this.placeholderString);
 
-    renderIndividualLink = (individualOpt, isDetailed) => {
+    renderIndividualLink = (individualOpt, withDates, isDetailed) => {
         if (individualOpt.isEmpty()) {
             return this.placeholderString;
         } else {
             let strEvents;
-            if (isDetailed) {
-                const birth = individualOpt.getEventBirth().option().array().map(e => displayEvent(e, 'born', false))[0];
-                const death = individualOpt.getEventDeath().option().array().map(e => displayEvent(e, 'died', true))[0];
+            if (withDates) {
+                const birthOpt = individualOpt.getEventBirth().option();
+                const deathOpt = individualOpt.getEventDeath().option();
+                if (isDetailed) {
+                    const birth = birthOpt.array().map(e => displayEvent(e, 'born', false))[0];
+                    const death = deathOpt.array().map(e => displayEvent(e, 'died', true))[0];
 
-                if (birth && death) {
-                    strEvents = `${birth}, ${death}`;
-                } else if (birth) {
-                    strEvents = birth;
-                } else if (death) {
-                    strEvents = death;
+                    if (birth && death) {
+                        strEvents = `${birth}, ${death}`;
+                    } else if (birth) {
+                        strEvents = birth;
+                    } else if (death) {
+                        strEvents = death;
+                    } else {
+                        strEvents = '';
+                    }
                 } else {
-                    strEvents = '';
+                    const birth = birthOpt.getDate().option().array().map(e => displayDate(e, true))[0];
+                    const death = deathOpt.getDate().option().array().map(e => displayDate(e, true))[0];
+                    if (death === undefined) {
+                        strEvents = birth;
+                    } else {
+                        strEvents = `${birth ? birth : this.placeholderString} - ${death ? death : this.placeholderString}`;
+                    }
                 }
             } else {
                 strEvents = '';
@@ -53,8 +65,8 @@ export class PageIndividual extends Component {
             <>
                 <h6>Parents</h6>
                 <ul>
-                    <li>{this.renderIndividualLink(familyAsChild.getHusband().getIndividualRecord().option(), true)}</li>
-                    <li>{this.renderIndividualLink(familyAsChild.getWife().getIndividualRecord().option(), true)}</li>
+                    <li>{this.renderIndividualLink(familyAsChild.getHusband().getIndividualRecord().option(), true, true)}</li>
+                    <li>{this.renderIndividualLink(familyAsChild.getWife().getIndividualRecord().option(), true, true)}</li>
                 </ul>
             </>
         );
@@ -69,15 +81,17 @@ export class PageIndividual extends Component {
             strMarriage = displayEvent(marriage, 'married', true);
         }
         const children = family.getChild().getIndividualRecord();
+        const hadChildren = !children.isEmpty();
+        const spouseData = <>{this.renderIndividualLink(other, false, undefined)}{strMarriage ? ` (${strMarriage})` : ''}</>;
         return (
             <>
-                With {this.renderIndividualLink(other, false)}{strMarriage ? ` (${strMarriage})` : ''}:
-                <ul>
-                    {children.isEmpty() ?
-                        <li key={-1}><em className="text-muted">(no children recorded)</em></li> : null}
-                    {children.array().map((child, i) =>
-                        <li key={i}>{this.renderIndividualLink(child.option(), true)}</li>)}
-                </ul>
+                {hadChildren ? <>With {spouseData}:</> : spouseData}
+                {hadChildren && (
+                    <ul>
+                        {children.array().map((child, i) =>
+                            <li key={i}>{this.renderIndividualLink(child.option(), true, false)}</li>)}
+                    </ul>
+                )}
             </>
         );
     };
@@ -107,6 +121,48 @@ export class PageIndividual extends Component {
             <ul>
                 {events.map((e, i) => <li key={i}>{e}</li>)}
             </ul>
+        );
+    };
+
+    renderSiblings = individual => {
+        const siblings = individual.getFamilyAsChild().option().getChild().getIndividualRecord();
+        if (siblings.isEmpty()) {
+            return null;
+        } else {
+            return (
+                <>
+                    <h6>Siblings</h6>
+                    <ul>
+                        {siblings.array().filter(child => child.pointer() !== individual.pointer()).map((child, i) =>
+                            <li key={i}>{this.renderIndividualLink(child.option(), true, false)}</li>)}
+                    </ul>
+                </>
+            );
+        }
+    };
+
+    renderHalfSiblingSide = (individual, parent) => {
+        const originalFamilyId = individual.getFamilyAsChild();
+        const otherFamilies = parent.getFamilyAsSpouse().filter(family => family.pointer() !== originalFamilyId.pointer()[0]);
+        return !otherFamilies.getChild().getIndividualRecord().isEmpty() && (
+            <Col>(not implemented)</Col>
+        ); // TODO
+    };
+
+    renderHalfSiblings = individual => {
+        const familyAsChild = individual.getFamilyAsChild();
+        const father = familyAsChild.getHusband().getIndividualRecord().option();
+        const mother = familyAsChild.getWife().getIndividualRecord().option();
+        const left = this.renderHalfSiblingSide(individual, father),
+            right = this.renderHalfSiblingSide(individual, mother);
+        return left && right && (
+            <>
+                <h6>Half-siblings</h6>
+                <Row>
+                    {left}
+                    {right}
+                </Row>
+            </>
         );
     };
 
@@ -159,6 +215,8 @@ export class PageIndividual extends Component {
                         {this.renderGeneral(individualOpt)}
                         {this.renderParents(individualOpt)}
                         {this.renderUnions(individualOpt)}
+                        {this.renderSiblings(individual)}
+                        {/*{this.renderHalfSiblings(individual)}*/}
                     </Card.Body>
                 </Card>
 
