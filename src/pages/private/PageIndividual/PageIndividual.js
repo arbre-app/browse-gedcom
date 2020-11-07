@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Card, Col, Container, Row } from 'react-bootstrap';
+import { Card, Col, Row } from 'react-bootstrap';
 import { Diagram2, Person } from 'react-bootstrap-icons';
 import { Gedcom } from 'read-gedcom';
 import { DebugGedcom, NormalLink } from '../../../components';
@@ -8,6 +8,7 @@ import { AncestorsTreeChart } from '../../../components/AncestorsTreeChart';
 import { AppRoutes } from '../../../routes';
 import { PageNotFound } from '../../public/PageNotFound';
 import { displayDate, displayEvent, displayName } from '../../../util';
+import { PrivateLayout } from '../PrivateLayout';
 
 export class PageIndividual extends Component {
     placeholderString = '?';
@@ -125,7 +126,7 @@ export class PageIndividual extends Component {
     };
 
     renderSiblings = individual => {
-        const siblings = individual.getFamilyAsChild().option().getChild().getIndividualRecord();
+        const siblings = individual.getFamilyAsChild().option().getChild().getIndividualRecord().filter(s => s.pointer() !== individual.pointer());
         if (siblings.isEmpty()) {
             return null;
         } else {
@@ -198,7 +199,7 @@ export class PageIndividual extends Component {
         }
         const individual = individualOpt.first();
         return (
-            <Container className="mt-4">
+            <PrivateLayout>
                 <Card>
                     <Card.Header>
                         <Card.Title>
@@ -221,7 +222,7 @@ export class PageIndividual extends Component {
                 </Card>
 
                 {this.renderAncestorsCard(individual)}
-            </Container>
+            </PrivateLayout>
         );
     }
 }

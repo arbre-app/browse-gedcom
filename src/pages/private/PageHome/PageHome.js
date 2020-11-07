@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Card, Container, Table } from 'react-bootstrap';
+import { Card, Table } from 'react-bootstrap';
 import { CodeSlash, FileEarmarkText, HouseDoor } from 'react-bootstrap-icons';
 import { Gedcom } from 'read-gedcom';
 import { NormalLink } from '../../../components';
 import { AppRoutes } from '../../../routes';
 import { displayName } from '../../../util';
+import { PrivateLayout } from '../PrivateLayout';
 
 export class PageHome extends Component {
     getOrUnknown = option => {
@@ -30,7 +31,7 @@ export class PageHome extends Component {
     render() {
         const { file } = this.props;
         return (
-            <Container className="mt-4">
+            <PrivateLayout>
                 <Card>
                     <Card.Body>
                         <Card.Title>
@@ -63,7 +64,7 @@ export class PageHome extends Component {
                         {this.renderRootIndividual()}
                     </Card.Body>
                 </Card>
-            </Container>
+            </PrivateLayout>
         );
     }
 }
