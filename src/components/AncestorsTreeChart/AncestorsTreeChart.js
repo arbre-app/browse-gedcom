@@ -13,7 +13,7 @@ export class AncestorsTreeChart extends Component {
         if (!individualOpt.isEmpty()) {
             const name = displayName(individualOpt, this.placeholderString);
             return (
-                <NormalLink to={AppRoutes.individualFor(individualOpt.pointer()[0])}>
+                <NormalLink to={AppRoutes.individualFor(individualOpt.pointer().one())}>
                     {name ? name : this.placeholderString}
                 </NormalLink>
             );
@@ -23,12 +23,12 @@ export class AncestorsTreeChart extends Component {
     };
 
     renderTreeLi = (individual, maxDepth) => {
-        const familyOpt = individual.getFamilyAsChild().option();
+        const familyOpt = individual.getFamilyAsChild(1);
         let child = null;
         if (maxDepth > 0 && !familyOpt.isEmpty()) {
-            const family = familyOpt.first();
-            const husband = family.getHusband().getIndividualRecord().option(),
-                wife = family.getWife().getIndividualRecord().option();
+            const family = familyOpt;
+            const husband = family.getHusband(1).getIndividualRecord(),
+                wife = family.getWife(1).getIndividualRecord();
             const currentDepth = maxDepth - 1;
             child = (
                 <ul>
@@ -40,7 +40,7 @@ export class AncestorsTreeChart extends Component {
         return (
             <li>
                 {child}
-                <span>{this.renderNodeValue(individual.option())}</span>
+                <span>{this.renderNodeValue(individual)}</span>
             </li>
         );
     };

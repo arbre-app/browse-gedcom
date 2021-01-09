@@ -21,7 +21,7 @@ export class PageHome extends Component {
                     <HouseDoor className="mr-2"/>
                     Root individual
                 </Card.Title>
-                <NormalLink to={AppRoutes.individualFor(rootIndividual.pointer())}>
+                <NormalLink to={AppRoutes.individualFor(rootIndividual.pointer().one())}>
                     {displayName(rootIndividual, '?')}
                 </NormalLink>
             </>
@@ -53,11 +53,11 @@ export class PageHome extends Component {
                             <tbody>
                                 <tr>
                                     <td>Provider:</td>
-                                    <td>{this.getOrUnknown(file.getHeader().getSourceSystem().value())}</td>
+                                    <td>{file.getHeader().getSourceSystem().value().option()}</td>
                                 </tr>
                                 <tr>
                                     <td>Version:</td>
-                                    <td>{this.getOrUnknown(file.getHeader().getSourceSystem().getVersion().value())}</td>
+                                    <td>{file.getHeader().getSourceSystem().getVersion().value().option()}</td>
                                 </tr>
                             </tbody>
                         </Table>

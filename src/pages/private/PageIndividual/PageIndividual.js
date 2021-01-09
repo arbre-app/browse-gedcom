@@ -21,8 +21,8 @@ export class PageIndividual extends Component {
         } else {
             let strEvents;
             if (withDates) {
-                const birthOpt = individualOpt.getEventBirth().option();
-                const deathOpt = individualOpt.getEventDeath().option();
+                const birthOpt = individualOpt.getEventBirth(1);
+                const deathOpt = individualOpt.getEventDeath(1);
                 if (isDetailed) {
                     const birth = birthOpt.array().map(e => displayEvent(e, 'born', false))[0];
                     const death = deathOpt.array().map(e => displayEvent(e, 'died', true))[0];
@@ -37,8 +37,8 @@ export class PageIndividual extends Component {
                         strEvents = '';
                     }
                 } else {
-                    const birth = birthOpt.getDate().option().array().map(e => displayDate(e, true))[0];
-                    const death = deathOpt.getDate().option().array().map(e => displayDate(e, true))[0];
+                    const birth = birthOpt.getDate(1).array().map(e => displayDate(e, true))[0];
+                    const death = deathOpt.getDate(1).array().map(e => displayDate(e, true))[0];
                     if (death === undefined) {
                         strEvents = birth;
                     } else {
@@ -51,7 +51,7 @@ export class PageIndividual extends Component {
 
             return (
                 <>
-                    <NormalLink to={AppRoutes.individualFor(individualOpt.pointer()[0])}>
+                    <NormalLink to={AppRoutes.individualFor(individualOpt.pointer().one())}>
                         {this.renderFullname(individualOpt)}
                     </NormalLink>
                     {strEvents ? ` (${strEvents})` : ''}
@@ -61,22 +61,22 @@ export class PageIndividual extends Component {
     };
 
     renderParents = individual => {
-        const familyAsChild = individual.getFamilyAsChild();
+        const familyAsChild = individual.getFamilyAsChild(1); // TODO filter adoptive
         return (
             <>
                 <h6>Parents</h6>
                 <ul>
-                    <li>{this.renderIndividualLink(familyAsChild.getHusband().getIndividualRecord().option(), true, true)}</li>
-                    <li>{this.renderIndividualLink(familyAsChild.getWife().getIndividualRecord().option(), true, true)}</li>
+                    <li>{this.renderIndividualLink(familyAsChild.getHusband(1).getIndividualRecord(1), true, true)}</li>
+                    <li>{this.renderIndividualLink(familyAsChild.getWife(1).getIndividualRecord(1), true, true)}</li>
                 </ul>
             </>
         );
     };
 
     renderUnion = (individual, family) => {
-        const otherRef = family.getHusband().value().some(s => s !== individual.pointer()[0]) ? family.getHusband() : family.getWife();
+        const otherRef = family.getHusband().value().option() === individual.pointer().one() ? family.getHusband() : family.getWife();
         const other = otherRef.getIndividualRecord();
-        const marriage = family.getEventMarriage().option();
+        const marriage = family.getEventMarriage(1);
         let strMarriage = '';
         if (!marriage.isEmpty()) {
             strMarriage = displayEvent(marriage, 'married', true);
@@ -90,7 +90,7 @@ export class PageIndividual extends Component {
                 {hadChildren && (
                     <ul>
                         {children.array().map((child, i) =>
-                            <li key={i}>{this.renderIndividualLink(child.option(), true, false)}</li>)}
+                            <li key={i}>{this.renderIndividualLink(child, true, false)}</li>)}
                     </ul>
                 )}
             </>
@@ -115,8 +115,8 @@ export class PageIndividual extends Component {
     };
 
     renderGeneral = individual => {
-        const birth = individual.getEventBirth().option().array().map(e => displayEvent(e, 'Birth', false));
-        const death = individual.getEventDeath().option().array().map(e => displayEvent(e, 'Deceased', true));
+        const birth = individual.getEventBirth(1).array().map(e => displayEvent(e, 'Birth', false));
+        const death = individual.getEventDeath(1).array().map(e => displayEvent(e, 'Deceased', true));
         const events = [birth, death].flatMap(e => e).filter(e => e);
         return (
             <ul>
@@ -126,7 +126,7 @@ export class PageIndividual extends Component {
     };
 
     renderSiblings = individual => {
-        const siblings = individual.getFamilyAsChild().option().getChild().getIndividualRecord().filter(s => s.pointer() !== individual.pointer());
+        const siblings = individual.getFamilyAsChild(1).getChild().getIndividualRecord().filter(s => s.pointer().one() !== individual.pointer().one());
         if (siblings.isEmpty()) {
             return null;
         } else {
@@ -134,8 +134,8 @@ export class PageIndividual extends Component {
                 <>
                     <h6>Siblings</h6>
                     <ul>
-                        {siblings.array().filter(child => child.pointer() !== individual.pointer()).map((child, i) =>
-                            <li key={i}>{this.renderIndividualLink(child.option(), true, false)}</li>)}
+                        {siblings.array().filter(child => child.pointer().one() !== individual.pointer().one()).map((child, i) =>
+                            <li key={i}>{this.renderIndividualLink(child, true, false)}</li>)}
                     </ul>
                 </>
             );
@@ -144,7 +144,7 @@ export class PageIndividual extends Component {
 
     renderHalfSiblingSide = (individual, parent) => {
         const originalFamilyId = individual.getFamilyAsChild();
-        const otherFamilies = parent.getFamilyAsSpouse().filter(family => family.pointer() !== originalFamilyId.pointer()[0]);
+        const otherFamilies = parent.getFamilyAsSpouse().filter(family => family.pointer().one() !== originalFamilyId.pointer().option());
         return !otherFamilies.getChild().getIndividualRecord().isEmpty() && (
             <Col>(not implemented)</Col>
         ); // TODO
@@ -152,8 +152,8 @@ export class PageIndividual extends Component {
 
     renderHalfSiblings = individual => {
         const familyAsChild = individual.getFamilyAsChild();
-        const father = familyAsChild.getHusband().getIndividualRecord().option();
-        const mother = familyAsChild.getWife().getIndividualRecord().option();
+        const father = familyAsChild.getHusband().getIndividualRecord(1);
+        const mother = familyAsChild.getWife().getIndividualRecord(1);
         const left = this.renderHalfSiblingSide(individual, father),
             right = this.renderHalfSiblingSide(individual, mother);
         return left && right && (
@@ -177,13 +177,13 @@ export class PageIndividual extends Component {
                     </h5>
                     <Row>
                         <Col className="d-none d-lg-block">
-                            <AncestorsTreeChart individual={individual.first()} maxDepth={3}/>
+                            <AncestorsTreeChart individual={individual} maxDepth={3}/>
                         </Col>
                         <Col className="d-none d-sm-block d-lg-none">
-                            <AncestorsTreeChart individual={individual.first()} maxDepth={2}/>
+                            <AncestorsTreeChart individual={individual} maxDepth={2}/>
                         </Col>
                         <Col className="d-block d-sm-none">
-                            <AncestorsTreeChart individual={individual.first()} maxDepth={1}/>
+                            <AncestorsTreeChart individual={individual} maxDepth={1}/>
                         </Col>
                     </Row>
                 </Card.Body>
@@ -193,11 +193,10 @@ export class PageIndividual extends Component {
 
     render() {
         const { file, match: { params: { individualId } } } = this.props;
-        const individualOpt = file.getIndividualRecord(individualId).option();
+        const individualOpt = file.getIndividualRecord(individualId, 1);
         if (individualOpt.isEmpty()) {
             return <PageNotFound/>;
         }
-        const individual = individualOpt.first();
         return (
             <PrivateLayout>
                 <Card>
@@ -205,7 +204,7 @@ export class PageIndividual extends Component {
                         <Card.Title>
                             <Person className="mr-1"/>
                             {this.renderFullname(individualOpt)}
-                            <DebugGedcom node={individual}
+                            <DebugGedcom node={individualOpt}
                                          style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}/>
                         </Card.Title>
                         <Card.Subtitle className="text-muted text-monospace">
@@ -216,12 +215,12 @@ export class PageIndividual extends Component {
                         {this.renderGeneral(individualOpt)}
                         {this.renderParents(individualOpt)}
                         {this.renderUnions(individualOpt)}
-                        {this.renderSiblings(individual)}
+                        {this.renderSiblings(individualOpt)}
                         {/*{this.renderHalfSiblings(individual)}*/}
                     </Card.Body>
                 </Card>
 
-                {this.renderAncestorsCard(individual)}
+                {this.renderAncestorsCard(individualOpt)}
             </PrivateLayout>
         );
     }

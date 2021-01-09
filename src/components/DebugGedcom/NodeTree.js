@@ -23,12 +23,12 @@ class NodeLi extends Component {
     renderTag = () => {
         const { node, synthetic } = this.props;
         return <Badge variant={synthetic ? 'info' : 'secondary'}
-                      className="text-monospace">{node.tag()}</Badge>;
+                      className="text-monospace">{node.tag().option()}</Badge>;
     };
 
     renderPointer = () => {
         const { node } = this.props;
-        const pointer = node.pointer();
+        const pointer = node.pointer().option();
         return pointer && <Badge variant="success" className="text-monospace">{pointer}</Badge>;
     };
 
@@ -41,7 +41,7 @@ class NodeLi extends Component {
     renderValue = () => {
         const { node } = this.props;
         const { xRefResolved } = this.state;
-        const value = node.value();
+        const value = node.value().option();
         if (value) {
             let k = 0;
             let cleanedValue = value.split(this.rSpecialCharacters).map((text, i) => {
@@ -81,12 +81,11 @@ class NodeLi extends Component {
     renderResolvedNode = () => {
         const { node, synthetic, maxDepth, ...otherProps } = this.props;
         const root = node.getGedcom();
-        const pointer = node.value();
-        const recordOpt = root.getRecord(null, pointer).option();
-        if (recordOpt.isUnique()) {
-            const syntheticNode = recordOpt.first();
+        const pointer = node.value().option();
+        const recordOpt = root.getRecord(null, pointer);
+        if (recordOpt.count() === 1) {
             return (
-                <NodeLi node={syntheticNode} synthetic maxDepth={maxDepth - 1} {...otherProps} />
+                <NodeLi node={recordOpt} synthetic maxDepth={maxDepth - 1} {...otherProps} />
             );
         } else if (recordOpt.isEmpty()) {
             return <li><Badge variant="danger" className="text-monospace">Not found: {pointer}</Badge></li>;
