@@ -4,6 +4,7 @@ import { Search } from 'react-bootstrap-icons';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, Container, Form, FormControl, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { AppRoutes } from '../../routes';
+import { version } from '../../../package.json'
 
 export class PrivateLayout extends Component {
     render() {
@@ -36,6 +37,9 @@ export class PrivateLayout extends Component {
                 <Container className="mt-2 mb-2">
                     {children}
                 </Container>
+                <footer className="text-center text-muted mb-2">
+                    Version {version}
+                </footer>
             </>
         );
     }

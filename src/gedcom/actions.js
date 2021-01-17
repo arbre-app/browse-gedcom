@@ -1,5 +1,5 @@
 import { readGedcom } from 'read-gedcom';
-import { createInitialSettings } from '../util/settings';
+import { createInitialSettings } from '../util';
 
 export const LOADING = 'gedcomFile/LOADING';
 export const SUCCESS = 'gedcomFile/SUCCESS';

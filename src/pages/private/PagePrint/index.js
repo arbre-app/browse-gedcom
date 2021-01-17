@@ -1,0 +1,1 @@
+export { PagePrint } from './PagePrint';

@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Redirect, Route } from 'react-router-dom';
 import { AppRoutes } from '../urls';
+import { parse } from 'query-string';
 
 export class PublicRoute extends Component {
     render() {
-        const { component: Component, restricted, isFileLoaded, ...rest } = this.props;
+        const { location: { search }, component: Component, restricted, isFileLoaded, ...rest } = this.props;
         if (restricted && isFileLoaded) {
-            return <Redirect to={AppRoutes.home}/>;
+            const redirect = parse(search).r;
+            return <Redirect to={redirect !== undefined ? redirect : AppRoutes.home}/>;
         } else {
             return (
                 <Route {...rest} render={props => <Component {...props} />}/>
@@ -17,6 +19,9 @@ export class PublicRoute extends Component {
 }
 
 PublicRoute.propTypes = {
+    location: PropTypes.shape({
+        search: PropTypes.string.isRequired,
+    }),
     component: PropTypes.any.isRequired,
     restricted: PropTypes.bool,
     /* Redux */
