@@ -5,15 +5,17 @@ const RoutesList = {
     home: '/',
     loadGedcomFile: '/load',
     individual: '/individual/:individualId',
+    search: '/individuals/search',
     print: '/print',
 };
 
-const RouteGenearators = {
+const RouteGenerators = {
     individualFor: individualId => generatePath(RoutesList.individual, { individualId }),
     loadGedcomFileRedirectTo: cleanedUrl => stringifyUrl({ url: RoutesList.loadGedcomFile, query: { r: cleanedUrl } }),
+    searchFor: (query, page = 1) => stringifyUrl({ url: RoutesList.search, query: { q: query, p: page } }),
 };
 
 export const AppRoutes = {
     ...RoutesList,
-    ...RouteGenearators,
+    ...RouteGenerators,
 };

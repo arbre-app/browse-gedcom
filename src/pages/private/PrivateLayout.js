@@ -4,11 +4,30 @@ import { Search } from 'react-bootstrap-icons';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, Container, Form, FormControl, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { AppRoutes } from '../../routes';
-import { version } from '../../../package.json'
+import history from '../../history';
+import { version } from '../../../package.json';
 
 export class PrivateLayout extends Component {
+    state = {
+        searchQuery: '',
+    }
+
+    handleSearchSubmit = event => {
+        const { searchQuery } = this.state;
+        const query = searchQuery.trim();
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (query) { // Empty string is no-op
+            this.setState({ searchQuery: '' });
+            history.push(AppRoutes.searchFor(query))
+        }
+    }
+
     render() {
         const { children } = this.props;
+        const { searchQuery } = this.state;
         return (
             <>
                 <Navbar bg="light" expand="lg">
@@ -25,10 +44,10 @@ export class PrivateLayout extends Component {
                                 <NavDropdown title="Explore" id="basic-nav-dropdown">
                                 </NavDropdown>
                             </Nav>
-                            <Form inline>
-                                <FormControl type="text" placeholder="Global search..." className="mr-sm-2"/>
+                            <Form inline onSubmit={this.handleSearchSubmit}>
+                                <FormControl type="text" placeholder="Global search..." className="mr-sm-2" value={searchQuery} onChange={event => this.setState({ searchQuery: event.target.value })}/>
                                 <Button variant="outline-secondary">
-                                    <Search/>
+                                    <Search className="icon" />
                                 </Button>
                             </Form>
                         </Navbar.Collapse>

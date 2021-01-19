@@ -4,9 +4,9 @@ import { Card, Col, Row } from 'react-bootstrap';
 import { Diagram2, Person } from 'react-bootstrap-icons';
 import { Gedcom } from 'read-gedcom';
 import { DebugGedcom, NormalLink } from '../../../components';
-import { AncestorsTreeChart } from '../../../components/AncestorsTreeChart';
+import { AncestorsTreeChart } from '../../../components';
 import { AppRoutes } from '../../../routes';
-import { PageNotFound } from '../../public/PageNotFound';
+import { PageNotFound } from '../../public';
 import { displayDate, displayEvent, displayName } from '../../../util';
 import { PrivateLayout } from '../PrivateLayout';
 
@@ -74,7 +74,7 @@ export class PageIndividual extends Component {
     };
 
     renderUnion = (individual, family) => {
-        const otherRef = family.getHusband().value().option() === individual.pointer().one() ? family.getHusband() : family.getWife();
+        const otherRef = family.getHusband().value().option() === individual.pointer().one() ? family.getWife() : family.getHusband();
         const other = otherRef.getIndividualRecord();
         const marriage = family.getEventMarriage(1);
         let strMarriage = '';
@@ -172,7 +172,7 @@ export class PageIndividual extends Component {
             <Card className="mt-3">
                 <Card.Body>
                     <h5>
-                        <Diagram2 className="flip-vertical mr-2"/>
+                        <Diagram2 className="icon flip-vertical mr-2"/>
                         Ancestors chart
                     </h5>
                     <Row>
@@ -202,7 +202,7 @@ export class PageIndividual extends Component {
                 <Card>
                     <Card.Header>
                         <Card.Title>
-                            <Person className="mr-1"/>
+                            <Person className="icon mr-1"/>
                             {this.renderFullname(individualOpt)}
                             <DebugGedcom node={individualOpt}
                                          style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}/>

@@ -27,7 +27,7 @@ export class DebugGedcom extends Component {
                         </Tooltip>
                     }
                 >
-                    <Bug className="hoverable" onClick={this.handleShow} {...buttonProps} />
+                    <Bug className="icon hoverable" onClick={this.handleShow} {...buttonProps} />
                 </OverlayTrigger>
 
                 <Modal size="lg" show={visible} onHide={this.handleClose}>

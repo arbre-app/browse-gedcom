@@ -9,6 +9,12 @@ body {
     background-color: #f8f9fa;
 }
 
+.icon {
+    /* Fixes icon alignment */
+    vertical-align: -0.125em;
+    margin-bottom: calc(-0.125em / 2);
+}
+
 .btn-load-more {
     padding: 0 0.25rem;
     font-size: 75%;

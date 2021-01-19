@@ -3,7 +3,7 @@ export function displayName(individual, placeholder = '') {
         .getName()
         .valueAsParts()
         .all()
-        .filter(v => v !== undefined)
+        .filter(v => v != null)
         .map(v => v.filter(s => s).join(' '))[0];
     return name ? name : placeholder;
 }
