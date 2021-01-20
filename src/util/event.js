@@ -1,7 +1,6 @@
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
 
 export function displayDate(dateGedcom, isShort) {
-    // TODO assert one
     const first = dateGedcom;
     const obj = first.valueAsDate().one();
     if (obj !== null) {
@@ -22,20 +21,9 @@ export function displayDate(dateGedcom, isShort) {
     }
 }
 
-export function displayEvent(eventGedcom, eventAction, withNameIfEmpty) {
-    // TODO assert one
-    const first = eventGedcom;
-    const eventDate = first.getDate(1).array().map(displayDate, false)[0];
-    const eventPlace = first.getPlace().value().option();
-    let strEvent;
-    if (eventDate && eventPlace) {
-        strEvent = ` ${eventDate} - ${eventPlace}`;
-    } else if (eventDate) {
-        strEvent = ` ${eventDate}`;
-    } else if (eventPlace) {
-        strEvent = ` - ${eventPlace}`;
-    } else {
-        strEvent = '';
-    }
-    return strEvent || withNameIfEmpty ? `${eventAction}${strEvent}` : '';
+export function isEventEmpty(eventGedcom, withDate = true, withPlace = true) {
+    return !(
+        (eventGedcom.getDate().value().option() && withDate)
+        || (eventGedcom.getPlace().value().option() && withPlace)
+    );
 }

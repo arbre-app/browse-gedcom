@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import { Card } from 'react-bootstrap';
 import { Search, SignpostSplit } from 'react-bootstrap-icons';
 import { Gedcom } from 'read-gedcom';
-import { NormalLink, Paginator } from '../../../components';
+import { IndividualRich, Paginator } from '../../../components';
 import { AppRoutes } from '../../../routes';
-import { displayName, normalize } from '../../../util';
+import { normalize } from '../../../util';
 import { PrivateLayout } from '../PrivateLayout';
 import { parse } from 'query-string';
 
@@ -31,14 +31,6 @@ export class PageSearch extends Component {
         return matches;
     };
 
-    renderIndividual = individual => {
-        return (
-            <NormalLink to={AppRoutes.individualFor(individual.pointer().one())}>
-                {displayName(individual)}
-            </NormalLink>
-        );
-    };
-
     renderResults = (query, page) => { // TODO async
         const matches = this.searchFuzzy(query);
         const pageSize = 100;
@@ -52,7 +44,7 @@ export class PageSearch extends Component {
             <>
                 <strong>{total}</strong> result{total !== 1 ? 's' : ''}:
                 <ul>
-                    {window.map(individual => (<li key={individual.pointer().one()}>{this.renderIndividual(individual)}</li>))}
+                    {window.map(individual => (<li key={individual.pointer().one()}><IndividualRich individual={individual} simpleDate noPlace simpleRange /></li>))}
                 </ul>
                 <Paginator
                     pages={totalPages}

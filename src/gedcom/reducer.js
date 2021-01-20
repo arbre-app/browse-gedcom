@@ -6,6 +6,7 @@ export const initialState = {
     error: null,
 };
 
+// eslint-disable-next-line
 export default (state = initialState, action) => {
     switch (action.type) {
         case LOADING:

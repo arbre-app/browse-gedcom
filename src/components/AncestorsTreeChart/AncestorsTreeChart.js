@@ -2,25 +2,9 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { IndividualRecord } from 'read-gedcom';
 import './style.css';
-import { AppRoutes } from '../../routes';
-import { displayName } from '../../util';
-import { NormalLink } from '../NormalLink';
+import { IndividualName } from '../IndividualName';
 
 export class AncestorsTreeChart extends Component {
-    placeholderString = '?';
-
-    renderNodeValue = individualOpt => {
-        if (!individualOpt.isEmpty()) {
-            const name = displayName(individualOpt, this.placeholderString);
-            return (
-                <NormalLink to={AppRoutes.individualFor(individualOpt.pointer().one())}>
-                    {name ? name : this.placeholderString}
-                </NormalLink>
-            );
-        } else {
-            return this.placeholderString;
-        }
-    };
 
     renderTreeLi = (individual, maxDepth) => {
         const familyOpt = individual.getFamilyAsChild(1);
@@ -40,7 +24,9 @@ export class AncestorsTreeChart extends Component {
         return (
             <li>
                 {child}
-                <span>{this.renderNodeValue(individual)}</span>
+                <span>
+                    <IndividualName individual={individual} />
+                </span>
             </li>
         );
     };

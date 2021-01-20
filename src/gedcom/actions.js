@@ -1,5 +1,5 @@
 import { readGedcom } from 'read-gedcom';
-import { createInitialSettings } from '../util';
+import { computeAncestors, createInitialSettings } from '../util';
 
 export const LOADING = 'gedcomFile/LOADING';
 export const SUCCESS = 'gedcomFile/SUCCESS';
@@ -10,24 +10,26 @@ export const loadGedcomUrl = url => async dispatch => {
     dispatch({
         type: LOADING,
     });
+    let root = null;
     try {
         const result = await fetch(url);
         const buffer = await result.arrayBuffer();
-        const root = readGedcom(buffer);
-        const settings = createInitialSettings(root);
-        dispatch({
-            type: SUCCESS,
-            data: {
-                root,
-                settings,
-            },
-        });
+        root = readGedcom(buffer);
     } catch (error) {
         dispatch({
             type: ERROR,
             error: error.message,
         });
+        return;
     }
+    const other = initializeFields(root);
+    dispatch({
+        type: SUCCESS,
+        data: {
+            root,
+            ...other,
+        },
+    });
 };
 
 export const loadGedcomFile = file => async dispatch => {
@@ -45,24 +47,36 @@ export const loadGedcomFile = file => async dispatch => {
         };
         reader.readAsArrayBuffer(file);
     });
+    let root = null;
     try {
         const buffer = await promise;
-        const root = readGedcom(buffer);
-        const settings = createInitialSettings(root);
-        dispatch({
-            type: SUCCESS,
-            data: {
-                root,
-                settings,
-            },
-        });
+        root = readGedcom(buffer);
     } catch (error) {
         dispatch({
             type: ERROR,
             error: error.message,
         });
+        return;
     }
+    const other = initializeFields(root);
+    dispatch({
+        type: SUCCESS,
+        data: {
+            root,
+            ...other,
+        },
+    });
 };
+
+const initializeFields = root => {
+    const settings = createInitialSettings(root);
+    let ancestors = initializeAncestry(root, settings);
+    return { settings, ancestors };
+};
+
+const initializeAncestry = (root, settings) => {
+    return settings.rootIndividual ? computeAncestors(root, settings.rootIndividual) : null;
+}
 
 export const clearNotifications = () => async dispatch => {
     dispatch({

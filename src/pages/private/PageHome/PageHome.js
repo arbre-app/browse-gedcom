@@ -8,15 +8,11 @@ import {
     HouseDoor, Person,
 } from 'react-bootstrap-icons';
 import { Gedcom, IndividualRecord } from 'read-gedcom';
-import { NormalLink } from '../../../components';
-import { AppRoutes } from '../../../routes';
+import { IndividualName } from '../../../components';
 import { displayName } from '../../../util';
 import { PrivateLayout } from '../PrivateLayout';
 
 export class PageHome extends Component {
-    getOrUnknown = option => {
-        return option.length > 0 ? option[0] : undefined;
-    };
 
     renderRootIndividual = () => {
         const { settings: { rootIndividual } } = this.props;
@@ -27,9 +23,7 @@ export class PageHome extends Component {
                     Root individual
                 </Card.Title>
                 <p className="mb-3">
-                    <NormalLink to={AppRoutes.individualFor(rootIndividual.pointer().one())}>
-                        {displayName(rootIndividual, '?')}
-                    </NormalLink>
+                    <IndividualName individual={rootIndividual} noAncestry />
                 </p>
             </>
         );

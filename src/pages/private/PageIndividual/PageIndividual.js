@@ -3,62 +3,13 @@ import React, { Component } from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 import { Diagram2, Person } from 'react-bootstrap-icons';
 import { Gedcom } from 'read-gedcom';
-import { DebugGedcom, NormalLink } from '../../../components';
+import { DebugGedcom, EventName, IndividualName, IndividualRich } from '../../../components';
 import { AncestorsTreeChart } from '../../../components';
-import { AppRoutes } from '../../../routes';
+import { isEventEmpty } from '../../../util';
 import { PageNotFound } from '../../public';
-import { displayDate, displayEvent, displayName } from '../../../util';
 import { PrivateLayout } from '../PrivateLayout';
 
 export class PageIndividual extends Component {
-    placeholderString = '?';
-
-    renderFullname = individual => displayName(individual, this.placeholderString);
-
-    renderIndividualLink = (individualOpt, withDates, isDetailed) => {
-        if (individualOpt.isEmpty()) {
-            return this.placeholderString;
-        } else {
-            let strEvents;
-            if (withDates) {
-                const birthOpt = individualOpt.getEventBirth(1);
-                const deathOpt = individualOpt.getEventDeath(1);
-                if (isDetailed) {
-                    const birth = birthOpt.array().map(e => displayEvent(e, 'born', false))[0];
-                    const death = deathOpt.array().map(e => displayEvent(e, 'died', true))[0];
-
-                    if (birth && death) {
-                        strEvents = `${birth}, ${death}`;
-                    } else if (birth) {
-                        strEvents = birth;
-                    } else if (death) {
-                        strEvents = death;
-                    } else {
-                        strEvents = '';
-                    }
-                } else {
-                    const birth = birthOpt.getDate(1).array().map(e => displayDate(e, true))[0];
-                    const death = deathOpt.getDate(1).array().map(e => displayDate(e, true))[0];
-                    if (death === undefined) {
-                        strEvents = birth;
-                    } else {
-                        strEvents = `${birth ? birth : this.placeholderString} - ${death ? death : this.placeholderString}`;
-                    }
-                }
-            } else {
-                strEvents = '';
-            }
-
-            return (
-                <>
-                    <NormalLink to={AppRoutes.individualFor(individualOpt.pointer().one())}>
-                        {this.renderFullname(individualOpt)}
-                    </NormalLink>
-                    {strEvents ? ` (${strEvents})` : ''}
-                </>
-            );
-        }
-    };
 
     renderParents = individual => {
         const familyAsChild = individual.getFamilyAsChild(1); // TODO filter adoptive
@@ -66,8 +17,8 @@ export class PageIndividual extends Component {
             <>
                 <h6>Parents</h6>
                 <ul>
-                    <li>{this.renderIndividualLink(familyAsChild.getHusband(1).getIndividualRecord(1), true, true)}</li>
-                    <li>{this.renderIndividualLink(familyAsChild.getWife(1).getIndividualRecord(1), true, true)}</li>
+                    <li><IndividualRich individual={familyAsChild.getHusband(1).getIndividualRecord(1)} /></li>
+                    <li><IndividualRich individual={familyAsChild.getWife(1).getIndividualRecord(1)} /></li>
                 </ul>
             </>
         );
@@ -76,21 +27,18 @@ export class PageIndividual extends Component {
     renderUnion = (individual, family) => {
         const otherRef = family.getHusband().value().option() === individual.pointer().one() ? family.getWife() : family.getHusband();
         const other = otherRef.getIndividualRecord();
-        const marriage = family.getEventMarriage(1);
-        let strMarriage = '';
-        if (!marriage.isEmpty()) {
-            strMarriage = displayEvent(marriage, 'married', true);
-        }
+        const marriage = family.getEventMarriage();
         const children = family.getChild().getIndividualRecord();
         const hadChildren = !children.isEmpty();
-        const spouseData = <>{this.renderIndividualLink(other, false, undefined)}{strMarriage ? ` (${strMarriage})` : ''}</>;
         return (
             <>
-                {hadChildren ? <>With {spouseData}:</> : spouseData}
+                {hadChildren && 'With '}
+                <IndividualRich individual={other} simpleDate noPlace simpleRange />{!marriage.isEmpty() && <>{', '}<EventName event={marriage} name="married" /></>}
+                {hadChildren && ':'}
                 {hadChildren && (
                     <ul>
                         {children.array().map((child, i) =>
-                            <li key={i}>{this.renderIndividualLink(child, true, false)}</li>)}
+                            <li key={i}><IndividualRich individual={child} simpleDate noPlace simpleRange /></li>)}
                     </ul>
                 )}
             </>
@@ -104,7 +52,7 @@ export class PageIndividual extends Component {
         } else {
             return (
                 <>
-                    <h6>Unions</h6>
+                    <h6>Unions & children</h6>
                     <ul>
                         {familiesAsSpouse.array().map((family, i) =>
                             <li key={i}>{this.renderUnion(individual, family)}</li>)}
@@ -115,12 +63,13 @@ export class PageIndividual extends Component {
     };
 
     renderGeneral = individual => {
-        const birth = individual.getEventBirth(1).array().map(e => displayEvent(e, 'Birth', false));
-        const death = individual.getEventDeath(1).array().map(e => displayEvent(e, 'Deceased', true));
-        const events = [birth, death].flatMap(e => e).filter(e => e);
+        const birth = individual.getEventBirth(), death = individual.getEventDeath();
+        const events = [{ event: birth, name: 'Born', silent: true }, { event: death, name: 'Deceased' }].filter(({ event, silent }) => !event.isEmpty() && (!silent || !isEventEmpty(event)));
         return (
             <ul>
-                {events.map((e, i) => <li key={i}>{e}</li>)}
+                {events.map(({ event, name, silent }, i) =>
+                    <li key={i}><EventName event={event} name={name} nameAlt={silent && ''} /></li>
+                )}
             </ul>
         );
     };
@@ -135,7 +84,7 @@ export class PageIndividual extends Component {
                     <h6>Siblings</h6>
                     <ul>
                         {siblings.array().filter(child => child.pointer().one() !== individual.pointer().one()).map((child, i) =>
-                            <li key={i}>{this.renderIndividualLink(child, true, false)}</li>)}
+                            <li key={i}><IndividualRich individual={child} simpleDate noPlace simpleRange /></li>)}
                     </ul>
                 </>
             );
@@ -203,7 +152,7 @@ export class PageIndividual extends Component {
                     <Card.Header>
                         <Card.Title>
                             <Person className="icon mr-1"/>
-                            {this.renderFullname(individualOpt)}
+                            <IndividualName individual={individualOpt} noLink />
                             <DebugGedcom node={individualOpt}
                                          style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}/>
                         </Card.Title>
