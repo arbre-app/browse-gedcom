@@ -7,8 +7,8 @@ export class Paginator extends Component {
     renderItem = page => {
         const { link, current } = this.props;
         return (
-            <LinkContainer to={link(page)}>
-                <Pagination.Item key={page} active={page === current}>{page}</Pagination.Item>
+            <LinkContainer to={link(page)} key={page}>
+                <Pagination.Item active={page === current}>{page}</Pagination.Item>
             </LinkContainer>
         )
     }

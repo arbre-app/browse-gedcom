@@ -13,7 +13,7 @@ export class IndividualName extends Component {
         const { ancestors, individual, placeholder, gender, noLink, noAncestry } = this.props;
         const name = displayName(individual);
         const content = name ? name : placeholder;
-        const hasAncestorIcon = !noAncestry && ancestors && ancestors.has(individual.pointer().one());
+        const hasAncestorIcon = !noAncestry && ancestors && ancestors.has(individual.pointer().option());
         const genderValue = individual.getSex().value().option();
         const genderClass = `icon${hasAncestorIcon ? '' : ' mr-1'}`;
         return individual.isEmpty() ? content : (

@@ -22,6 +22,7 @@ export class IndividualRich extends Component {
                     <EventName event={birth} name={simpleRange ? '' : 'born'} {...props}  />
                 )}
                 {showBirth && showDeath && (simpleRange ? ' - ' : ', ')}
+                {showDeath && !showBirth && simpleRange && '? - '}
                 {showDeath && (
                     <EventName event={death} name={simpleRange ? '' : 'deceased'} {...props}  />
                 )}
