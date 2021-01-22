@@ -38,7 +38,7 @@ export class PageIndividual extends Component {
                 {hadChildren && (
                     <ul>
                         {children.array().map((child, i) =>
-                            <li key={i}><IndividualRich individual={child} simpleDate noPlace simpleRange /></li>)}
+                            <li key={i}><IndividualRich individual={child} gender simpleDate noPlace simpleRange /></li>)}
                     </ul>
                 )}
             </>
@@ -84,7 +84,7 @@ export class PageIndividual extends Component {
                     <h6>Siblings</h6>
                     <ul>
                         {siblings.array().filter(child => child.pointer().one() !== individual.pointer().one()).map((child, i) =>
-                            <li key={i}><IndividualRich individual={child} simpleDate noPlace simpleRange /></li>)}
+                            <li key={i}><IndividualRich individual={child} gender simpleDate noPlace simpleRange /></li>)}
                     </ul>
                 </>
             );
@@ -151,8 +151,8 @@ export class PageIndividual extends Component {
                 <Card>
                     <Card.Header>
                         <Card.Title>
-                            <Person className="icon mr-1"/>
-                            <IndividualName individual={individualOpt} noLink />
+                            <Person className="icon mr-2"/>
+                            <IndividualName individual={individualOpt} gender noLink />
                             <DebugGedcom node={individualOpt}
                                          style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}/>
                         </Card.Title>

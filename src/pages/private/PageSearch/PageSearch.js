@@ -44,7 +44,7 @@ export class PageSearch extends Component {
             <>
                 <strong>{total}</strong> result{total !== 1 ? 's' : ''}:
                 <ul>
-                    {window.map(individual => (<li key={individual.pointer().one()}><IndividualRich individual={individual} simpleDate noPlace simpleRange /></li>))}
+                    {window.map(individual => (<li key={individual.pointer().one()}><IndividualRich individual={individual} gender simpleDate noPlace simpleRange /></li>))}
                 </ul>
                 <Paginator
                     pages={totalPages}

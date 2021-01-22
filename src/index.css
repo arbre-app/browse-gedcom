@@ -35,3 +35,11 @@ body {
 .hoverable {
     cursor: pointer;
 }
+
+.color-male {
+    color: #006657;
+}
+
+.color-female {
+    color: #380097;
+}
