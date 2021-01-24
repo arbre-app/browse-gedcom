@@ -6,3 +6,4 @@ export { IndividualName } from './IndividualName';
 export { EventName } from './EventName';
 export { IndividualRich } from './IndividualRich';
 export * from './icons';
+export * from './form';

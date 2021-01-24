@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Bug } from 'react-bootstrap-icons';
 import { Node as GedcomNode } from 'read-gedcom';
-import { Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import { NodeTree } from './NodeTree';
 
 export class DebugGedcom extends Component {
@@ -12,24 +11,19 @@ export class DebugGedcom extends Component {
 
     handleClose = () => this.setState({ visible: false });
 
-    handleShow = () => this.setState({ visible: true });
+    handleShow = event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.setState({ visible: true });
+    }
 
     render() {
-        const { node, maxDepth, maxNodes, loadMoreCount, ...buttonProps } = this.props;
+        const { node, triggerComponent: TriggerComponent, maxDepth, maxNodes, loadMoreCount } = this.props;
         const { visible } = this.state;
         return (
             <>
-                <OverlayTrigger
-                    placement="left"
-                    overlay={
-                        <Tooltip>
-                            Debug Gedcom structure
-                        </Tooltip>
-                    }
-                >
-                    <Bug className="icon hoverable" onClick={this.handleShow} {...buttonProps} />
-                </OverlayTrigger>
-
+                <TriggerComponent onClick={this.handleShow} />
                 <Modal size="lg" show={visible} onHide={this.handleClose}>
                     <Modal.Header closeButton>
                         <Modal.Title>Original record structure</Modal.Title>
@@ -51,6 +45,7 @@ export class DebugGedcom extends Component {
 
 DebugGedcom.propTypes = {
     node: PropTypes.instanceOf(GedcomNode).isRequired,
+    triggerComponent: PropTypes.any.isRequired,
     maxDepth: PropTypes.number,
     maxNodes: PropTypes.number,
     loadMoreCount: PropTypes.number,

@@ -1,22 +1,31 @@
 import { drawRectangle } from 'genealogy-visualizations';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Card } from 'react-bootstrap';
+import { Card, Spinner } from 'react-bootstrap';
 import { Gedcom } from 'read-gedcom';
 import { PrivateLayout } from '../PrivateLayout';
+import { PrintForm } from './PrintForm';
 
 export class PagePrint extends Component {
-    buildData = () => {
-        const { file } = this.props;
+    state = {
+        divRef: null,
+        isLoading: false,
+    };
+
+    buildData = (ascendingGenerations, descendingGenerations) => {
+        const { file, location: { state } } = this.props;
 
         // TODO
-        const rootId = '@I0001@';
-        const generations = 6; // > 0
+        const rootId = state && state.initialIndividualId ? state.initialIndividualId : '@I0000@';
+
+        // Ascending
 
         const individualsData = {};
+        const familiesData = {};
+        const ascendingData = {};
         let currentGeneration = new Set([rootId]);
         const allGenerations = new Set();
-        for(let i = 0; i < generations; i++) {
+        for(let i = 0; i < ascendingGenerations; i++) {
             const nextGeneration = new Set();
             for(const id of currentGeneration.values()) {
                 if (!allGenerations.has(id)) {
@@ -27,19 +36,24 @@ export class PagePrint extends Component {
                         throw new Error('No matching individual!');
                     }
 
-                    const parentsData = {};
+                    const familyData = {};
 
                     const parentFamilyRecord = individualRecord.getFamilyAsChild();
+                    if(!parentFamilyRecord.isEmpty()) {
+                        const husbandId = parentFamilyRecord.getHusband().value().option();
+                        if (husbandId) {
+                            familyData.husbandIndividualId = husbandId;
+                            nextGeneration.add(husbandId);
+                        }
+                        const wifeId = parentFamilyRecord.getWife().value().option();
+                        if (wifeId) {
+                            familyData.wifeIndividualId = wifeId;
+                            nextGeneration.add(wifeId);
+                        }
 
-                    const husbandId = parentFamilyRecord.getHusband().value().option();
-                    if (husbandId) {
-                        parentsData.husbandIndividualId = husbandId;
-                        nextGeneration.add(husbandId);
-                    }
-                    const wifeId = parentFamilyRecord.getWife().value().option();
-                    if (wifeId) {
-                        parentsData.wifeIndividualId = wifeId;
-                        nextGeneration.add(wifeId);
+                        const familyId = parentFamilyRecord.pointer().one();
+                        familiesData[familyId] = familyData;
+                        ascendingData[id] = familyId;
                     }
 
                     const nameParts = individualRecord.getName().valueAsParts().option([]);
@@ -47,32 +61,59 @@ export class PagePrint extends Component {
                     individualsData[id] = {
                         surname: nameParts[1],
                         givenName: nameParts[0],
-                        parents: parentsData,
                     };
+
                 }
             }
 
             currentGeneration = nextGeneration;
         }
 
+        // Descending
+
+        // TODO
+
+
         return {
             rootIndividualId: rootId,
             individuals: individualsData,
+            families: familiesData,
+            ascendingRelation: ascendingData,
+            descendingRelation: {},
         };
     };
 
+    setDivRef = element => {
+        this.setState({ divRef: element }, () => this.updateDrawing({ generations: { ascending: 3 } })); // TODO
+    }
+
+    updateDrawing = config => {
+        const { divRef } = this.state;
+
+        const data = this.buildData(config.generations.ascending, 0);
+
+        if(divRef) {
+            this.setState({ isLoading: true }, () => {
+                drawRectangle(data, config, divRef)
+                    .catch(error => this.setState({ isLoading: false }))
+                    .then(svg => this.setState({ isLoading: false }));
+            });
+        }
+    }
+
     render() {
-        const data = this.buildData();
-        const config = {
-            style: {},
-            generations: 6,
-        };
-        const svg = drawRectangle(data, config); // TODO
+        const { isLoading } = this.state;
         return (
             <PrivateLayout>
                 <Card>
                     <Card.Body>
-                        <div ref={(nodeElement) => {nodeElement && nodeElement.appendChild(svg)}}/>
+                        <PrintForm onSubmit={this.updateDrawing} disabled={isLoading} />
+                        <div style={{ visibility: isLoading ? 'hidden' : 'visible' }} ref={this.setDivRef} />
+                        {isLoading && (
+                            <Spinner animation="border" role="status">
+                                <span className="sr-only">Loading...</span>
+                            </Spinner>
+                        )}
                     </Card.Body>
                 </Card>
             </PrivateLayout>
@@ -82,6 +123,11 @@ export class PagePrint extends Component {
 
 PagePrint.propTypes = {
     file: PropTypes.instanceOf(Gedcom).isRequired,
+    location: PropTypes.shape({
+        state: PropTypes.shape({
+            initialIndividualId: PropTypes.string,
+        }),
+    }).isRequired,
 };
 
 PagePrint.defaultProps = {

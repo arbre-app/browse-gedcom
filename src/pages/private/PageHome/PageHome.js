@@ -1,14 +1,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Card, Col, Row, Table } from 'react-bootstrap';
+import { Button, Card, Col, Row, Table } from 'react-bootstrap';
 import {
-    BoxArrowUpRight,
+    BoxArrowUpRight, Bug,
     CodeSlash, Envelope,
-    FileEarmarkText,
+    FileEarmarkText, Gear,
     HouseDoor, Person,
 } from 'react-bootstrap-icons';
 import { Gedcom, IndividualRecord } from 'read-gedcom';
-import { IndividualName } from '../../../components';
+import { DebugGedcom, IndividualName } from '../../../components';
 import { displayName } from '../../../util';
 import { PrivateLayout } from '../PrivateLayout';
 
@@ -120,7 +120,18 @@ export class PageHome extends Component {
                                 </Table>
                             </Col>
                         </Row>
-
+                        <Card.Title>
+                            <Gear className="icon mr-2"/>
+                            Tools
+                        </Card.Title>
+                        <p className="mb-3">
+                            <DebugGedcom triggerComponent={({ onClick }) =>
+                                <Button variant="outline-secondary" size="sm" onClick={onClick}>
+                                    <Bug className="icon mr-1" />
+                                    View Gedcom node
+                                </Button>
+                            } node={file} />
+                        </p>
                     </Card.Body>
                 </Card>
             </PrivateLayout>

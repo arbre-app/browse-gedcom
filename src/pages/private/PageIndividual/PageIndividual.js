@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Card, Col, Row } from 'react-bootstrap';
-import { Diagram2, Person } from 'react-bootstrap-icons';
+import { Card, Col, Dropdown, DropdownButton, Row } from 'react-bootstrap';
+import { Bug, Diagram2, Person, Printer, ThreeDotsVertical } from 'react-bootstrap-icons';
 import { Gedcom } from 'read-gedcom';
+import { LinkContainer } from 'react-router-bootstrap';
 import { DebugGedcom, EventName, IndividualName, IndividualRich } from '../../../components';
 import { AncestorsTreeChart } from '../../../components';
+import { AppRoutes } from '../../../routes';
 import { isEventEmpty } from '../../../util';
 import { PageNotFound } from '../../public';
 import { PrivateLayout } from '../PrivateLayout';
@@ -153,8 +155,24 @@ export class PageIndividual extends Component {
                         <Card.Title>
                             <Person className="icon mr-2"/>
                             <IndividualName individual={individualOpt} gender noLink />
-                            <DebugGedcom node={individualOpt}
-                                         style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}/>
+                            <DropdownButton title={<ThreeDotsVertical className="icon" />} variant="outline-secondary" size="sm" style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}>
+                                <LinkContainer to={{
+                                        pathname: AppRoutes.print,
+                                        state: { initialIndividualId: individualOpt.pointer().one() },
+                                    }}>
+                                    <Dropdown.Item disabled>
+                                        <Printer className="icon mr-2" />
+                                        Print (soon)
+                                    </Dropdown.Item>
+                                </LinkContainer>
+                                <Dropdown.Divider />
+                                <DebugGedcom triggerComponent={({ onClick }) =>
+                                    <Dropdown.Item href="#" onClick={onClick}>
+                                        <Bug className="icon mr-2" />
+                                        View gedcom node
+                                    </Dropdown.Item>
+                                } node={individualOpt} />
+                            </DropdownButton>
                         </Card.Title>
                         <Card.Subtitle className="text-muted text-monospace">
                             {individualId}
