@@ -46,8 +46,8 @@ export class EventName extends Component {
 
 EventName.propTypes = {
     event: PropTypes.instanceOf(EventFact).isRequired,
-    name: PropTypes.string,
-    nameAlt: PropTypes.string,
+    name: PropTypes.any,
+    nameAlt: PropTypes.any,
     simpleDate: PropTypes.bool,
     simplePlace: PropTypes.bool,
     noDate: PropTypes.bool,

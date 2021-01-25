@@ -37,7 +37,7 @@
   "component.debug.resolution.not_found": "Not found: {pointer}",
   "component.debug.resolution.ambiguous": "Ambiguous resolution: {pointer}",
   "component.debug.n_more": "{amount} more...",
-  "common.event.married_lower": "married",
+  "common.event.married_plural_lower": "married",
   "common.event.born_lower": "born",
   "common.event.deceased_lower": "deceased",
   "common.event.born_upper": "Born",

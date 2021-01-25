@@ -15,17 +15,18 @@ export class IndividualRich extends Component {
         const birth = individual.getEventBirth(1), death = individual.getEventDeath(1);
         const showBirth = visible && !isEventEmpty(birth, !noDate, !noPlace), showDeath = visible && (simpleRange ? !isEventEmpty(death, !noDate, !noPlace) : !death.isEmpty()); // Birth is not shown if fruitless
         const hasSuffix = showBirth || showDeath;
+        const sex = individual.getSex().value().option();
         return (
             <>
                 <IndividualName individual={individual} gender={gender} />
                 {hasSuffix && ' ('}
                 {showBirth && (
-                    <EventName event={birth} name={simpleRange ? '' : <FormattedMessage id="common.event.born_lower"/>} {...props}  />
+                    <EventName event={birth} name={simpleRange ? '' : <FormattedMessage id="common.event.born_lower" values={{ gender: sex }}/>} {...props}  />
                 )}
                 {showBirth && showDeath && (simpleRange ? ' - ' : ', ')}
                 {showDeath && !showBirth && simpleRange && '? - '}
                 {showDeath && (
-                    <EventName event={death} name={simpleRange ? '' : <FormattedMessage id="common.event.deceased_lower"/>} {...props}  />
+                    <EventName event={death} name={simpleRange ? '' : <FormattedMessage id="common.event.deceased_lower" values={{ gender: sex }}/>} {...props}  />
                 )}
                 {hasSuffix && ')'}
             </>

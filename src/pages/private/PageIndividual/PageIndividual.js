@@ -36,7 +36,7 @@ export class PageIndividual extends Component {
         const spouseData = (
             <>
                 <IndividualRich individual={other} simpleDate noPlace simpleRange />
-                {!marriage.isEmpty() && <>{', '}<EventName event={marriage} name={<FormattedMessage id="common.event.married_lower"/>} /></>}
+                {!marriage.isEmpty() && <>{', '}<EventName event={marriage} name={<FormattedMessage id="common.event.married_plural_lower" />} /></>}
             </>
         );
         return hadChildren ? (
@@ -74,9 +74,10 @@ export class PageIndividual extends Component {
 
     renderGeneral = individual => {
         const birth = individual.getEventBirth(), death = individual.getEventDeath();
+        const gender = individual.getSex().value().option();
         const events = [
-            { event: birth, name: <FormattedMessage id="common.event.born_upper"/>, silent: true },
-            { event: death, name: <FormattedMessage id="common.event.deceased_upper"/> }
+            { event: birth, name: <FormattedMessage id="common.event.born_upper" values={{ gender }}/>, silent: true },
+            { event: death, name: <FormattedMessage id="common.event.deceased_upper" values={{ gender }}/> }
             ].filter(({ event, silent }) => !event.isEmpty() && (!silent || !isEventEmpty(event)));
         return (
             <ul>

@@ -37,10 +37,10 @@
   "component.debug.resolution.not_found": "Non trouvé : {pointer}",
   "component.debug.resolution.ambiguous": "Résolution ambiguë : {pointer}",
   "component.debug.n_more": "{amount} de plus...",
-  "common.event.married_lower": "marié(e)",
-  "common.event.born_lower": "né(e)",
-  "common.event.deceased_lower": "décédé(e)",
-  "common.event.born_upper": "Né(e)",
-  "common.event.deceased_upper": "Décédé(e)",
+  "common.event.married_plural_lower": "mariés",
+  "common.event.born_lower": "{gender, select, M {né} F {née} other {né(e)}}",
+  "common.event.deceased_lower": "{gender, select, M {décédé} F {décédée} other {décédé(e)}}",
+  "common.event.born_upper": "{gender, select, M {Né} F {Née} other {Né(e)}}",
+  "common.event.deceased_upper": "{gender, select, M {Décédé} F {Décédée} other {Décédé(e)}}",
   "common.date.about_lower": "vers"
 }
