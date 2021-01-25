@@ -1,4 +1,9 @@
-const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+import React from 'react';
+import { FormattedDate, FormattedMessage } from 'react-intl';
+
+function isValidDate(dateObject){
+    return dateObject.toString() !== 'Invalid Date';
+}
 
 export function displayDate(dateGedcom, isShort) {
     const first = dateGedcom;
@@ -6,13 +11,34 @@ export function displayDate(dateGedcom, isShort) {
     if (obj !== null) {
         if (obj.isDatePunctual && obj.date.calendar.isGregorian && !obj.date.year.isDual) {
             const date = obj.date;
-            const strApproximationOpt = obj.isDateApproximate ? 'about ' : '';
-            const strBceOpt = date.year.isBce ? ' BCE' : '';
-            const strYear = date.year.value;
-            const strMonthOpt = date.month !== undefined && !isShort ? `${MONTHS[date.month - 1]} ` : '';
-            const strDayOpt = date.day !== undefined && !isShort ? `${date.day} ` : '';
 
-            return `${strApproximationOpt}${strDayOpt}${strMonthOpt}${strYear}${strBceOpt}`;
+            const jsDate = new Date(
+                parseInt(date.year.value) * (date.year.isBce ? -1 : 1),
+                date.month ? parseInt(date.month) - 1 : 0,
+                date.day ? parseInt(date.day) : 1
+            );
+
+            if(isValidDate(jsDate)) {
+                return (
+                    <>
+                        {obj.isDateApproximate && (
+                            <>
+                                <FormattedMessage id="common.date.about_lower"/>
+                                {' '}
+                            </>
+                        )}
+                        <FormattedDate
+                            value={jsDate}
+                            year="numeric"
+                            month={isShort ? undefined : 'long'}
+                            day={isShort ? undefined : 'numeric'}
+                        />
+                    </>
+                );
+            } else {
+                return first.value().one();
+            }
+
         } else {
             return first.value().one();
         }

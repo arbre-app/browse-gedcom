@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Node as GedcomNode } from 'read-gedcom';
 import { Badge, Button } from 'react-bootstrap';
 import Linkify from 'react-linkify';
@@ -88,9 +89,9 @@ class NodeLi extends Component {
                 <NodeLi node={recordOpt} synthetic maxDepth={maxDepth - 1} {...otherProps} />
             );
         } else if (recordOpt.isEmpty()) {
-            return <li><Badge variant="danger" className="text-monospace">Not found: {pointer}</Badge></li>;
+            return <li><Badge variant="danger" className="text-monospace"><FormattedMessage id="component.debug.resolution.not_found" values={{ pointer }}/></Badge></li>;
         } else {
-            return <li><Badge variant="danger" className="text-monospace">Ambiguous resolution: {pointer}</Badge></li>;
+            return <li><Badge variant="danger" className="text-monospace"><FormattedMessage id="component.debug.resolution.ambiguous" values={{ pointer }}/></Badge></li>;
         }
     };
 
@@ -143,7 +144,7 @@ export class NodeTree extends Component {
     renderLoadMoreNodes = amount => {
         return (
             <Button variant="light" className="btn-load-more" onClick={this.handleLoadMore}>
-                {amount} more...
+                <FormattedMessage id="component.debug.n_more" values={{amount}}/>
             </Button>
         );
     };

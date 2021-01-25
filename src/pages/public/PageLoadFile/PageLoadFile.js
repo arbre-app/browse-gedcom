@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Alert, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { FormattedMessage } from 'react-intl';
 
 class LoadFileButton extends Component {
     state = {
@@ -22,12 +23,17 @@ class LoadFileButton extends Component {
         const { selection } = this.state;
         return (
             <Form>
-                <Form.File
-                    label={loading ? selection : 'Select a gedcom file...'}
-                    custom
-                    disabled={loading}
-                    onChange={this.handleFileChange}
-                />
+                <FormattedMessage id="page.load.browse">
+                    {browse =>
+                        <Form.File
+                            label={loading ? selection : <FormattedMessage id="page.load.select_file"/>}
+                            custom
+                            data-browse={browse}
+                            disabled={loading}
+                            onChange={this.handleFileChange}
+                        />
+                    }
+                </FormattedMessage>
             </Form>
         );
     }
@@ -54,7 +60,7 @@ export class PageLoadFile extends Component {
             <Alert variant="danger" onClose={() => clearNotifications()} dismissible>
                 <Alert.Heading>{error}</Alert.Heading>
                 <p>
-                    Either the file you provided is not a Gedcom file, or its format was not recognized and the content could not be interpreted.
+                    <FormattedMessage id="page.load.error.general"/>
                 </p>
             </Alert>
         );

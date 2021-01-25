@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { Form as FinalForm, Field as FinalField } from 'react-final-form';
+import { Form as FinalForm } from 'react-final-form';
 import { NumberField } from '../../../components';
 
 export class PrintForm extends Component {

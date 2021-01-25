@@ -11,19 +11,36 @@ export class EventName extends Component {
             throw new Error('Event cannot be empty'); // TODO
         }
         const eventDate = !noDate && event.getDate().array().map(date => displayDate(date, simpleDate))[0];
-        const eventPlace = !noPlace && event.getPlace().value().map(place => simplePlace ? simplePlace.split(',').map(s => s.trim()).filter(s => !s)[0] : place).option(); // TODO improve
+        const eventPlace = !noPlace && event.getPlace().value().map(place => place.split(',').map(s => s.trim()).filter(s => s)).map(parts => simplePlace ? parts[0] : parts.join(', ')).option(); // TODO improve
         const space = name ? ' ' : '';
         let strEvent;
         if (eventDate && eventPlace) {
-            strEvent = `${space}${eventDate} - ${eventPlace}`;
+            strEvent = (
+                <>
+                    {space}
+                    {eventDate}
+                    {' - '}
+                    {eventPlace}
+                </>
+            );
         } else if (eventDate) {
-            strEvent = `${space}${eventDate}`;
+            strEvent = (
+                <>
+                    {space}
+                    {eventDate}
+                </>
+            );
         } else if (eventPlace) {
             strEvent = `${space}- ${eventPlace}`;
         } else {
             strEvent = '';
         }
-        return `${strEvent || nameAlt === null ? name : nameAlt}${strEvent}`;
+        return (
+            <>
+                {strEvent || nameAlt === null ? name : nameAlt}
+                {strEvent}
+            </>
+        );
     }
 }
 

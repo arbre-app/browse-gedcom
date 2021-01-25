@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Node as GedcomNode } from 'read-gedcom';
 import { Modal } from 'react-bootstrap';
 import { NodeTree } from './NodeTree';
@@ -26,7 +27,7 @@ export class DebugGedcom extends Component {
                 <TriggerComponent onClick={this.handleShow} />
                 <Modal size="lg" show={visible} onHide={this.handleClose}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Original record structure</Modal.Title>
+                        <Modal.Title><FormattedMessage id="component.debug.title"/></Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <NodeTree

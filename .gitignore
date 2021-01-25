@@ -24,6 +24,6 @@ yarn-error.log*
 
 .idea
 *.iml
-public/test.ged
+public/*.ged
 
 .eslintcache

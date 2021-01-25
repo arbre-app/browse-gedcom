@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Card } from 'react-bootstrap';
 import { Search, SignpostSplit } from 'react-bootstrap-icons';
+import { FormattedMessage } from 'react-intl';
 import { Gedcom } from 'read-gedcom';
 import { IndividualRich, Paginator } from '../../../components';
 import { AppRoutes } from '../../../routes';
@@ -42,7 +43,13 @@ export class PageSearch extends Component {
 
         return total > 0 ? (
             <>
-                <strong>{total}</strong> result{total !== 1 ? 's' : ''}:
+                <FormattedMessage
+                    id="page.search.n_results"
+                    values={{
+                        b: chunk => <strong>{chunk}</strong>,
+                        total,
+                    }}
+                />
                 <ul>
                     {window.map(individual => (<li key={individual.pointer().one()}><IndividualRich individual={individual} gender simpleDate noPlace simpleRange /></li>))}
                 </ul>
@@ -56,9 +63,9 @@ export class PageSearch extends Component {
             <div className="text-center">
                 <h5>
                     <SignpostSplit className="icon mr-2"/>
-                    No results
+                    <FormattedMessage id="page.search.no_results"/>
                 </h5>
-                Try again with a different query
+                <FormattedMessage id="page.search.try_again"/>
             </div>
         );
     };
@@ -74,10 +81,16 @@ export class PageSearch extends Component {
                     <Card.Body>
                         <Card.Title>
                             <Search className="icon mr-2"/>
-                            Search
+                            <FormattedMessage id="page.search.title"/>
                         </Card.Title>
                         <p>
-                            Searching for <strong>"{query}"</strong>.
+                            <FormattedMessage
+                                id="page.search.searching"
+                                values={{
+                                    b: chunk => <strong>{chunk}</strong>,
+                                    query,
+                                }}
+                            />
                         </p>
                         {this.renderResults(query, page)}
                     </Card.Body>

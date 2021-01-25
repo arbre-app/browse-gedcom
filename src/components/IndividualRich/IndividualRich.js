@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { IndividualRecord } from 'read-gedcom';
 import { isEventEmpty } from '../../util';
 import { EventName } from '../EventName';
@@ -19,12 +20,12 @@ export class IndividualRich extends Component {
                 <IndividualName individual={individual} gender={gender} />
                 {hasSuffix && ' ('}
                 {showBirth && (
-                    <EventName event={birth} name={simpleRange ? '' : 'born'} {...props}  />
+                    <EventName event={birth} name={simpleRange ? '' : <FormattedMessage id="common.event.born_lower"/>} {...props}  />
                 )}
                 {showBirth && showDeath && (simpleRange ? ' - ' : ', ')}
                 {showDeath && !showBirth && simpleRange && '? - '}
                 {showDeath && (
-                    <EventName event={death} name={simpleRange ? '' : 'deceased'} {...props}  />
+                    <EventName event={death} name={simpleRange ? '' : <FormattedMessage id="common.event.deceased_lower"/>} {...props}  />
                 )}
                 {hasSuffix && ')'}
             </>

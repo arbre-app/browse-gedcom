@@ -7,6 +7,7 @@ import {
     FileEarmarkText, Gear,
     HouseDoor, Person,
 } from 'react-bootstrap-icons';
+import { FormattedMessage } from 'react-intl';
 import { Gedcom, IndividualRecord } from 'read-gedcom';
 import { DebugGedcom, IndividualName } from '../../../components';
 import { displayName } from '../../../util';
@@ -20,7 +21,7 @@ export class PageHome extends Component {
             <>
                 <Card.Title>
                     <HouseDoor className="icon mr-2"/>
-                    Root individual
+                    <FormattedMessage id="page.home.root.title"/>
                 </Card.Title>
                 <p className="mb-3">
                     <IndividualName individual={rootIndividual} noAncestry />
@@ -72,10 +73,9 @@ export class PageHome extends Component {
                     <Card.Body>
                         <Card.Title>
                             <CodeSlash className="icon mr-2"/>
-                            Welcome!
+                            <FormattedMessage id="page.home.welcome.title"/>
                         </Card.Title>
-                        This application is under development, some features may be missing or not fully working.
-                        Thank you for testing it!
+                        <FormattedMessage id="page.home.welcome.content"/>
                     </Card.Body>
                 </Card>
 
@@ -86,20 +86,20 @@ export class PageHome extends Component {
                             <Col md={6}>
                                 <Card.Title>
                                     <FileEarmarkText className="icon mr-2"/>
-                                    File metadata
+                                    <FormattedMessage id="page.home.metadata.title"/>
                                 </Card.Title>
                                 <Table borderless size="sm">
                                     <tbody>
                                     <tr>
-                                        <td>Name:</td>
+                                        <td><FormattedMessage id="page.home.metadata.name"/></td>
                                         <td>{file.getHeader().getFilename().value().option()}</td>
                                     </tr>
                                     <tr>
-                                        <td>Provider:</td>
+                                        <td><FormattedMessage id="page.home.metadata.provider"/></td>
                                         <td>{this.renderProvider()}</td>
                                     </tr>
                                     <tr>
-                                        <td>Version:</td>
+                                        <td><FormattedMessage id="page.home.metadata.version"/></td>
                                         <td>{file.getHeader().getSourceSystem().getVersion().value().option()}</td>
                                     </tr>
                                     </tbody>
@@ -108,12 +108,12 @@ export class PageHome extends Component {
                             <Col md={6}>
                                 <Card.Title>
                                     <Person className="icon mr-2"/>
-                                    Author details
+                                    <FormattedMessage id="page.home.author.title"/>
                                 </Card.Title>
                                 <Table borderless size="sm">
                                     <tbody>
                                     <tr>
-                                        <td>Name:</td>
+                                        <td><FormattedMessage id="page.home.author.name"/></td>
                                         <td>{this.renderSubmitter()}</td>
                                     </tr>
                                     </tbody>
@@ -122,13 +122,13 @@ export class PageHome extends Component {
                         </Row>
                         <Card.Title>
                             <Gear className="icon mr-2"/>
-                            Tools
+                            <FormattedMessage id="page.home.tools.title"/>
                         </Card.Title>
                         <p className="mb-3">
                             <DebugGedcom triggerComponent={({ onClick }) =>
                                 <Button variant="outline-secondary" size="sm" onClick={onClick}>
                                     <Bug className="icon mr-1" />
-                                    View Gedcom node
+                                    <FormattedMessage id="page.home.tools.debug"/>
                                 </Button>
                             } node={file} />
                         </p>

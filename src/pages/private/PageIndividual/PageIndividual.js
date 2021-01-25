@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Card, Col, Dropdown, DropdownButton, Row } from 'react-bootstrap';
 import { Bug, Diagram2, Person, Printer, ThreeDotsVertical } from 'react-bootstrap-icons';
+import { FormattedMessage } from 'react-intl';
 import { Gedcom } from 'read-gedcom';
 import { LinkContainer } from 'react-router-bootstrap';
 import { DebugGedcom, EventName, IndividualName, IndividualRich } from '../../../components';
@@ -17,7 +18,7 @@ export class PageIndividual extends Component {
         const familyAsChild = individual.getFamilyAsChild(1); // TODO filter adoptive
         return (
             <>
-                <h6>Parents</h6>
+                <h6><FormattedMessage id="page.individual.parents"/></h6>
                 <ul>
                     <li><IndividualRich individual={familyAsChild.getHusband(1).getIndividualRecord(1)} /></li>
                     <li><IndividualRich individual={familyAsChild.getWife(1).getIndividualRecord(1)} /></li>
@@ -32,19 +33,26 @@ export class PageIndividual extends Component {
         const marriage = family.getEventMarriage();
         const children = family.getChild().getIndividualRecord();
         const hadChildren = !children.isEmpty();
-        return (
+        const spouseData = (
             <>
-                {hadChildren && 'With '}
-                <IndividualRich individual={other} simpleDate noPlace simpleRange />{!marriage.isEmpty() && <>{', '}<EventName event={marriage} name="married" /></>}
-                {hadChildren && ':'}
-                {hadChildren && (
-                    <ul>
-                        {children.array().map((child, i) =>
-                            <li key={i}><IndividualRich individual={child} gender simpleDate noPlace simpleRange /></li>)}
-                    </ul>
-                )}
+                <IndividualRich individual={other} simpleDate noPlace simpleRange />
+                {!marriage.isEmpty() && <>{', '}<EventName event={marriage} name={<FormattedMessage id="common.event.married_lower"/>} /></>}
             </>
         );
+        return hadChildren ? (
+            <>
+                <FormattedMessage
+                    id="page.individual.spouse_with"
+                    values={{
+                        spouse: spouseData,
+                    }}
+                />
+                <ul>
+                    {children.array().map((child, i) =>
+                        <li key={i}><IndividualRich individual={child} gender simpleDate noPlace simpleRange /></li>)}
+                </ul>
+            </>
+        ) : spouseData;
     };
 
     renderUnions = individual => {
@@ -54,7 +62,7 @@ export class PageIndividual extends Component {
         } else {
             return (
                 <>
-                    <h6>Unions & children</h6>
+                    <h6><FormattedMessage id="page.individual.unions_children"/></h6>
                     <ul>
                         {familiesAsSpouse.array().map((family, i) =>
                             <li key={i}>{this.renderUnion(individual, family)}</li>)}
@@ -66,7 +74,10 @@ export class PageIndividual extends Component {
 
     renderGeneral = individual => {
         const birth = individual.getEventBirth(), death = individual.getEventDeath();
-        const events = [{ event: birth, name: 'Born', silent: true }, { event: death, name: 'Deceased' }].filter(({ event, silent }) => !event.isEmpty() && (!silent || !isEventEmpty(event)));
+        const events = [
+            { event: birth, name: <FormattedMessage id="common.event.born_upper"/>, silent: true },
+            { event: death, name: <FormattedMessage id="common.event.deceased_upper"/> }
+            ].filter(({ event, silent }) => !event.isEmpty() && (!silent || !isEventEmpty(event)));
         return (
             <ul>
                 {events.map(({ event, name, silent }, i) =>
@@ -83,7 +94,7 @@ export class PageIndividual extends Component {
         } else {
             return (
                 <>
-                    <h6>Siblings</h6>
+                    <h6><FormattedMessage id="page.individual.siblings"/></h6>
                     <ul>
                         {siblings.array().filter(child => child.pointer().one() !== individual.pointer().one()).map((child, i) =>
                             <li key={i}><IndividualRich individual={child} gender simpleDate noPlace simpleRange /></li>)}
@@ -109,7 +120,7 @@ export class PageIndividual extends Component {
             right = this.renderHalfSiblingSide(individual, mother);
         return left && right && (
             <>
-                <h6>Half-siblings</h6>
+                <h6><FormattedMessage id="page.individual.half_siblings"/></h6>
                 <Row>
                     {left}
                     {right}
@@ -124,7 +135,7 @@ export class PageIndividual extends Component {
                 <Card.Body>
                     <h5>
                         <Diagram2 className="icon flip-vertical mr-2"/>
-                        Ancestors chart
+                        <FormattedMessage id="page.individual.ancestors_chart.title"/>
                     </h5>
                     <Row>
                         <Col className="d-none d-lg-block">
@@ -157,19 +168,19 @@ export class PageIndividual extends Component {
                             <IndividualName individual={individualOpt} gender noLink />
                             <DropdownButton title={<ThreeDotsVertical className="icon" />} variant="outline-secondary" size="sm" style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}>
                                 <LinkContainer to={{
-                                        pathname: AppRoutes.print,
-                                        state: { initialIndividualId: individualOpt.pointer().one() },
-                                    }}>
+                                    pathname: AppRoutes.print,
+                                    state: { initialIndividualId: individualOpt.pointer().one() },
+                                }}>
                                     <Dropdown.Item disabled>
                                         <Printer className="icon mr-2" />
-                                        Print (soon)
+                                        <FormattedMessage id="page.individual.actions.print"/>
                                     </Dropdown.Item>
                                 </LinkContainer>
                                 <Dropdown.Divider />
                                 <DebugGedcom triggerComponent={({ onClick }) =>
                                     <Dropdown.Item href="#" onClick={onClick}>
                                         <Bug className="icon mr-2" />
-                                        View gedcom node
+                                        <FormattedMessage id="page.individual.actions.debug"/>
                                     </Dropdown.Item>
                                 } node={individualOpt} />
                             </DropdownButton>
