@@ -1,5 +1,5 @@
 import { readGedcom } from 'read-gedcom';
-import { computeAncestors, createInitialSettings } from '../util';
+import { computeAncestors, computeDescendants, createInitialSettings } from '../util';
 
 export const LOADING = 'gedcomFile/LOADING';
 export const SUCCESS = 'gedcomFile/SUCCESS';
@@ -70,19 +70,17 @@ export const loadGedcomFile = file => async dispatch => {
 
 const initializeFields = root => {
     const settings = createInitialSettings(root);
-    const ancestors = initializeAncestry(root, settings);
-    const statistics = computeStatistics(root, settings, ancestors);
-    return { settings, ancestors, statistics };
+    const ancestors = settings.rootIndividual ? computeAncestors(root, settings.rootIndividual) : null;
+    const descendants = settings.rootIndividual ? computeDescendants(root, settings.rootIndividual) : null;
+    const statistics = computeStatistics(root, settings, ancestors, descendants);
+    return { settings, ancestors, descendants, statistics };
 };
 
-const initializeAncestry = (root, settings) => {
-    return settings.rootIndividual ? computeAncestors(root, settings.rootIndividual) : null;
-}
-
-const computeStatistics = (root, settings, ancestors) => {
+const computeStatistics = (root, settings, ancestors, descendants) => {
      const totalIndividuals = root.getIndividualRecord().count();
-     const totalAncestors = ancestors !== null ? ancestors.size : null;
-     return { totalIndividuals, totalAncestors };
+     const totalAncestors = ancestors !== null ? ancestors.size - 1 : null;
+    const totalDescendants = descendants !== null ? descendants.size - 1 : null;
+    return { totalIndividuals, totalAncestors, totalDescendants };
 };
 
 export const clearNotifications = () => async dispatch => {

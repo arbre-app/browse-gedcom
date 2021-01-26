@@ -28,3 +28,13 @@ export function computeAncestors(root, initialIndividual) {
             .map(ref => ref.getIndividualRecord())
     );
 }
+
+export function computeDescendants(root, initialIndividual) {
+    return breadthFirstSearch(root, initialIndividual, individual =>
+        individual
+            .getFamilyAsSpouse()
+            .getChild()
+            .getIndividualRecord()
+            .array()
+    );
+}

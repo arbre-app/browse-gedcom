@@ -6,12 +6,12 @@ import { AppRoutes } from '../urls';
 
 export class PrivateRoute extends Component {
     render() {
-        const { location: { pathname }, component: Component, file, settings, statistics, ...rest } = this.props;
+        const { location: { pathname }, component: Component, file, settings, ...rest } = this.props;
         const isFileLoaded = !!file;
         return (
             <Route {...rest}
                    render={props => isFileLoaded ?
-                       <Component file={file} settings={settings} statistics={statistics} {...props} /> :
+                       <Component file={file} settings={settings} {...props} /> :
                        <Redirect to={AppRoutes.loadGedcomFileRedirectTo(pathname)} />}
             />
         );
@@ -26,9 +26,9 @@ PrivateRoute.propTypes = {
     /* Redux */
     file: PropTypes.instanceOf(Gedcom),
     settings: PropTypes.object,
-    statistics: PropTypes.object,
 };
 
 PrivateRoute.defaultProps = {
-    file: false,
+    file: null,
+    settings: null,
 };

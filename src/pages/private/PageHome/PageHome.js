@@ -102,6 +102,12 @@ export class PageHome extends Component {
                                             <td><strong><FormattedNumber value={statistics.totalAncestors}/></strong></td>
                                         </tr>
                                     )}
+                                    {statistics.totalDescendants !== null && (
+                                        <tr>
+                                            <td><FormattedMessage id="page.home.statistics.descendants"/></td>
+                                            <td><strong><FormattedNumber value={statistics.totalDescendants}/></strong></td>
+                                        </tr>
+                                    )}
                                     </tbody>
                                 </Table>
                             </Col>

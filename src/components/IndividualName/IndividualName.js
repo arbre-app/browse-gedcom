@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Question, Record2Fill } from 'react-bootstrap-icons';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Question, QuestionCircleFill, Record2Fill } from 'react-bootstrap-icons';
+import { FormattedMessage } from 'react-intl';
 import { IndividualRecord, Sex } from 'read-gedcom';
 import { AppRoutes } from '../../routes';
 import { displayName } from '../../util';
@@ -10,18 +12,37 @@ import { NormalLink } from '../NormalLink';
 export class IndividualName extends Component {
 
     render() {
-        const { ancestors, individual, placeholder, gender, noLink, noAncestry } = this.props;
+        const { individual, placeholder, gender, noLink, noAncestry, settings, ancestors, descendants } = this.props;
         const name = displayName(individual);
         const content = name ? name : placeholder;
-        const hasAncestorIcon = !noAncestry && ancestors && ancestors.has(individual.pointer().option());
+        const id = individual.pointer().option();
+        const isAncestor = ancestors && ancestors.has(id);
+        const isDescendant = descendants && descendants.has(id);
+        const hasAncestorIcon = !noAncestry && (isAncestor || isDescendant);
+        const rootIndividualName = hasAncestorIcon && displayName(settings.rootIndividual, '?')
         const genderValue = individual.getSex().value().option();
         const genderClass = `icon${hasAncestorIcon ? '' : ' mr-1'}`;
         return individual.isEmpty() ? content : (
             <>
                 {gender && (genderValue === Sex.MALE ? <GenderMale className={`${genderClass} color-male`} /> : genderValue === Sex.FEMALE ? <GenderFemale className={`${genderClass} color-female`} /> : <Question className={genderClass} />)}
                 {hasAncestorIcon && (
-                    <Record2Fill className="icon text-success" />
-                    )}
+                    <OverlayTrigger
+                        placement="top"
+                        overlay={
+                            <Tooltip id="tooltip-ancestry">
+                                {isAncestor && isDescendant ?
+                                    <FormattedMessage id="component.ancestry.root" values={{ name: rootIndividualName, gender: genderValue }}/>
+                                    : isAncestor ?
+                                        <FormattedMessage id="component.ancestry.ancestor" values={{ name: rootIndividualName, gender: genderValue }}/>
+                                        :
+                                        <FormattedMessage id="component.ancestry.descendant" values={{ name: rootIndividualName, gender: genderValue }}/>
+                                }
+                            </Tooltip>
+                        }
+                    >
+                        <Record2Fill className={`icon ${isAncestor ? 'text-success' : 'text-primary'}`} />
+                    </OverlayTrigger>
+                )}
                 {noLink ? content : (
                     <NormalLink to={AppRoutes.individualFor(individual.pointer().one())}>
                         {content}
@@ -39,7 +60,9 @@ IndividualName.propTypes = {
     noLink: PropTypes.bool,
     noAncestry: PropTypes.bool,
     /* Redux */
-    ancestors: PropTypes.instanceOf(Set), // Nullable
+    settings: PropTypes.object.isRequired,
+    ancestors: PropTypes.instanceOf(Set), // Both nullable
+    descendants: PropTypes.instanceOf(Set),
 };
 
 IndividualName.defaultProps = {
@@ -47,4 +70,6 @@ IndividualName.defaultProps = {
     gender: false,
     noLink: false,
     noAncestry: false,
+    ancestors: null,
+    descendants: null,
 };
