@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { PublicLayout } from '../PublicLayout';
 
 export class PageNotFound extends Component {
     render() {
-        return <FormattedMessage id="page.not_found.not_found"/>;
+        return (
+            <PublicLayout>
+                <FormattedMessage id="page.not_found.not_found"/>
+            </PublicLayout>
+        );
     }
 }

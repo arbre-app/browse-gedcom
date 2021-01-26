@@ -1,7 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Alert, Card, Col, Container, Form, Row } from 'react-bootstrap';
+import { Alert, Card, Col, Form, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
+import { Github, QuestionCircleFill, ShieldLock, Upload } from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
+import { PublicLayout } from '../PublicLayout';
+import { name } from '../../../../package.json';
 
 class LoadFileButton extends Component {
     state = {
@@ -74,22 +77,74 @@ export class PageLoadFile extends Component {
     render() {
         const { loading } = this.props;
         return (
-            <Container className="mt-4">
+            <PublicLayout>
                 <Card>
                     <Card.Body>
+                        <Card.Title>
+                            <Upload className="icon mr-2"/>
+                            <FormattedMessage id="page.load.title"/>
+                        </Card.Title>
                         <Row className="justify-content-md-center">
                             <Col md={8}>
                                 {this.renderError()}
                             </Col>
                         </Row>
                         <Row className="justify-content-md-center">
-                            <Col md={4}>
+                            <Col md={6} lg={4}>
                                 <LoadFileButton loading={loading} onFileSubmit={this.handleFileSubmit} />
                             </Col>
                         </Row>
+                        <p className="mt-4 text-center text-muted">
+                            <ShieldLock className="icon mr-1"/>
+                            <FormattedMessage id="page.load.disclaimer"/>
+                        </p>
                     </Card.Body>
                 </Card>
-            </Container>
+                <div className="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-xs-12 offset-xs-0 mt-3 text-center text-muted">
+                    <h5>
+                        <QuestionCircleFill className="icon mr-2"/>
+                        <FormattedMessage id="page.load.about.title"/>
+                    </h5>
+                    <p className="text-justify">
+                        <FormattedMessage id="page.load.about.gedcom_file.url">
+                            { url => (
+                                <FormattedMessage
+                                    id="page.load.about.description"
+                                    values={{
+                                        b: chunk => <strong>{chunk}</strong>,
+                                        a: chunk => (
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip-gedcom">
+                                                        <QuestionCircleFill className="icon mr-1" />
+                                                        <FormattedMessage id="page.load.about.gedcom_file.about"/>
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <a href={url} target="_blank" rel="noreferrer">{chunk}</a>
+                                            </OverlayTrigger>
+                                        ),
+                                        name,
+                                    }}
+                                />
+                            )}
+                        </FormattedMessage>
+                    </p>
+                    <p className="text-justify">
+                        <FormattedMessage id="page.load.about.note"/>
+                    </p>
+                    <h1>
+                        <a href="https://github.com/arbre-app" target="_blank" rel="noreferrer" className="link-inherit link-hover-dark"><Github className="icon"/></a>
+                    </h1>
+                    <p>
+                        <FormattedMessage id="page.load.about.open_source" values={{ b: chunk => <strong>{chunk}</strong>, i: chunk => <em>{chunk}</em>, name }}/>
+                        <br />
+                        <a href="https://github.com/arbre-app" target="_blank" rel="noreferrer"><FormattedMessage id="page.load.about.source_code"/></a>
+                    </p>
+                    <hr/>
+                </div>
+            </PublicLayout>
         );
     }
 }

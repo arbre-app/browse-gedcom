@@ -4,6 +4,7 @@ import { stringifyUrl } from 'query-string';
 const RoutesList = {
     home: '/',
     loadGedcomFile: '/load',
+    about: '/about',
     individual: '/individual/:individualId',
     search: '/individuals/search',
     print: '/print',

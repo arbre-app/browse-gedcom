@@ -43,3 +43,11 @@ body {
 .color-female {
     color: #380097;
 }
+
+a.link-inherit {
+    color: inherit;
+}
+
+a:hover.link-hover-dark {
+    color: #212529;
+}
