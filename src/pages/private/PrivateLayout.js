@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Search } from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, Form, FormControl, InputGroup, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { Button, Form, FormControl, InputGroup, Nav, NavDropdown } from 'react-bootstrap';
 import { AppRoutes } from '../../routes';
 import history from '../../history';
 import { Content } from '../Content';

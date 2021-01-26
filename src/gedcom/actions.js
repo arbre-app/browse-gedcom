@@ -70,13 +70,20 @@ export const loadGedcomFile = file => async dispatch => {
 
 const initializeFields = root => {
     const settings = createInitialSettings(root);
-    let ancestors = initializeAncestry(root, settings);
-    return { settings, ancestors };
+    const ancestors = initializeAncestry(root, settings);
+    const statistics = computeStatistics(root, settings, ancestors);
+    return { settings, ancestors, statistics };
 };
 
 const initializeAncestry = (root, settings) => {
     return settings.rootIndividual ? computeAncestors(root, settings.rootIndividual) : null;
 }
+
+const computeStatistics = (root, settings, ancestors) => {
+     const totalIndividuals = root.getIndividualRecord().count();
+     const totalAncestors = ancestors !== null ? ancestors.size : null;
+     return { totalIndividuals, totalAncestors };
+};
 
 export const clearNotifications = () => async dispatch => {
     dispatch({

@@ -5,9 +5,9 @@ import {
     BoxArrowUpRight, Bug,
     CodeSlash, Envelope,
     FileEarmarkText, Gear,
-    HouseDoor, Person,
+    HouseDoor, Percent, Person,
 } from 'react-bootstrap-icons';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, FormattedNumber } from 'react-intl';
 import { Gedcom, IndividualRecord } from 'read-gedcom';
 import { DebugGedcom, IndividualName } from '../../../components';
 import { displayName } from '../../../util';
@@ -66,7 +66,7 @@ export class PageHome extends Component {
     }
 
     render() {
-        const { file } = this.props;
+        const { file, statistics } = this.props;
         return (
             <PrivateLayout>
                 <Card>
@@ -81,7 +81,31 @@ export class PageHome extends Component {
 
                 <Card className="mt-3">
                     <Card.Body>
-                        {this.renderRootIndividual()}
+                        <Row>
+                            <Col md={6}>
+                                {this.renderRootIndividual()}
+                            </Col>
+                            <Col md={6}>
+                                <Card.Title>
+                                    <Percent className="icon mr-2"/>
+                                    <FormattedMessage id="page.home.statistics.title"/>
+                                </Card.Title>
+                                <Table borderless size="sm">
+                                    <tbody>
+                                    <tr>
+                                        <td><FormattedMessage id="page.home.statistics.individuals"/></td>
+                                        <td><strong><FormattedNumber value={statistics.totalIndividuals}/></strong></td>
+                                    </tr>
+                                    {statistics.totalAncestors !== null && (
+                                        <tr>
+                                            <td><FormattedMessage id="page.home.statistics.ancestors"/></td>
+                                            <td><strong><FormattedNumber value={statistics.totalAncestors}/></strong></td>
+                                        </tr>
+                                    )}
+                                    </tbody>
+                                </Table>
+                            </Col>
+                        </Row>
                         <Row>
                             <Col md={6}>
                                 <Card.Title>
@@ -142,4 +166,5 @@ export class PageHome extends Component {
 PageHome.propTypes = {
     file: PropTypes.instanceOf(Gedcom).isRequired,
     settings: PropTypes.object.isRequired,
+    statistics: PropTypes.object.isRequired,
 };

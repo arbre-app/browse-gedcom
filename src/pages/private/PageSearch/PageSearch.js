@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Card } from 'react-bootstrap';
 import { Search, SignpostSplit } from 'react-bootstrap-icons';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, FormattedNumber } from 'react-intl';
 import { Gedcom } from 'read-gedcom';
 import { IndividualRich, Paginator } from '../../../components';
 import { AppRoutes } from '../../../routes';
@@ -46,7 +46,7 @@ export class PageSearch extends Component {
                 <FormattedMessage
                     id="page.search.n_results"
                     values={{
-                        b: chunk => <strong>{chunk}</strong>,
+                        b: chunk => <strong><FormattedNumber value={chunk}/></strong>,
                         total,
                     }}
                 />
