@@ -7,6 +7,7 @@ import { Gedcom } from 'read-gedcom';
 import { IndividualRich, Paginator } from '../../../components';
 import { AppRoutes } from '../../../routes';
 import { normalize } from '../../../util';
+import { HelmetBase } from '../../HelmetBase';
 import { PrivateLayout } from '../PrivateLayout';
 import { parse } from 'query-string';
 
@@ -77,6 +78,9 @@ export class PageSearch extends Component {
         const page = parsed.p;
         return (
             <PrivateLayout>
+                <FormattedMessage id="page.search.head.title" values={{ query }}>
+                    {title => <HelmetBase title={title}/>}
+                </FormattedMessage>
                 <Card>
                     <Card.Body>
                         <Card.Title>

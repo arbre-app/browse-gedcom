@@ -6,6 +6,7 @@ import { Nav } from 'react-bootstrap';
 import { AppRoutes } from '../../routes';
 import { Content } from '../Content';
 import { Footer } from '../Footer';
+import { HelmetBase } from '../HelmetBase';
 import { MenuBase } from '../MenuBase';
 
 export class PublicLayout extends Component {
@@ -13,6 +14,7 @@ export class PublicLayout extends Component {
         const { children } = this.props;
         return (
             <>
+                <HelmetBase /> {/* Helmet fallback */}
                 <MenuBase
                     left={(
                         <>

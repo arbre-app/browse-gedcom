@@ -8,6 +8,7 @@ import { AppRoutes } from '../../../routes';
 import history from '../../../history';
 import { Content } from '../../Content';
 import { Footer } from '../../Footer';
+import { HelmetBase } from '../../HelmetBase';
 import { MenuBase } from '../../MenuBase';
 
 export class PrivateLayout extends Component {
@@ -33,6 +34,7 @@ export class PrivateLayout extends Component {
         const { searchQuery } = this.state;
         return (
             <>
+                <HelmetBase /> {/* Helmet fallback */}
                 <MenuBase
                     left={(
                         <>

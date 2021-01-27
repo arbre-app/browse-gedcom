@@ -8,7 +8,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { DebugGedcom, EventName, IndividualName, IndividualRich } from '../../../components';
 import { AncestorsTreeChart } from '../../../components';
 import { AppRoutes } from '../../../routes';
-import { isEventEmpty } from '../../../util';
+import { displayName, isEventEmpty } from '../../../util';
+import { HelmetBase } from '../../HelmetBase';
 import { PageNotFound } from '../../public';
 import { PrivateLayout } from '../PrivateLayout';
 
@@ -162,6 +163,7 @@ export class PageIndividual extends Component {
         }
         return (
             <PrivateLayout>
+                <HelmetBase title={displayName(individualOpt)}/>
                 <Card>
                     <Card.Header>
                         <Card.Title>

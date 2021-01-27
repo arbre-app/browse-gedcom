@@ -28,6 +28,7 @@
     "react-dom": "^16.13.1",
     "react-final-form": "^6.5.2",
     "react-flags-select": "^2.0.2",
+    "react-helmet": "^6.1.0",
     "react-intl": "^5.10.16",
     "react-linkify": "^1.0.0-alpha",
     "react-redux": "^7.2.1",

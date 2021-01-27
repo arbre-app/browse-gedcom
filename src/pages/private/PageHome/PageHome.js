@@ -11,6 +11,7 @@ import { FormattedMessage, FormattedNumber } from 'react-intl';
 import { Gedcom, IndividualRecord } from 'read-gedcom';
 import { DebugGedcom, IndividualName } from '../../../components';
 import { displayName } from '../../../util';
+import { HelmetBase } from '../../HelmetBase';
 import { PrivateLayout } from '../PrivateLayout';
 
 export class PageHome extends Component {
@@ -69,6 +70,9 @@ export class PageHome extends Component {
         const { file, statistics } = this.props;
         return (
             <PrivateLayout>
+                <FormattedMessage id="page.home.head.title">
+                    {title => <HelmetBase title={title}/>}
+                </FormattedMessage>
                 <Card>
                     <Card.Body>
                         <Card.Title>
