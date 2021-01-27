@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Card, Col, Dropdown, DropdownButton, Row } from 'react-bootstrap';
-import { Bug, Diagram2, Person, Printer, ThreeDotsVertical } from 'react-bootstrap-icons';
+import { Bug, Diagram2, HouseDoor, Person, Printer, ThreeDotsVertical } from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
 import { Gedcom } from 'read-gedcom';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -155,7 +155,7 @@ export class PageIndividual extends Component {
     };
 
     render() {
-        const { file, match: { params: { individualId } } } = this.props;
+        const { file, match: { params: { individualId } }, settings: { rootIndividual }, setRootIndividual } = this.props;
         const individualOpt = file.getIndividualRecord(individualId, 1);
         if (individualOpt.isEmpty()) {
             return <PageNotFound/>;
@@ -168,6 +168,11 @@ export class PageIndividual extends Component {
                             <Person className="icon mr-2"/>
                             <IndividualName individual={individualOpt} gender noLink />
                             <DropdownButton title={<ThreeDotsVertical className="icon" />} variant="outline-secondary" size="sm" style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}>
+                                <Dropdown.Item href="#" disabled={individualOpt.pointer().one() === rootIndividual.pointer().one()} onClick={() => setRootIndividual(file, individualOpt)}>
+                                    <HouseDoor className="icon mr-2" />
+                                    <FormattedMessage id="page.individual.actions.define_root"/>
+                                </Dropdown.Item>
+                                <Dropdown.Divider />
                                 <LinkContainer to={{
                                     pathname: AppRoutes.print,
                                     state: { initialIndividualId: individualOpt.pointer().one() },
@@ -212,4 +217,7 @@ PageIndividual.propTypes = {
         }).isRequired,
     }).isRequired,
     file: PropTypes.instanceOf(Gedcom).isRequired,
+    /* Redux */
+    settings: PropTypes.object.isRequired,
+    setRootIndividual: PropTypes.func.isRequired,
 };

@@ -1,4 +1,4 @@
-export { PrivateLayout } from './PrivateLayout';
+export { PrivateLayout } from './PrivateLayout/PrivateLayout';
 export { PageHome } from './PageHome';
 export { PageIndividual } from './PageIndividual';
 export { PagePrint } from './PagePrint';

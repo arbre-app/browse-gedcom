@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import { Search } from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, Form, FormControl, InputGroup, Nav, NavDropdown } from 'react-bootstrap';
-import { AppRoutes } from '../../routes';
-import history from '../../history';
-import { Content } from '../Content';
-import { Footer } from '../Footer';
-import { MenuBase } from '../MenuBase';
+import { Button, Form, FormControl, InputGroup, Nav, NavDropdown, Spinner } from 'react-bootstrap';
+import { AppRoutes } from '../../../routes';
+import history from '../../../history';
+import { Content } from '../../Content';
+import { Footer } from '../../Footer';
+import { MenuBase } from '../../MenuBase';
 
 export class PrivateLayout extends Component {
     state = {
@@ -29,7 +29,7 @@ export class PrivateLayout extends Component {
     }
 
     render() {
-        const { children } = this.props;
+        const { children, loading } = this.props;
         const { searchQuery } = this.state;
         return (
             <>
@@ -61,7 +61,13 @@ export class PrivateLayout extends Component {
                     )}
                 />
                 <Content>
-                    {children}
+                    {loading ? (
+                        <div className="my-4 text-center">
+                            <Spinner animation="border" role="status">
+                                <span className="sr-only"><FormattedMessage id="page.common.loading"/></span>
+                            </Spinner>
+                        </div>
+                    ) : children}
                 </Content>
                 <Footer/>
             </>
@@ -71,6 +77,8 @@ export class PrivateLayout extends Component {
 
 PrivateLayout.propTypes = {
     children: PropTypes.any,
+    /* Redux */
+    loading: PropTypes.bool.isRequired,
 };
 
 PrivateLayout.defaultProps = {

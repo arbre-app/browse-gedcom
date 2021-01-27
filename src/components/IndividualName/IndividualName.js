@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { Question, QuestionCircleFill, Record2Fill } from 'react-bootstrap-icons';
+import { Question, Record2Fill } from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
 import { IndividualRecord, Sex } from 'read-gedcom';
 import { AppRoutes } from '../../routes';
@@ -40,7 +40,7 @@ export class IndividualName extends Component {
                             </Tooltip>
                         }
                     >
-                        <Record2Fill className={`icon ${isAncestor ? 'text-success' : 'text-primary'}`} />
+                        <Record2Fill className={`icon ${isAncestor && isDescendant ? 'text-info' : isAncestor ? 'text-success' : 'text-primary'}`} />
                     </OverlayTrigger>
                 )}
                 {noLink ? content : (

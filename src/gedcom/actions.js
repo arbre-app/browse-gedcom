@@ -3,6 +3,8 @@ import { computeAncestors, computeDescendants, createInitialSettings } from '../
 
 export const LOADING = 'gedcomFile/LOADING';
 export const SUCCESS = 'gedcomFile/SUCCESS';
+export const BLOCK = 'gedcomFile/BLOCK';
+export const SET_ROOT = 'gedcomFile/SET_ROOT';
 export const ERROR = 'gedcomFile/ERROR';
 export const CLEAR = 'gedcomFile/CLEAR';
 
@@ -22,7 +24,7 @@ export const loadGedcomUrl = url => async dispatch => {
         });
         return;
     }
-    const other = initializeFields(root);
+    const other = initializeAllFields(root);
     dispatch({
         type: SUCCESS,
         data: {
@@ -58,7 +60,7 @@ export const loadGedcomFile = file => async dispatch => {
         });
         return;
     }
-    const other = initializeFields(root);
+    const other = initializeAllFields(root);
     dispatch({
         type: SUCCESS,
         data: {
@@ -68,23 +70,40 @@ export const loadGedcomFile = file => async dispatch => {
     });
 };
 
-const initializeFields = root => {
-    const settings = createInitialSettings(root);
-    const ancestors = settings.rootIndividual ? computeAncestors(root, settings.rootIndividual) : null;
-    const descendants = settings.rootIndividual ? computeDescendants(root, settings.rootIndividual) : null;
-    const statistics = computeStatistics(root, settings, ancestors, descendants);
-    return { settings, ancestors, descendants, statistics };
-};
-
-const computeStatistics = (root, settings, ancestors, descendants) => {
-     const totalIndividuals = root.getIndividualRecord().count();
-     const totalAncestors = ancestors !== null ? ancestors.size - 1 : null;
-    const totalDescendants = descendants !== null ? descendants.size - 1 : null;
-    return { totalIndividuals, totalAncestors, totalDescendants };
-};
-
 export const clearNotifications = () => async dispatch => {
     dispatch({
         type: CLEAR,
     });
+};
+
+export const setRootIndividual = (root, rootIndividual) => async dispatch => {
+    dispatch({
+        type: BLOCK,
+    });
+    const dependant = computeDependantFields(root, rootIndividual);
+    const data = { rootIndividual, dependant };
+    dispatch({
+        type: SET_ROOT,
+        data: data,
+    });
+};
+
+const initializeAllFields = root => {
+    const settings = createInitialSettings(root);
+    const dependant = computeDependantFields(root, settings.rootIndividual);
+    return { settings, ...dependant };
+};
+
+const computeDependantFields = (root, rootIndividual) => {
+    const ancestors = rootIndividual ? computeAncestors(root, rootIndividual) : null;
+    const descendants = rootIndividual ? computeDescendants(root, rootIndividual) : null;
+    const statistics = computeStatistics(root, ancestors, descendants);
+    return { ancestors, descendants, statistics };
+};
+
+const computeStatistics = (root, ancestors, descendants) => {
+     const totalIndividuals = root.getIndividualRecord().count();
+     const totalAncestors = ancestors !== null ? ancestors.size - 1 : null;
+    const totalDescendants = descendants !== null ? descendants.size - 1 : null;
+    return { totalIndividuals, totalAncestors, totalDescendants };
 };
