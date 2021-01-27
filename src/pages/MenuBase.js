@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import { ChooseLanguage } from '../components/ChooseLanguage';
+import { APP_NAME_HTML } from '../config';
 import { AppRoutes } from '../routes';
-import { name } from '../../package.json';
 
 export class MenuBase extends Component {
     render() {
@@ -13,7 +13,7 @@ export class MenuBase extends Component {
             <Navbar bg="light" expand="lg">
                 <Container>
                     <LinkContainer to={AppRoutes.home}>
-                        <Navbar.Brand>{name}</Navbar.Brand>
+                        <Navbar.Brand dangerouslySetInnerHTML={{ __html: APP_NAME_HTML }}/>
                     </LinkContainer>
                     <Navbar.Toggle aria-controls="basic-navbar-nav"/>
                     <Navbar.Collapse id="basic-navbar-nav">

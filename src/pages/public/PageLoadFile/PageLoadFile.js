@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Alert, Card, Col, Form, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
-import { Github, QuestionCircleFill, ShieldLock, Upload } from 'react-bootstrap-icons';
+import { CodeSlash, Github, QuestionCircleFill, ShieldLockFill, Upload } from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
+import { APP_NAME } from '../../../config';
 import { PublicLayout } from '../PublicLayout';
-import { name } from '../../../../package.json';
 
 class LoadFileButton extends Component {
     state = {
@@ -95,7 +95,7 @@ export class PageLoadFile extends Component {
                             </Col>
                         </Row>
                         <p className="mt-4 text-center text-muted">
-                            <ShieldLock className="icon mr-1"/>
+                            <ShieldLockFill className="icon mr-1"/>
                             <FormattedMessage id="page.load.disclaimer"/>
                         </p>
                     </Card.Body>
@@ -125,7 +125,7 @@ export class PageLoadFile extends Component {
                                                 <a href={url} target="_blank" rel="noreferrer">{chunk}</a>
                                             </OverlayTrigger>
                                         ),
-                                        name,
+                                        name: APP_NAME,
                                     }}
                                 />
                             )}
@@ -138,9 +138,13 @@ export class PageLoadFile extends Component {
                         <a href="https://github.com/arbre-app" target="_blank" rel="noreferrer" className="link-inherit link-hover-dark"><Github className="icon"/></a>
                     </h1>
                     <p>
-                        <FormattedMessage id="page.load.about.open_source" values={{ b: chunk => <strong>{chunk}</strong>, i: chunk => <em>{chunk}</em>, name }}/>
-                        <br />
-                        <a href="https://github.com/arbre-app" target="_blank" rel="noreferrer"><FormattedMessage id="page.load.about.source_code"/></a>
+                        <FormattedMessage id="page.load.about.open_source" values={{ b: chunk => <strong>{chunk}</strong>, i: chunk => <em>{chunk}</em>, name: APP_NAME }}/>
+                    </p>
+                    <p>
+                        <a href="https://github.com/arbre-app" target="_blank" rel="noreferrer">
+                            <CodeSlash className="icon mr-1"/>
+                            <FormattedMessage id="page.load.about.source_code"/>
+                        </a>
                     </p>
                     <hr/>
                 </div>

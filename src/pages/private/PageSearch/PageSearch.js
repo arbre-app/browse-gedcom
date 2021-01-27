@@ -79,7 +79,7 @@ export class PageSearch extends Component {
         return (
             <PrivateLayout>
                 <FormattedMessage id="page.search.head.title" values={{ query }}>
-                    {title => <HelmetBase title={title}/>}
+                    {([title]) => <HelmetBase title={title}/>}
                 </FormattedMessage>
                 <Card>
                     <Card.Body>

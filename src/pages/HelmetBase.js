@@ -2,12 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { useIntl } from 'react-intl';
-import { name } from '../../package.json';
+import { APP_NAME } from '../config';
 
 export const HelmetBase = ({ title, description }) => {
     const intl = useIntl();
 
-    const titleSuffix = name;
+    const titleSuffix = APP_NAME;
     const titleSeparator = '⋅';
     const actualDescription = description !== null ? description : intl.formatMessage({ id: 'page.common.head.description' });
     const actualTitle = `${title !== null ? `${title} ${titleSeparator} ` : ''}${titleSuffix}`;
@@ -29,7 +29,7 @@ export const HelmetBase = ({ title, description }) => {
 
             <meta property="og:title" content={actualTitle}/>
             <meta property="og:description" content={actualDescription}/>
-            <meta property="og:site_name" content={name}/>
+            <meta property="og:site_name" content={titleSuffix}/>
         </Helmet>
     );
 }

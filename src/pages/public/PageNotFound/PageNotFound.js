@@ -8,7 +8,7 @@ export class PageNotFound extends Component {
         return (
             <PublicLayout>
                 <FormattedMessage id="page.not_found.head.title">
-                    {title => <HelmetBase title={title} />}
+                    {([title]) => <HelmetBase title={title} />}
                 </FormattedMessage>
                 <FormattedMessage id="page.not_found.not_found"/>
             </PublicLayout>

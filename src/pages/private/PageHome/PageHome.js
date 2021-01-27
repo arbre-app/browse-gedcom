@@ -71,7 +71,7 @@ export class PageHome extends Component {
         return (
             <PrivateLayout>
                 <FormattedMessage id="page.home.head.title">
-                    {title => <HelmetBase title={title}/>}
+                    {([title]) => <HelmetBase title={title}/>}
                 </FormattedMessage>
                 <Card>
                     <Card.Body>
