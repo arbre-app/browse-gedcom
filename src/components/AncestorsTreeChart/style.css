@@ -31,12 +31,12 @@
 
 /* Horizontal bar */
 .ascending-tree li:after {
-    outline: solid 1px #bebebe;
+    outline: solid .1em #bebebe;
     content: "";
     left: 0;
     position: absolute;
     right: 0;
-    bottom: 0.5em;
+    bottom: .5em;
 }
 
 /* Left horizontal bar */
@@ -46,7 +46,7 @@
 
 /* Right horizontal bar */
 .ascending-tree li:last-child:after {
-    right: calc(50% + 1px); /* Fix artifacts */
+    right: calc(50% + .1em); /* Fix artifacts */
 }
 
 /* Text box */
@@ -62,7 +62,7 @@
 /* Vertical bar */
 .ascending-tree span:before,
 .ascending-tree span:after {
-    outline: solid 0.1em #bebebe;
+    outline: solid .1em #bebebe;
     content: "";
     height: .5em;
     left: 50%;
@@ -83,6 +83,11 @@
 .ascending-tree span:first-child:before, /* (top) leaves */
 .ascending-tree > li > span:after { /* (bottom) root */
     outline: none;
+}
+
+/* Hide bottom bar */
+.ascending-tree > li:after {
+    display: none;
 }
 
 /* Clear bottom margin */
