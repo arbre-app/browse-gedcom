@@ -106,7 +106,7 @@ LoadFileURL.propTypes = {
 export class LoadFileSample extends Component {
     handleSampleLoad = file => {
         const { onUrlSubmit } = this.props;
-        onUrlSubmit(`./${file}`); // TODO should build the path instead
+        onUrlSubmit(`/gedcoms/${file}`); // TODO should build the path instead
     }
 
     renderItem = ({ id, file }) => (
