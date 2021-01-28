@@ -1,20 +1,39 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Alert, Card, Col, Form, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
-import { CodeSlash, Github, QuestionCircleFill, ShieldLockFill, Upload } from 'react-bootstrap-icons';
+import {
+    Alert,
+    Button,
+    Card,
+    Col, Dropdown,
+    DropdownButton,
+    Form,
+    FormControl,
+    InputGroup,
+    OverlayTrigger,
+    Row,
+    Tooltip,
+} from 'react-bootstrap';
+import {
+    CodeSlash,
+    Download, FileEarmark,
+    Github,
+    QuestionCircleFill,
+    ShieldLockFill,
+} from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
 import { APP_NAME } from '../../../config';
+import { AVAILABLE_SAMPLE_FILES } from '../../../i18n';
 import { PublicLayout } from '../PublicLayout';
 
-class LoadFileButton extends Component {
+class LoadFileLocal extends Component {
     state = {
         selection: null,
     };
 
     handleFileChange = e => {
-        const { onFileSubmit } = this.props;
+        const { loading, onFileSubmit } = this.props;
         const fileList = e.target.files;
-        if (fileList.length > 0) {
+        if (!loading && fileList.length > 0) {
             const file = fileList[0];
             this.setState({ selection: file.name });
             onFileSubmit(file);
@@ -29,7 +48,7 @@ class LoadFileButton extends Component {
                 <FormattedMessage id="page.load.browse">
                     {browse =>
                         <Form.File
-                            label={loading ? selection : <FormattedMessage id="page.load.select_file"/>}
+                            label={selection !== null ? selection : <FormattedMessage id="page.load.select_file"/>}
                             custom
                             data-browse={browse}
                             disabled={loading}
@@ -42,9 +61,74 @@ class LoadFileButton extends Component {
     }
 }
 
-LoadFileButton.propTypes = {
+LoadFileLocal.propTypes = {
     loading: PropTypes.bool.isRequired,
     onFileSubmit: PropTypes.func.isRequired,
+};
+
+export class LoadFileURL extends Component {
+    state = {
+        value: '',
+    };
+
+    render() {
+        const { loading, onUrlSubmit } = this.props;
+        const { value } = this.state;
+        const isValidUrl = value.startsWith('https://');
+        return (
+            <InputGroup disabled>
+                <FormattedMessage id="page.load.example_url">
+                    {url => (
+                        <FormControl
+                            placeholder={url}
+                            aria-label={url}
+                            disabled={loading}
+                            value={value}
+                            onChange={event => this.setState({ value: event.target.value})}
+                        />
+                    )}
+                </FormattedMessage>
+                <InputGroup.Append>
+                    <Button variant="outline-secondary" onClick={() => onUrlSubmit(value)} disabled={loading || !isValidUrl}>
+                        <Download className="icon"/>
+                    </Button>
+                </InputGroup.Append>
+            </InputGroup>
+        );
+    }
+}
+
+LoadFileURL.propTypes = {
+    loading: PropTypes.bool.isRequired,
+    onUrlSubmit: PropTypes.func.isRequired,
+};
+
+export class LoadFileSample extends Component {
+    handleSampleLoad = file => {
+        const { onUrlSubmit } = this.props;
+        onUrlSubmit(`./${file}`); // TODO should build the path instead
+    }
+
+    renderItem = ({ id, file }) => (
+        <Dropdown.Item href="#" key={id} onClick={() => this.handleSampleLoad(file)}>
+            <FileEarmark className="icon mr-2"/>
+            <FormattedMessage id={`page.load.samples_names.${id}`}/>
+        </Dropdown.Item>
+    );
+
+    render() {
+        const { loading } = this.props;
+        return (
+            <DropdownButton title={<FormattedMessage id="page.load.samples"/>} disabled={loading}>
+                {AVAILABLE_SAMPLE_FILES.map(this.renderItem)}
+            </DropdownButton>
+        );
+    }
+}
+
+LoadFileSample.propTypes = {
+    loading: PropTypes.bool.isRequired,
+    onUrlSubmit: PropTypes.func.isRequired,
 };
 
 export class PageLoadFile extends Component {
@@ -74,6 +158,11 @@ export class PageLoadFile extends Component {
         loadGedcomFile(file);
     };
 
+    handleUrlSubmit = url => {
+        const { loadGedcomUrl } = this.props;
+        loadGedcomUrl(url);
+    };
+
     render() {
         const { loading } = this.props;
         return (
@@ -81,22 +170,53 @@ export class PageLoadFile extends Component {
                 <Card>
                     <Card.Body>
                         <Card.Title>
-                            <Upload className="icon mr-2"/>
+                            <FileEarmark className="icon mr-2"/>
                             <FormattedMessage id="page.load.title"/>
                         </Card.Title>
-                        <Row className="justify-content-md-center">
+                        <Row className="justify-content-center mt-4">
                             <Col md={8}>
                                 {this.renderError()}
                             </Col>
                         </Row>
-                        <Row className="justify-content-md-center">
+                        <Row className="justify-content-center">
                             <Col md={6} lg={4}>
-                                <LoadFileButton loading={loading} onFileSubmit={this.handleFileSubmit} />
+                                <LoadFileLocal loading={loading} onFileSubmit={this.handleFileSubmit} />
                             </Col>
                         </Row>
+                        <p className="text-center">
+                            <small><FormattedMessage id="page.load.file_constraints"/></small>
+                        </p>
                         <p className="mt-4 text-center text-muted">
                             <ShieldLockFill className="icon mr-1"/>
                             <FormattedMessage id="page.load.disclaimer"/>
+                        </p>
+                        <Row className="justify-content-center">
+                            <Col sm={10} md={8} lg={6}>
+                                <div className="divider-text">
+                                    <FormattedMessage id="page.load.or"/>
+                                </div>
+                            </Col>
+                        </Row>
+                        {/*<Row className="justify-content-center mt-3">
+                            <Col sm={12} md={9} lg={7}>
+                                <LoadFileURL loading={loading} onUrlSubmit={this.handleUrlSubmit}/>
+                            </Col>
+                        </Row>
+                        <p className="text-center">
+                            <small><FormattedMessage id="page.load.url_constraints"/></small>
+                        </p>
+                        <Row className="justify-content-center">
+                            <Col sm={10} md={8} lg={6}>
+                                <div className="divider-text">
+                                    <FormattedMessage id="page.load.or"/>
+                                </div>
+                            </Col>
+                        </Row>*/}
+                        <Row className="justify-content-center mt-3">
+                            <LoadFileSample loading={loading} onUrlSubmit={this.handleUrlSubmit}/>
+                        </Row>
+                        <p className="text-center mb-0">
+                            <small><FormattedMessage id="page.load.samples_constraints"/></small>
                         </p>
                     </Card.Body>
                 </Card>
@@ -112,6 +232,7 @@ export class PageLoadFile extends Component {
                                     id="page.load.about.description"
                                     values={{
                                         b: chunk => <strong>{chunk}</strong>,
+                                        i: chunk => <em>{chunk}</em>,
                                         a: chunk => (
                                             <OverlayTrigger
                                                 placement="top"

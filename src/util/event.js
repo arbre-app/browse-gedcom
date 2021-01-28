@@ -30,8 +30,8 @@ export function displayDate(dateGedcom, isShort) {
                         <FormattedDate
                             value={jsDate}
                             year="numeric"
-                            month={isShort ? undefined : 'long'}
-                            day={isShort ? undefined : 'numeric'}
+                            month={!date.month || isShort ? undefined : 'long'}
+                            day={!date.day || isShort ? undefined : 'numeric'}
                         />
                     </>
                 );

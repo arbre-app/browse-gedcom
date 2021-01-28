@@ -18,6 +18,7 @@ export const loadGedcomUrl = url => async dispatch => {
         const buffer = await result.arrayBuffer();
         root = readGedcom(buffer);
     } catch (error) {
+        console.error(error);
         dispatch({
             type: ERROR,
             error: error.message,
@@ -54,6 +55,7 @@ export const loadGedcomFile = file => async dispatch => {
         const buffer = await promise;
         root = readGedcom(buffer);
     } catch (error) {
+        console.error(error);
         dispatch({
             type: ERROR,
             error: error.message,
