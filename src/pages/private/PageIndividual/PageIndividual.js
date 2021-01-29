@@ -10,7 +10,7 @@ import { AncestorsTreeChart } from '../../../components';
 import { AppRoutes } from '../../../routes';
 import { displayName, isEventEmpty } from '../../../util';
 import { HelmetBase } from '../../HelmetBase';
-import { PageNotFound } from '../../public';
+import { PageNotFound } from '../../mixed';
 import { PrivateLayout } from '../PrivateLayout';
 
 export class PageIndividual extends Component {

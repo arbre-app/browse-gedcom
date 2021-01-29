@@ -1,2 +1,2 @@
+export { PublicLayout } from './PublicLayout';
 export { PageLoadFile } from './PageLoadFile';
-export { PageNotFound } from './PageNotFound';

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import { ChooseLanguage } from '../components/ChooseLanguage';
@@ -19,9 +20,12 @@ export class MenuBase extends Component {
                     <Navbar.Collapse id="basic-navbar-nav">
                         <Nav className="mr-auto">
                             {left}
+                            <LinkContainer to={AppRoutes.about}>
+                                <Nav.Link><FormattedMessage id="menu.about"/></Nav.Link>
+                            </LinkContainer>
                         </Nav>
                         {right}
-                        <ChooseLanguage className="ml-2"/>
+                        <ChooseLanguage className="ml-lg-2 mt-lg-0 mt-2"/>
                     </Navbar.Collapse>
                 </Container>
             </Navbar>

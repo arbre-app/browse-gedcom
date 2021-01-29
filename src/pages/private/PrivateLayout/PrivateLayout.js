@@ -38,7 +38,7 @@ export class PrivateLayout extends Component {
                 <MenuBase
                     left={(
                         <>
-                            <LinkContainer to={AppRoutes.home}>
+                            <LinkContainer to={AppRoutes.home} exact>
                                 <Nav.Link><FormattedMessage id="menu.overview"/></Nav.Link>
                             </LinkContainer>
                             {/*<NavDropdown title={<FormattedMessage id="menu.explore"/>} id="basic-nav-dropdown">
