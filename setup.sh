@@ -10,9 +10,9 @@ then
   git pull
   cd ..
 else
-  git clone git@github.com:arbre-app/public-gedcoms.git public-gedcoms
+  git clone https://github.com/arbre-app/public-gedcoms.git public-gedcoms
 fi
 
-rm public/gedcoms/*.ged
+rm -f public/gedcoms/*.ged
 
 cp public-gedcoms/files/*.ged public/gedcoms/

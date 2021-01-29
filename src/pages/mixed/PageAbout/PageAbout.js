@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Card } from 'react-bootstrap';
-import { Code, CodeSlash, Envelope, InfoCircle, People, QuestionCircle } from 'react-bootstrap-icons';
+import { CodeSlash, Envelope, InfoCircle, People } from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
 import { HelmetBase } from '../../HelmetBase';
 import { MixedLayout } from '../MixedLayout';
