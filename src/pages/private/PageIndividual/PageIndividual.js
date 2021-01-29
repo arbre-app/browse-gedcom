@@ -58,14 +58,33 @@ export class PageIndividual extends Component {
 
     renderUnions = individual => {
         const familiesAsSpouse = individual.getFamilyAsSpouse();
+        const orderIfSpecified = individual.getSpouseFamilyLink().value().all();
         if (familiesAsSpouse.isEmpty()) {
             return null;
         } else {
+            // Sort the families in the order of the FAMS tags (rather than in the order of their ids)
+            const available = Object.fromEntries(familiesAsSpouse.array().map(family => [family.pointer().one(), family]));
+            const processed = new Set();
+            const ordered = [];
+            orderIfSpecified.forEach(id => {
+                if(!processed.has(id)) { // Weird but could happen
+                    const family = available[id];
+                    if(family) {
+                        ordered.push(family);
+                        processed.add(id);
+                    }
+                }
+            });
+            Object.entries(available).forEach(([id, family]) => {
+                if(!processed.has(id)) {
+                    ordered.push(family);
+                }
+            });
             return (
                 <>
                     <h6><FormattedMessage id="page.individual.unions_children"/></h6>
                     <ul>
-                        {familiesAsSpouse.array().map((family, i) =>
+                        {ordered.map((family, i) =>
                             <li key={i}>{this.renderUnion(individual, family)}</li>)}
                     </ul>
                 </>
