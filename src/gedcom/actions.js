@@ -1,5 +1,5 @@
 import { readGedcom } from 'read-gedcom';
-import { computeAncestors, computeDescendants, createInitialSettings } from '../util';
+import { computeAncestors, computeDescendants, computeRelated, createInitialSettings } from '../util';
 
 export const LOADING = 'gedcomFile/LOADING';
 export const SUCCESS = 'gedcomFile/SUCCESS';
@@ -99,13 +99,15 @@ const initializeAllFields = root => {
 const computeDependantFields = (root, rootIndividual) => {
     const ancestors = rootIndividual ? computeAncestors(root, rootIndividual) : null;
     const descendants = rootIndividual ? computeDescendants(root, rootIndividual) : null;
-    const statistics = computeStatistics(root, ancestors, descendants);
-    return { ancestors, descendants, statistics };
+    const related = rootIndividual ? computeRelated(root, ancestors) : null;
+    const statistics = computeStatistics(root, ancestors, descendants, related);
+    return { ancestors, descendants, related, statistics };
 };
 
-const computeStatistics = (root, ancestors, descendants) => {
-     const totalIndividuals = root.getIndividualRecord().count();
-     const totalAncestors = ancestors !== null ? ancestors.size - 1 : null;
+const computeStatistics = (root, ancestors, descendants, related) => {
+    const totalIndividuals = root.getIndividualRecord().count();
+    const totalAncestors = ancestors !== null ? ancestors.size - 1 : null;
     const totalDescendants = descendants !== null ? descendants.size - 1 : null;
-    return { totalIndividuals, totalAncestors, totalDescendants };
+    const totalRelated = related !== null ? related.size - 1 : null;
+    return { totalIndividuals, totalAncestors, totalDescendants, totalRelated };
 };

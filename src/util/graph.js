@@ -1,6 +1,6 @@
-function breadthFirstSearch(root, initialIndividual, neighboursOf) {
-    const visited = new Set([initialIndividual.pointer().one()]);
-    let current = new Set([initialIndividual]);
+function breadthFirstSearch(root, initialIndividuals, neighboursOf) {
+    const visited = new Set(initialIndividuals.map(individual => individual.pointer().one()));
+    let current = new Set(initialIndividuals);
     while (current.size > 0) {
         const next = new Set();
         for(const individual of current.values()) {
@@ -19,22 +19,28 @@ function breadthFirstSearch(root, initialIndividual, neighboursOf) {
     return visited;
 }
 
+const ancestorRelation = individual =>
+    individual
+        .getFamilyAsChild()
+        .array()
+        .flatMap(ind => [ind.getHusband(), ind.getWife()])
+        .map(ref => ref.getIndividualRecord());
+
+const descendantRelation = individual =>
+    individual
+        .getFamilyAsSpouse()
+        .getChild()
+        .getIndividualRecord()
+        .array();
+
 export function computeAncestors(root, initialIndividual) {
-    return breadthFirstSearch(root, initialIndividual, individual =>
-        individual
-            .getFamilyAsChild()
-            .array()
-            .flatMap(ind => [ind.getHusband(), ind.getWife()])
-            .map(ref => ref.getIndividualRecord())
-    );
+    return breadthFirstSearch(root, [initialIndividual], ancestorRelation);
 }
 
 export function computeDescendants(root, initialIndividual) {
-    return breadthFirstSearch(root, initialIndividual, individual =>
-        individual
-            .getFamilyAsSpouse()
-            .getChild()
-            .getIndividualRecord()
-            .array()
-    );
+    return breadthFirstSearch(root, [initialIndividual], descendantRelation);
+}
+
+export function computeRelated(root, ancestorsIdSet) {
+    return breadthFirstSearch(root, Array.from(ancestorsIdSet).map(id => root.getIndividualRecord(id)), descendantRelation);
 }

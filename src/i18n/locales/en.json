@@ -54,6 +54,7 @@
   "page.home.statistics.individuals": "Individuals:",
   "page.home.statistics.ancestors": "Ancestors:",
   "page.home.statistics.descendants": "Descendants:",
+  "page.home.statistics.related": "Related:",
   "page.home.metadata.title": "File metadata",
   "page.home.metadata.name": "Name:",
   "page.home.metadata.provider": "Provider:",
