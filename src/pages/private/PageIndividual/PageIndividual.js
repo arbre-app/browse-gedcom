@@ -56,8 +56,8 @@ export class PageIndividual extends Component {
         ) : spouseData;
     };
 
-    renderUnions = individual => {
-        const familiesAsSpouse = individual.getFamilyAsSpouse();
+    renderUnions = (individual, familiesFilter = _ => true, title = true) => {
+        const familiesAsSpouse = individual.getFamilyAsSpouse().filter(familiesFilter);
         const orderIfSpecified = individual.getSpouseFamilyLink().value().all();
         if (familiesAsSpouse.isEmpty()) {
             return null;
@@ -82,7 +82,7 @@ export class PageIndividual extends Component {
             });
             return (
                 <>
-                    <h6><FormattedMessage id="page.individual.unions_children"/></h6>
+                    {title && <h6><FormattedMessage id="page.individual.unions_children"/></h6>}
                     <ul>
                         {ordered.map((family, i) =>
                             <li key={i}>{this.renderUnion(individual, family)}</li>)}
@@ -94,16 +94,18 @@ export class PageIndividual extends Component {
 
     renderGeneral = individual => {
         const birth = individual.getEventBirth(), death = individual.getEventDeath();
+        const occupationValue = individual.getAttributeOccupation().value().option();
         const gender = individual.getSex().value().option();
         const events = [
             { event: birth, name: <FormattedMessage id="common.event.born_upper" values={{ gender }}/>, silent: true },
             { event: death, name: <FormattedMessage id="common.event.deceased_upper" values={{ gender }}/> }
-            ].filter(({ event, silent }) => !event.isEmpty() && (!silent || !isEventEmpty(event)));
+        ].filter(({ event, silent }) => !event.isEmpty() && (!silent || !isEventEmpty(event)));
         return (
             <ul>
                 {events.map(({ event, name, silent }, i) =>
                     <li key={i}><EventName event={event} name={name} nameAlt={silent && ''} /></li>
                 )}
+                {occupationValue && <li>{occupationValue}</li>}
             </ul>
         );
     };
@@ -126,11 +128,14 @@ export class PageIndividual extends Component {
     };
 
     renderHalfSiblingSide = (individual, parent) => {
-        const originalFamilyId = individual.getFamilyAsChild();
-        const otherFamilies = parent.getFamilyAsSpouse().filter(family => family.pointer().one() !== originalFamilyId.pointer().option());
-        return !otherFamilies.getChild().getIndividualRecord().isEmpty() && (
-            <Col>(not implemented)</Col>
-        ); // TODO
+        const originalFamilyId = individual.getFamilyAsChild().pointer().option();
+        const filter = family => family.pointer().one() !== originalFamilyId && !family.getChild().getIndividualRecord().isEmpty();
+        return !parent.getFamilyAsSpouse().filter(filter).isEmpty() && (
+            <Col>
+                <FormattedMessage id="page.individual.on_the_side" values={{ parent: <IndividualName individual={parent} /> }}/>
+                {this.renderUnions(parent, filter, false)}
+            </Col>
+        );
     };
 
     renderHalfSiblings = individual => {
@@ -139,7 +144,7 @@ export class PageIndividual extends Component {
         const mother = familyAsChild.getWife().getIndividualRecord(1);
         const left = this.renderHalfSiblingSide(individual, father),
             right = this.renderHalfSiblingSide(individual, mother);
-        return left && right && (
+        return (left || right) && (
             <>
                 <h6><FormattedMessage id="page.individual.half_siblings"/></h6>
                 <Row>
@@ -221,7 +226,7 @@ export class PageIndividual extends Component {
                         {this.renderParents(individualOpt)}
                         {this.renderUnions(individualOpt)}
                         {this.renderSiblings(individualOpt)}
-                        {/*{this.renderHalfSiblings(individual)}*/}
+                        {this.renderHalfSiblings(individualOpt)}
                     </Card.Body>
                 </Card>
 

@@ -72,3 +72,8 @@ a:hover.link-hover-dark {
 .divider-text::after {
     margin-left: .5em;
 }
+
+ul {
+    /* Reduce ul left margin */
+    padding-left: 1.5em;
+}

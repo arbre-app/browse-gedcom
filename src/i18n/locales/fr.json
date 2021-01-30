@@ -72,6 +72,7 @@
   "page.individual.actions.print": "Imprimer",
   "page.individual.actions.debug": "Consulter le nœud Gedcom",
   "page.individual.spouse_with": "Avec {spouse} :",
+  "page.individual.on_the_side": "Du côté de {parent} :",
   "page.search.head.title": "Résultats pour « {query} »",
   "page.search.title": "Recherche",
   "page.search.searching": "Recherche <b>« {query} »</b>.",

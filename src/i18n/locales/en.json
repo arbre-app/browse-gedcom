@@ -72,6 +72,7 @@
   "page.individual.actions.print": "Print",
   "page.individual.actions.debug": "View Gedcom node",
   "page.individual.spouse_with": "With {spouse}:",
+  "page.individual.on_the_side": "On the side of {parent}:",
   "page.search.head.title": "Results for \"{query}\"",
   "page.search.title": "Search",
   "page.search.searching": "Searching <b>\"{query}\"</b>.",
