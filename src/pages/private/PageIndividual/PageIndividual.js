@@ -1,14 +1,14 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Card, Col, Dropdown, DropdownButton, Row } from 'react-bootstrap';
-import { Bug, Diagram2, HouseDoor, Person, Printer, ThreeDotsVertical } from 'react-bootstrap-icons';
+import { Bug, CalendarWeek, Diagram2, HouseDoor, Person, Printer, ThreeDotsVertical } from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
-import { Gedcom } from 'read-gedcom';
+import { Event as EventFact, Gedcom, IndividualEvent, Tag } from 'read-gedcom';
 import { LinkContainer } from 'react-router-bootstrap';
 import { DebugGedcom, EventName, IndividualName, IndividualRich } from '../../../components';
 import { AncestorsTreeChart } from '../../../components';
 import { AppRoutes } from '../../../routes';
-import { displayName, isEventEmpty } from '../../../util';
+import { displayDate, displayName, isEventEmpty } from '../../../util';
 import { HelmetBase } from '../../HelmetBase';
 import { PageNotFound } from '../../mixed';
 import { PrivateLayout } from '../PrivateLayout';
@@ -94,7 +94,7 @@ export class PageIndividual extends Component {
 
     renderGeneral = individual => {
         const birth = individual.getEventBirth(), death = individual.getEventDeath();
-        const occupationValue = individual.getAttributeOccupation().value().option();
+        const occupationValue = individual.getAttributeOccupation().value().all().filter(s => s).join(', ');
         const gender = individual.getSex().value().option();
         const events = [
             { event: birth, name: <FormattedMessage id="common.event.born_upper" values={{ gender }}/>, silent: true },
@@ -179,6 +179,86 @@ export class PageIndividual extends Component {
         );
     };
 
+    renderTimelineEvent = (event, i, translationKey) => {
+        const value = event.value().option();
+        const date = !event.getDate().isEmpty() && displayDate(event.getDate());
+        const place = event.getPlace().value().map(place => place.split(',').map(s => s.trim()).filter(s => s)).map(parts => parts.join(', ')).option();
+        return (
+            <li key={i}>
+                <div>
+                    <span className="small-header">
+                        <FormattedMessage id={`common.event.title.${translationKey}`}/>
+                    </span>
+                    {date && (
+                        <span className="text-muted">
+                            {', '}
+                            {date}
+                        </span>
+                    )}
+                </div>
+                {value && value !== EventFact.YES && (
+                    <div>
+                        {value}
+                    </div>
+                )}
+                {place && (
+                    <div>
+                        <span className="text-muted">
+                            {place}
+                        </span>
+                    </div>
+                )}
+            </li>
+        );
+    };
+
+    renderTimelineCard = individual => {
+        const eventsWithKeys = {
+            [Tag.BIRTH]: 'birth',
+            [Tag.CHRISTENING]: 'christening',
+            [Tag.DEATH]: 'death',
+            [Tag.BURIAL]: 'burial',
+            [Tag.CREMATION]: 'cremation',
+            [Tag.ADOPTION]: 'adoption',
+            [Tag.BAPTISM]: 'baptism',
+            [Tag.BAR_MITZVAH]: 'bar_mitzvah',
+            [Tag.BAT_MITZVAH]: 'bat_mitzvah',
+            [Tag.ADULT_CHRISTENING]: 'adult_christening',
+            [Tag.CONFIRMATION]: 'confirmation',
+            [Tag.FIRST_COMMUNION]: 'first_communion',
+            [Tag.NATURALIZATION]: 'naturalization',
+            [Tag.EMIGRATION]: 'emigration',
+            [Tag.IMMIGRATION]: 'immigration',
+            [Tag.CENSUS]: 'census',
+            [Tag.PROBATE]: 'probate',
+            [Tag.WILL]: 'will',
+            [Tag.GRADUATION]: 'graduation',
+            [Tag.RETIREMENT]: 'retirement',
+            [Tag.OCCUPATION]: 'occupation', // While originally defined as an attribute it is used as an event
+            [Tag.RESIDENCE]: 'residence', // Same here
+            [Tag.EVENT]: 'other_event',
+        };
+        const events = individual.children().filter(node => eventsWithKeys[node.tag().one()] !== undefined).as(IndividualEvent);
+        if(events.isEmpty() || !events.array().some(event => ![Tag.BIRTH, Tag.DEATH, Tag.OCCUPATION].includes(event.tag().one()))) {
+            return null;
+        }
+        return (
+            <Card className="mt-3">
+                <Card.Body>
+                    <h5>
+                        <CalendarWeek className="icon mr-2"/>
+                        <FormattedMessage id="page.individual.events.title"/>
+                    </h5>
+                    <ul className="timeline">
+                        {events.array().map((event, i) => (
+                            this.renderTimelineEvent(event, i, eventsWithKeys[event.tag().one()])
+                        ))}
+                    </ul>
+                </Card.Body>
+            </Card>
+        );
+    }
+
     render() {
         const { file, match: { params: { individualId } }, settings: { rootIndividual }, setRootIndividual } = this.props;
         const individualOpt = file.getIndividualRecord(individualId, 1);
@@ -231,6 +311,8 @@ export class PageIndividual extends Component {
                 </Card>
 
                 {this.renderAncestorsCard(individualOpt)}
+
+                {this.renderTimelineCard(individualOpt)}
             </PrivateLayout>
         );
     }

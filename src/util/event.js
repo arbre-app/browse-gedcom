@@ -5,7 +5,7 @@ function isValidDate(dateObject){
     return dateObject.toString() !== 'Invalid Date';
 }
 
-export function displayDate(dateGedcom, isShort) {
+export function displayDate(dateGedcom, isShort = false) {
     const first = dateGedcom;
     const obj = first.valueAsDate().one();
     if (obj !== null) {
