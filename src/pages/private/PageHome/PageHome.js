@@ -170,7 +170,7 @@ export class PageHome extends Component {
                                     <Bug className="icon mr-1" />
                                     <FormattedMessage id="page.home.tools.debug"/>
                                 </Button>
-                            } node={file} />
+                            } node={file.children()} maxDepth={0} />
                         </p>
                     </Card.Body>
                 </Card>

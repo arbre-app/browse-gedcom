@@ -24,13 +24,13 @@ class NodeLi extends Component {
     renderTag = () => {
         const { node, synthetic } = this.props;
         return <Badge variant={synthetic ? 'info' : 'secondary'}
-                      className="text-monospace">{node.tag().option()}</Badge>;
+                      className="text-monospace mr-1">{node.tag().option()}</Badge>;
     };
 
     renderPointer = () => {
         const { node } = this.props;
         const pointer = node.pointer().option();
-        return pointer && <Badge variant="success" className="text-monospace">{pointer}</Badge>;
+        return pointer && <Badge variant="success" className="text-monospace mr-1">{pointer}</Badge>;
     };
 
     linkComponentDecorator = (decoratedHref, decoratedText, key) => (
@@ -89,9 +89,9 @@ class NodeLi extends Component {
                 <NodeLi node={recordOpt} synthetic maxDepth={maxDepth - 1} {...otherProps} />
             );
         } else if (recordOpt.isEmpty()) {
-            return <li><Badge variant="danger" className="text-monospace"><FormattedMessage id="component.debug.resolution.not_found" values={{ pointer }}/></Badge></li>;
+            return <li><Badge variant="danger" className="text-monospace mr-1"><FormattedMessage id="component.debug.resolution.not_found" values={{ pointer }}/></Badge></li>;
         } else {
-            return <li><Badge variant="danger" className="text-monospace"><FormattedMessage id="component.debug.resolution.ambiguous" values={{ pointer }}/></Badge></li>;
+            return <li><Badge variant="danger" className="text-monospace mr-1"><FormattedMessage id="component.debug.resolution.ambiguous" values={{ pointer }}/></Badge></li>;
         }
     };
 
@@ -100,8 +100,8 @@ class NodeLi extends Component {
         const { xRefResolved } = this.state;
         return (
             <li>
-                {this.renderTag()}{' '}
-                {this.renderPointer()}{' '}
+                {this.renderTag()}
+                {this.renderPointer()}
                 {this.renderValue()}
                 <NodeTree node={node.children()} maxDepth={maxDepth - 1} {...otherProps}>
                     {xRefResolved && this.renderResolvedNode()}
