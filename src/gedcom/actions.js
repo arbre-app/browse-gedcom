@@ -1,5 +1,5 @@
 import { readGedcom } from 'read-gedcom';
-import { computeAncestors, computeDescendants, computeRelated, createInitialSettings } from '../util';
+import { computeAncestors, computeDescendants, computeRelated, createInitialSettings, topologicalSort } from '../util';
 
 export const LOADING = 'gedcomFile/LOADING';
 export const SUCCESS = 'gedcomFile/SUCCESS';
@@ -92,8 +92,10 @@ export const setRootIndividual = (root, rootIndividual) => async dispatch => {
 
 const initializeAllFields = root => {
     const settings = createInitialSettings(root);
+    const { topologicalArray, topologicalOrdering } = topologicalSort(root);
+    const inbreedingMap = new Map();
     const dependant = computeDependantFields(root, settings.rootIndividual);
-    return { settings, ...dependant };
+    return { settings, topologicalArray, topologicalOrdering, inbreedingMap, ...dependant };
 };
 
 const computeDependantFields = (root, rootIndividual) => {

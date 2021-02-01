@@ -1,17 +1,34 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Card, Col, Dropdown, DropdownButton, Row } from 'react-bootstrap';
-import { Bug, CalendarWeek, Diagram2, HouseDoor, Person, Printer, ThreeDotsVertical } from 'react-bootstrap-icons';
-import { FormattedMessage } from 'react-intl';
+import { Badge, Button, Card, Col, Dropdown, DropdownButton, Row } from 'react-bootstrap';
+import {
+    Bug,
+    CalendarWeek, Cpu,
+    Diagram2,
+    HouseDoor,
+    Percent,
+    Person,
+    Printer,
+    ThreeDotsVertical,
+} from 'react-bootstrap-icons';
+import { FormattedMessage, FormattedNumber } from 'react-intl';
 import { Event as EventFact, Gedcom, IndividualEvent, Tag } from 'read-gedcom';
 import { LinkContainer } from 'react-router-bootstrap';
 import { DebugGedcom, EventName, IndividualName, IndividualRich } from '../../../components';
 import { AncestorsTreeChart } from '../../../components';
 import { AppRoutes } from '../../../routes';
-import { displayDate, displayName, isEventEmpty } from '../../../util';
+import {
+    computeAncestors,
+    computeDescendants,
+    computeInbreeding, computeRelated,
+    displayDate,
+    displayName,
+    isEventEmpty, setIntersectionSize,
+} from '../../../util';
 import { HelmetBase } from '../../HelmetBase';
 import { PageNotFound } from '../../mixed';
 import { PrivateLayout } from '../PrivateLayout';
+import { StatisticsProxy } from './StatisticsProxy';
 
 export class PageIndividual extends Component {
 
@@ -245,10 +262,10 @@ export class PageIndividual extends Component {
         return (
             <Card className="mt-3">
                 <Card.Body>
-                    <h5>
+                    <Card.Title>
                         <CalendarWeek className="icon mr-2"/>
                         <FormattedMessage id="page.individual.events.title"/>
-                    </h5>
+                    </Card.Title>
                     <ul className="timeline">
                         {events.array().map((event, i) => (
                             this.renderTimelineEvent(event, i, eventsWithKeys[event.tag().one()])
@@ -257,7 +274,116 @@ export class PageIndividual extends Component {
                 </Card.Body>
             </Card>
         );
-    }
+    };
+
+    computeStatistics = individual => {
+        const { file, ancestors, descendants, related, topologicalOrdering, inbreedingMap } = this.props;
+        const { settings: { rootIndividual } } = this.props;
+        const coefficientInbreeding = computeInbreeding(file, topologicalOrdering, inbreedingMap, individual);
+        const individualId = individual.pointer().one();
+        const individualAncestors = computeAncestors(file, individual), individualDescendants = computeDescendants(file, individual), individualRelated = computeRelated(file, individualAncestors);
+        individualAncestors.delete(individualId);
+        individualDescendants.delete(individualId);
+        individualRelated.delete(individualId);
+        const totalAncestors = individualAncestors.size, totalDescendants = individualDescendants.size, totalRelated = individualRelated.size;
+        let commonAncestors = null, commonDescendants = null, commonRelated = null;
+        if(rootIndividual !== null) {
+            const rootId = rootIndividual.pointer().one();
+            individualAncestors.delete(rootId);
+            individualDescendants.delete(rootId);
+            individualRelated.delete(rootId);
+            commonAncestors = setIntersectionSize(individualAncestors, ancestors);
+            commonDescendants = setIntersectionSize(individualDescendants, descendants);
+            commonRelated = setIntersectionSize(individualRelated, related);
+        }
+        return { coefficientInbreeding, totalAncestors, totalDescendants, totalRelated, commonAncestors, commonDescendants, commonRelated };
+    };
+
+    renderStatisticsContent = individual => ({ coefficientInbreeding, totalAncestors, totalDescendants, totalRelated, commonAncestors, commonDescendants, commonRelated }) => {
+        const { settings: { rootIndividual } } = this.props;
+        const withCommon = rootIndividual !== null && individual.pointer().one() !== rootIndividual.pointer().one();
+        return (
+            <>
+                <FormattedMessage
+                    id="page.individual.statistics.coefficient_inbreeding"
+                    values={{ percentage: (
+                            <Badge variant="secondary">
+                                <FormattedNumber
+                                    value={coefficientInbreeding}
+                                    style="percent"
+                                    maximumFractionDigits={2}
+                                />
+                            </Badge>
+                        )}}
+                />
+                <table className="mt-2 table table-borderless table-striped text-center">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>
+                            <FormattedMessage id="page.individual.statistics.table.total"/>
+                        </th>
+                        {withCommon && (
+                            <th>
+                                <FormattedMessage
+                                    id="page.individual.statistics.table.in_common_with"
+                                    values={{
+                                        name: <IndividualName individual={rootIndividual} noLink noAncestry />,
+                                    }}
+                                />
+                            </th>
+                        )
+                        }
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td className="font-weight-bold"><FormattedMessage id="page.individual.statistics.table.ancestors"/></td>
+                        <td><FormattedNumber value={totalAncestors}/></td>
+                        <td>{withCommon && <FormattedNumber value={commonAncestors}/>}</td>
+                    </tr>
+                    <tr>
+                        <td className="font-weight-bold"><FormattedMessage id="page.individual.statistics.table.descendants"/></td>
+                        <td><FormattedNumber value={totalDescendants}/></td>
+                        <td>{withCommon && <FormattedNumber value={commonDescendants}/>}</td>
+                    </tr>
+                    <tr>
+                        <td className="font-weight-bold"><FormattedMessage id="page.individual.statistics.table.related"/></td>
+                        <td><FormattedNumber value={totalRelated}/></td>
+                        <td>{withCommon && <FormattedNumber value={commonRelated}/>}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </>
+        )
+    };
+
+    renderStatisticsCard = individual => {
+        // Beware that the component is not remounted if the root changes
+        return (
+            <Card className="mt-3">
+                <Card.Body>
+                    <Card.Title>
+                        <Percent className="icon mr-2"/>
+                        <FormattedMessage id="page.individual.statistics.title"/>
+                    </Card.Title>
+                    <StatisticsProxy
+                        key={individual.pointer().one()}
+                        computeData={() => this.computeStatistics(individual)}
+                        buttonComponent={({ onClick }) => (
+                            <div className="text-center">
+                                <Button onClick={onClick}>
+                                    <Cpu className="icon mr-2"/>
+                                    <FormattedMessage id="page.individual.statistics.compute"/>
+                                </Button>
+                            </div>
+                        )}
+                        contentComponent={this.renderStatisticsContent(individual)}
+                    />
+                </Card.Body>
+            </Card>
+        )
+    };
 
     render() {
         const { file, match: { params: { individualId } }, settings: { rootIndividual }, setRootIndividual } = this.props;
@@ -274,7 +400,7 @@ export class PageIndividual extends Component {
                             <Person className="icon mr-2"/>
                             <IndividualName individual={individualOpt} gender noLink />
                             <DropdownButton title={<ThreeDotsVertical className="icon" />} variant="outline-secondary" size="sm" style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}>
-                                <Dropdown.Item href="#" disabled={individualOpt.pointer().one() === rootIndividual.pointer().one()} onClick={() => setRootIndividual(file, individualOpt)}>
+                                <Dropdown.Item href="#" disabled={rootIndividual !== null && individualOpt.pointer().one() === rootIndividual.pointer().one()} onClick={() => setRootIndividual(file, individualOpt)}>
                                     <HouseDoor className="icon mr-2" />
                                     <FormattedMessage id="page.individual.actions.define_root"/>
                                 </Dropdown.Item>
@@ -313,6 +439,8 @@ export class PageIndividual extends Component {
                 {this.renderAncestorsCard(individualOpt)}
 
                 {this.renderTimelineCard(individualOpt)}
+
+                {this.renderStatisticsCard(individualOpt)}
             </PrivateLayout>
         );
     }
@@ -327,5 +455,16 @@ PageIndividual.propTypes = {
     file: PropTypes.instanceOf(Gedcom).isRequired,
     /* Redux */
     settings: PropTypes.object.isRequired,
+    ancestors: PropTypes.instanceOf(Set),
+    descendants: PropTypes.instanceOf(Set),
+    related: PropTypes.instanceOf(Set),
+    topologicalOrdering: PropTypes.object.isRequired,
+    inbreedingMap: PropTypes.instanceOf(Map).isRequired,
     setRootIndividual: PropTypes.func.isRequired,
+};
+
+PageIndividual.defaultProps = {
+    ancestors: null,
+    descendants: null,
+    related: null,
 };
