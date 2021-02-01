@@ -48,7 +48,12 @@ export class PageAbout extends Component {
                                 <FormattedMessage id="page.about.contribute.suggestions_bugs"/>
                             </li>
                             <li>
-                                <FormattedMessage id="page.about.contribute.translations"/>
+                                <FormattedMessage
+                                    id="page.about.contribute.translations"
+                                    values={{
+                                        a: chunk => <a href="https://crowdin.com/project/monarbreapp" target="_blank" rel="noreferrer">{chunk}</a>,
+                                    }}
+                                />
                             </li>
                             <li>
                                 <FormattedMessage id="page.about.contribute.development"/>

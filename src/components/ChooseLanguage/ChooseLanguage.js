@@ -26,7 +26,7 @@ export class ChooseLanguage extends Component {
                     </Dropdown.Item>
                 ))}
                 <Dropdown.Divider />
-                <Dropdown.Item href="https://github.com/arbre-app/browse-gedcom/blob/master/src/i18n/locales" target="_blank" rel="noreferrer">
+                <Dropdown.Item href="https://crowdin.com/project/monarbreapp" target="_blank" rel="noreferrer">
                     <CardText className="icon mr-2" />
                     <FormattedMessage id="menu.language.contribute"/>
                 </Dropdown.Item>
