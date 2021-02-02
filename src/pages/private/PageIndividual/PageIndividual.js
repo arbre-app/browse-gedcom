@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Badge, Button, Card, Col, Dropdown, DropdownButton, Row } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Dropdown, DropdownButton, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import {
     Bug,
     CalendarWeek, Cpu,
@@ -20,7 +20,7 @@ import { AppRoutes } from '../../../routes';
 import {
     computeAncestors,
     computeDescendants,
-    computeInbreeding, computeRelated,
+    computeInbreedingCoefficient, computeRelated, computeRelatednessCoefficient,
     displayDate,
     displayName,
     isEventEmpty, setIntersectionSize,
@@ -277,17 +277,19 @@ export class PageIndividual extends Component {
     };
 
     computeStatistics = individual => {
-        const { file, ancestors, descendants, related, topologicalOrdering, inbreedingMap } = this.props;
+        const { file, ancestors, descendants, related, topologicalOrdering, inbreedingMap, relatednessMap } = this.props;
         const { settings: { rootIndividual } } = this.props;
-        const coefficientInbreeding = computeInbreeding(file, topologicalOrdering, inbreedingMap, individual);
+        const coefficientInbreeding = computeInbreedingCoefficient(file, topologicalOrdering, inbreedingMap, individual);
         const individualId = individual.pointer().one();
         const individualAncestors = computeAncestors(file, individual), individualDescendants = computeDescendants(file, individual), individualRelated = computeRelated(file, individualAncestors);
         individualAncestors.delete(individualId);
         individualDescendants.delete(individualId);
         individualRelated.delete(individualId);
         const totalAncestors = individualAncestors.size, totalDescendants = individualDescendants.size, totalRelated = individualRelated.size;
+        let coefficientRelatedness = null;
         let commonAncestors = null, commonDescendants = null, commonRelated = null;
         if(rootIndividual !== null) {
+            coefficientRelatedness = computeRelatednessCoefficient(file, topologicalOrdering, relatednessMap, individual, rootIndividual);
             const rootId = rootIndividual.pointer().one();
             individualAncestors.delete(rootId);
             individualDescendants.delete(rootId);
@@ -296,26 +298,91 @@ export class PageIndividual extends Component {
             commonDescendants = setIntersectionSize(individualDescendants, descendants);
             commonRelated = setIntersectionSize(individualRelated, related);
         }
-        return { coefficientInbreeding, totalAncestors, totalDescendants, totalRelated, commonAncestors, commonDescendants, commonRelated };
+        return { coefficientInbreeding, coefficientRelatedness, totalAncestors, totalDescendants, totalRelated, commonAncestors, commonDescendants, commonRelated };
     };
 
-    renderStatisticsContent = individual => ({ coefficientInbreeding, totalAncestors, totalDescendants, totalRelated, commonAncestors, commonDescendants, commonRelated }) => {
+    renderStatisticsContent = individual => ({ coefficientInbreeding, coefficientRelatedness, totalAncestors, totalDescendants, totalRelated, commonAncestors, commonDescendants, commonRelated }) => {
         const { settings: { rootIndividual } } = this.props;
+        const computeDegrees = x => -Math.log2(x);
         const withCommon = rootIndividual !== null && individual.pointer().one() !== rootIndividual.pointer().one();
         return (
             <>
-                <FormattedMessage
-                    id="page.individual.statistics.coefficient_inbreeding"
-                    values={{ percentage: (
-                            <Badge variant="secondary">
-                                <FormattedNumber
-                                    value={coefficientInbreeding}
-                                    style="percent"
-                                    maximumFractionDigits={2}
-                                />
-                            </Badge>
-                        )}}
-                />
+                <div>
+                    <FormattedMessage
+                        id="page.individual.statistics.coefficient_inbreeding"
+                        values={{ percentage: (
+                                <OverlayTrigger
+                                    placement="top"
+                                    overlay={
+                                        <Tooltip id="tooltip-inbreeding">
+                                            {coefficientInbreeding > 0 ? (
+                                                <FormattedMessage
+                                                    id="page.individual.statistics.degrees"
+                                                    values={{ value: computeDegrees(coefficientInbreeding), degrees: (
+                                                            <FormattedNumber
+                                                                value={computeDegrees(coefficientInbreeding)}
+                                                                style="decimal"
+                                                                maximumFractionDigits={2}
+                                                            />
+                                                        )}}
+                                                />
+                                            ) : (
+                                                <FormattedMessage id="page.individual.statistics.no_inbreeding"/>
+                                            )}
+                                        </Tooltip>
+                                    }
+                                >
+                                    <Badge variant="secondary">
+                                        <FormattedNumber
+                                            value={coefficientInbreeding}
+                                            style="percent"
+                                            maximumFractionDigits={2}
+                                        />
+                                    </Badge>
+                                </OverlayTrigger>
+                            )
+                        }}
+                    />
+                </div>
+                {withCommon && (
+                    <div>
+                        <FormattedMessage
+                            id="page.individual.statistics.coefficient_relatedness"
+                            values={{ name: <IndividualName individual={individual} noLink noAncestry/>, percentage: (
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={
+                                            <Tooltip id="tooltip-relatedness">
+                                                {coefficientRelatedness > 0 ? (
+                                                    <FormattedMessage
+                                                        id="page.individual.statistics.degrees"
+                                                        values={{ value: computeDegrees(coefficientRelatedness), degrees: (
+                                                                <FormattedNumber
+                                                                    value={computeDegrees(coefficientRelatedness)}
+                                                                    style="decimal"
+                                                                    maximumFractionDigits={2}
+                                                                />
+                                                            )}}
+                                                    />
+                                                ) : (
+                                                    <FormattedMessage id="page.individual.statistics.no_relation"/>
+                                                )}
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <Badge variant="secondary">
+                                            <FormattedNumber
+                                                value={coefficientRelatedness}
+                                                style="percent"
+                                                maximumFractionDigits={2}
+                                            />
+                                        </Badge>
+                                    </OverlayTrigger>
+                                )
+                            }}
+                        />
+                    </div>
+                )}
                 <table className="mt-2 table table-borderless table-striped text-center">
                     <thead>
                     <tr>

@@ -90,7 +90,7 @@ export function topologicalSort(root) {
     return { topologicalArray: reverse, topologicalOrdering: index };
 }
 
-export function computeInbreeding(root, topologicalOrdering, inbreedingMap, individual) {
+function computeCoefficient(root, topologicalOrdering, inbreedingMap, isModeInbreed, individual1, individual2) {
     function keyFor(id1, id2) {
         if(id1 < id2) {
             return `${id1}${id2}`;
@@ -109,9 +109,13 @@ export function computeInbreeding(root, topologicalOrdering, inbreedingMap, indi
         }
         let value;
         if(id1 === id2) {
-            const family = individual1.getFamilyAsChild();
-            const father = family.getHusband().getIndividualRecord(), mother = family.getWife().getIndividualRecord();
-            value = 0.5 * (1 + memoizedInbreeding(father, mother));
+            if(isModeInbreed) {
+                const family = individual1.getFamilyAsChild();
+                const father = family.getHusband().getIndividualRecord(), mother = family.getWife().getIndividualRecord();
+                value = 0.5 * (1 + memoizedInbreeding(father, mother));
+            } else {
+                value = 1.0;
+            }
         } else {
             if(topologicalOrdering[id1] < topologicalOrdering[id2]) {
                 const family2 = individual2.getFamilyAsChild();
@@ -126,7 +130,15 @@ export function computeInbreeding(root, topologicalOrdering, inbreedingMap, indi
         inbreedingMap.set(key, value);
         return value;
     }
-    return 2 * (memoizedInbreeding(individual, individual) - 0.5);
+    return memoizedInbreeding(individual1, individual2);
+}
+
+export function computeInbreedingCoefficient(root, topologicalOrdering, inbreedingMap, individual) {
+    return 2 * (computeCoefficient(root, topologicalOrdering, inbreedingMap, true, individual, individual) - 0.5);
+}
+
+export function computeRelatednessCoefficient(root, topologicalOrdering, relatednessMap, individual1, individual2) {
+    return computeCoefficient(root, topologicalOrdering, relatednessMap, false, individual1, individual2);
 }
 
 export function setIntersectionSize(set1, set2) {

@@ -1,0 +1,9 @@
+{
+  "extends": ["react-app"],
+  "rules": {
+    "react/style-prop-object": [
+      "error",
+      { "allow": ["FormattedNumber", "FormattedDateParts", "FormattedRelativeTime"] }
+    ]
+  }
+}

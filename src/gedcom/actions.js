@@ -93,9 +93,9 @@ export const setRootIndividual = (root, rootIndividual) => async dispatch => {
 const initializeAllFields = root => {
     const settings = createInitialSettings(root);
     const { topologicalArray, topologicalOrdering } = topologicalSort(root);
-    const inbreedingMap = new Map();
+    const inbreedingMap = new Map(), relatednessMap = new Map();
     const dependant = computeDependantFields(root, settings.rootIndividual);
-    return { settings, topologicalArray, topologicalOrdering, inbreedingMap, ...dependant };
+    return { settings, topologicalArray, topologicalOrdering, inbreedingMap, relatednessMap, ...dependant };
 };
 
 const computeDependantFields = (root, rootIndividual) => {

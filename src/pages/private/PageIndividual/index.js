@@ -9,6 +9,7 @@ const mapStateToProps = state => ({
     related: state.gedcomFile.data.related,
     topologicalOrdering: state.gedcomFile.data.topologicalOrdering,
     inbreedingMap: state.gedcomFile.data.inbreedingMap,
+    relatednessMap: state.gedcomFile.data.relatednessMap,
 });
 
 const mapDispatchToProps = dispatch => ({

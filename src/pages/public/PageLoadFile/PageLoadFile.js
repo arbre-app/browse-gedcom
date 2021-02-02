@@ -133,6 +133,7 @@ LoadFileSample.propTypes = {
 
 export class PageLoadFile extends Component {
     componentDidMount() {
+        // eslint-disable-next-line
         const { loadGedcomUrl } = this.props;
         const environment = process.env.NODE_ENV;
         const isDevelopment = !environment || environment === 'development';
