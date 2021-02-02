@@ -11,8 +11,10 @@ body {
 
 .icon {
     /* Fixes icon alignment */
-    vertical-align: -0.125em;
-    margin-bottom: calc(-0.125em / 2);
+    width: 1em;
+    height: 1em;
+    vertical-align: -.1em;
+    display: inline-block;
 }
 
 .btn-load-more {

@@ -348,7 +348,7 @@ export class PageIndividual extends Component {
                     <div>
                         <FormattedMessage
                             id="page.individual.statistics.coefficient_relatedness"
-                            values={{ name: <IndividualName individual={individual} noLink noAncestry/>, percentage: (
+                            values={{ name: <IndividualName individual={rootIndividual} noAncestry/>, percentage: (
                                     <OverlayTrigger
                                         placement="top"
                                         overlay={
@@ -395,7 +395,7 @@ export class PageIndividual extends Component {
                                 <FormattedMessage
                                     id="page.individual.statistics.table.in_common_with"
                                     values={{
-                                        name: <IndividualName individual={rootIndividual} noLink noAncestry />,
+                                        name: <span className="font-weight-normal"><IndividualName individual={rootIndividual} noAncestry /></span>,
                                     }}
                                 />
                             </th>

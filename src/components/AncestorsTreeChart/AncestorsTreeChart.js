@@ -6,7 +6,7 @@ import { IndividualName } from '../IndividualName';
 
 export class AncestorsTreeChart extends Component {
 
-    renderTreeLi = (individual, maxDepth) => {
+    renderTreeLi = (individual, maxDepth, isRoot = false) => {
         const familyOpt = individual.getFamilyAsChild(1);
         let child = null;
         if (maxDepth > 0 && !familyOpt.isEmpty()) {
@@ -25,7 +25,7 @@ export class AncestorsTreeChart extends Component {
             <li>
                 {child}
                 <span>
-                    <IndividualName individual={individual} />
+                    <IndividualName individual={individual} noLink={isRoot} />
                 </span>
             </li>
         );
@@ -35,7 +35,7 @@ export class AncestorsTreeChart extends Component {
         const { individual, maxDepth } = this.props;
         return (
             <ul className="ascending-tree">
-                {this.renderTreeLi(individual, maxDepth)}
+                {this.renderTreeLi(individual, maxDepth, true)}
             </ul>
         );
     }
