@@ -39,6 +39,7 @@
   "page.load.samples_constraints": "Si vous n'avez pas de fichier Gedcom ou que vous souhaitez essayer l'application",
   "page.load.samples_names.royal92": "Familles royales en Europe",
   "page.load.samples_names.pres2020": "Présidents des États-Unis",
+  "page.load.crashes": "Envoyer automatiquement les rapports de plantage",
   "page.load.about.title": "Qu'est-ce que c'est ?",
   "page.load.about.description": "<b>{name}</b> est une application qui vous permet de lire un <a>fichier Gedcom</a> depuis votre navigateur et vous donne accès à divers outils utiles.",
   "page.load.about.gedcom_file.about": "Qu'est-ce qu'un fichier Gedcom ?",

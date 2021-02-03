@@ -1,5 +1,6 @@
+import * as Sentry from "@sentry/react";
 import { readGedcom } from 'read-gedcom';
-import { computeAncestors, computeDescendants, computeRelated, createInitialSettings, topologicalSort } from '../util';
+import { computeAncestors, computeDescendants, computeRelated, createInitialSettings, topologicalSort } from '../../util';
 
 export const LOADING = 'gedcomFile/LOADING';
 export const SUCCESS = 'gedcomFile/SUCCESS';
@@ -8,7 +9,7 @@ export const SET_ROOT = 'gedcomFile/SET_ROOT';
 export const ERROR = 'gedcomFile/ERROR';
 export const CLEAR = 'gedcomFile/CLEAR';
 
-export const loadGedcomUrl = url => async dispatch => {
+export const loadGedcomUrl = (url, isSentryEnabled = false) => async dispatch => {
     dispatch({
         type: LOADING,
     });
@@ -19,6 +20,9 @@ export const loadGedcomUrl = url => async dispatch => {
         root = readGedcom(buffer);
     } catch (error) {
         console.error(error);
+        if(isSentryEnabled) {
+            Sentry.captureException(error);
+        }
         dispatch({
             type: ERROR,
             error: error.message,
@@ -35,7 +39,7 @@ export const loadGedcomUrl = url => async dispatch => {
     });
 };
 
-export const loadGedcomFile = file => async dispatch => {
+export const loadGedcomFile = (file, isSentryEnabled = false) => async dispatch => {
     dispatch({
         type: LOADING,
     });
@@ -56,6 +60,9 @@ export const loadGedcomFile = file => async dispatch => {
         root = readGedcom(buffer);
     } catch (error) {
         console.error(error);
+        if(isSentryEnabled) {
+            Sentry.captureException(error);
+        }
         dispatch({
             type: ERROR,
             error: error.message,

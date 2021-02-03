@@ -21,7 +21,7 @@ import {
     ShieldLockFill,
 } from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
-import { APP_NAME } from '../../../config';
+import { APP_NAME, SENTRY_ENABLED } from '../../../config';
 import { AVAILABLE_SAMPLE_FILES } from '../../../i18n';
 import { PublicLayout } from '../PublicLayout';
 
@@ -132,6 +132,10 @@ LoadFileSample.propTypes = {
 };
 
 export class PageLoadFile extends Component {
+    state = {
+        isSentryRequested: SENTRY_ENABLED, // Checked by default if enabled
+    };
+
     componentDidMount() {
         // eslint-disable-next-line
         const { loadGedcomUrl } = this.props;
@@ -154,18 +158,31 @@ export class PageLoadFile extends Component {
         );
     };
 
+    handleSubmit = () => {
+        const { activateSentry, isSentryEnabled } = this.props;
+        const { isSentryRequested } = this.state;
+        if(SENTRY_ENABLED && isSentryRequested && !isSentryEnabled) {
+            activateSentry();
+        }
+    }
+
     handleFileSubmit = file => {
-        const { loadGedcomFile } = this.props;
-        loadGedcomFile(file);
+        const { loadGedcomFile, isSentryEnabled } = this.props;
+        const { isSentryRequested } = this.state;
+        this.handleSubmit();
+        loadGedcomFile(file, SENTRY_ENABLED && (isSentryRequested || isSentryEnabled));
     };
 
     handleUrlSubmit = url => {
-        const { loadGedcomUrl } = this.props;
-        loadGedcomUrl(url);
+        const { loadGedcomUrl, isSentryEnabled } = this.props;
+        const { isSentryRequested } = this.state;
+        this.handleSubmit();
+        loadGedcomUrl(url, SENTRY_ENABLED && (isSentryRequested || isSentryEnabled));
     };
 
     render() {
-        const { loading } = this.props;
+        const { loading, isSentryEnabled } = this.props;
+        const { isSentryRequested } = this.state;
         return (
             <PublicLayout>
                 <Card>
@@ -216,9 +233,20 @@ export class PageLoadFile extends Component {
                         <Row className="justify-content-center mt-3">
                             <LoadFileSample loading={loading} onUrlSubmit={this.handleUrlSubmit}/>
                         </Row>
-                        <p className="text-center mb-0">
+                        <p className="text-center mb-5">
                             <small><FormattedMessage id="page.load.samples_constraints"/></small>
                         </p>
+                        {SENTRY_ENABLED && !isSentryEnabled && (
+                            <Form>
+                                <Form.Group controlId="crashes" className="text-center mb-0">
+                                    <FormattedMessage id="page.load.crashes">
+                                        {text => (
+                                            <Form.Check type="checkbox" label={text} checked={isSentryRequested} onChange={event => this.setState({ isSentryRequested: event.target.checked })} disabled={loading}/>
+                                        )}
+                                    </FormattedMessage>
+                                </Form.Group>
+                            </Form>
+                        )}
                     </Card.Body>
                 </Card>
                 <div className="col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-xs-12 offset-xs-0 mt-3 text-center text-muted">
@@ -279,9 +307,11 @@ PageLoadFile.propTypes = {
     /* Redux */
     loading: PropTypes.bool.isRequired,
     error: PropTypes.string,
+    isSentryEnabled: PropTypes.bool.isRequired,
     loadGedcomFile: PropTypes.func.isRequired,
     loadGedcomUrl: PropTypes.func.isRequired,
     clearNotifications: PropTypes.func.isRequired,
+    activateSentry: PropTypes.func.isRequired,
 };
 
 PageLoadFile.defaultProps = {

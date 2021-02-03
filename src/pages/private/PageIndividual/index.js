@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { setRootIndividual } from '../../../gedcom/actions';
+import { setRootIndividual } from '../../../state/gedcom/actions';
 import { PageIndividual as PageIndividualComponent } from './PageIndividual';
 
 const mapStateToProps = state => ({
