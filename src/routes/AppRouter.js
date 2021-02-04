@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Switch } from 'react-router-dom';
-import { PageAbout, PageNotFound } from '../pages/mixed';
+import { PageAbout, PageChangelog, PageNotFound } from '../pages/mixed';
 import { PageHome, PageIndividual, PagePrint, PageSearch } from '../pages/private';
 import { PageLoadFile } from '../pages/public';
 import { PrivateRoute } from './PrivateRoute';
@@ -14,6 +14,7 @@ export class AppRouter extends Component {
                 <PublicRoute path={AppRoutes.loadGedcomFile} exact restricted component={PageLoadFile} />
 
                 <PublicRoute path={AppRoutes.about} exact component={PageAbout} />
+                <PublicRoute path={AppRoutes.changelog} exact component={PageChangelog} />
 
                 <PrivateRoute path={AppRoutes.home} exact component={PageHome} />
                 <PrivateRoute path={AppRoutes.individual} exact component={PageIndividual} />

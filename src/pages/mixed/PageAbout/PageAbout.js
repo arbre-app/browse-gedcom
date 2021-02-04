@@ -17,7 +17,7 @@ export class PageAbout extends Component {
         return (
             <MixedLayout>
                 <FormattedMessage id="page.about.head.title">
-                    {title => <HelmetBase title={title} />}
+                    {([title]) => <HelmetBase title={title} />}
                 </FormattedMessage>
                 <Card>
                     <Card.Body>

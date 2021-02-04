@@ -1,0 +1,61 @@
+{
+  "0.1.1": {
+    "date": "2021-02-05",
+    "description": {
+      "en": "Thank you to the users who tested the application.",
+      "fr": "Merci aux utilisateurs qui ont testé l'application."
+    },
+    "additions": [
+      {
+        "en": "Display of half-siblings",
+        "fr": "Affichage des fratries recomposées"
+      },
+      {
+        "en": "Display of individual events",
+        "fr": "Affichage chronologique des événements individuels"
+      },
+      {
+        "en": "Computations per individual: coefficient of relation with the root, coefficient of inbreeding, general statistics",
+        "fr": "Calculs par individu : coefficient de parenté avec la souche, coefficient de consanguinité, statistiques générales"
+      },
+      {
+        "en": "Set up a crowdsourcing platform for managing the translations",
+        "fr": "Mise en place d'une plateforme de crowdsourcing pour la gestion des traductions"
+      },
+      {
+        "en": "Automated crashes report",
+        "fr": "Rapport automatique des plantages"
+      },
+      {
+        "en": "The application is now installable and usable offline (Progressive Web App); created a visual identity",
+        "fr": "L'application est désormais installable et utilisable en mode hors-ligne (Progressive Web App) ; création d'une identité visuelle"
+      },
+      {
+        "en": "Keeping track of a changelog",
+        "fr": "Suivi de version"
+      }
+    ],
+    "fixes": [
+      {
+        "en": "Improved the compatibility of Gedcom files",
+        "fr": "Amélioration de la compatibilité des fichiers Gedcom",
+        "authors": ["Tom B."]
+      },
+      {
+        "en": "The spouses are now sorted according to the FAMS field if available",
+        "fr": "Les conjoints sont triés par rapport au champ FAMS si disponible"
+      }
+    ],
+    "deletions": []
+  },
+  "0.1.0": {
+    "date": "2021-01-29",
+    "description": {
+      "en": "Early release with minimal features.",
+      "fr": "Sortie anticipée avec fonctionnalités minimales."
+    },
+    "additions": [],
+    "fixes": [],
+    "deletions": []
+  }
+}

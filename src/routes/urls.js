@@ -5,6 +5,7 @@ const RoutesList = {
     home: '/',
     loadGedcomFile: '/load',
     about: '/about',
+    changelog: '/changelog',
     individual: '/individual/:individualId',
     search: '/individuals/search',
     print: '/print',

@@ -1,0 +1,1 @@
+export { PageChangelog } from './PageChangelog';
