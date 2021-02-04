@@ -45,7 +45,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --passWithNoTests",
     "eject": "react-scripts eject",
-    "setup": "bash setup.sh"
+    "setup": "bash setup.sh",
+    "favicons": "real-favicon generate favicon.json faviconData.json public"
   },
   "eslintConfig": {
     "extends": "react-app"
