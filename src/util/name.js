@@ -4,6 +4,6 @@ export function displayName(individual, placeholder = '') {
         .valueAsParts()
         .all()
         .filter(v => v != null)
-        .map(v => v.filter(s => s).map(s => s.replaceAll(/_+/g, ' ')).join(' '))[0];
+        .map(v => v.filter(s => s).map(s => s.replace(/_+/g, ' ')).join(' '))[0];
     return name ? name : placeholder;
 }
