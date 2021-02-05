@@ -4,10 +4,11 @@ import { computeAncestors, computeDescendants, computeRelated, createInitialSett
 
 export const LOADING = 'gedcomFile/LOADING';
 export const SUCCESS = 'gedcomFile/SUCCESS';
+export const CLEAR_FILE = 'gedcomFile/CLEAR_FILE';
 export const BLOCK = 'gedcomFile/BLOCK';
 export const SET_ROOT = 'gedcomFile/SET_ROOT';
 export const ERROR = 'gedcomFile/ERROR';
-export const CLEAR = 'gedcomFile/CLEAR';
+export const CLEAR_NOTIFICATIONS = 'gedcomFile/CLEAR_NOTIFICATIONS';
 
 export const loadGedcomUrl = (url, isSentryEnabled = false) => async dispatch => {
     dispatch({
@@ -79,9 +80,15 @@ export const loadGedcomFile = (file, isSentryEnabled = false) => async dispatch 
     });
 };
 
+export const clearGedcomFile = () => async dispatch => {
+    dispatch({
+        type: CLEAR_FILE,
+    })
+}
+
 export const clearNotifications = () => async dispatch => {
     dispatch({
-        type: CLEAR,
+        type: CLEAR_NOTIFICATIONS,
     });
 };
 

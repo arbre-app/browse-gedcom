@@ -2,6 +2,8 @@
   "menu.about": "À propos",
   "menu.overview": "Aperçu",
   "menu.explore": "Explorer",
+  "menu.file.title": "Fichier",
+  "menu.file.close": "Fermer le fichier",
   "menu.search.placeholder": "Recherche globale...",
   "menu.language.title": "Langue",
   "menu.language.contribute": "Contribuer",

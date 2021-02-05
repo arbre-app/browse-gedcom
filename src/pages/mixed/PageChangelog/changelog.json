@@ -44,6 +44,10 @@
       {
         "en": "The spouses are now sorted according to the FAMS field if available",
         "fr": "Les conjoints sont triés par rapport au champ FAMS si disponible"
+      },
+      {
+        "en": "The file can be unloaded without having to refresh the page",
+        "fr": "Le fichier peut être déchargé sans avoir à actualiser la page"
       }
     ],
     "deletions": []

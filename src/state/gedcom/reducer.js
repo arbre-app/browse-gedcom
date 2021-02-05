@@ -1,4 +1,4 @@
-import { LOADING, SUCCESS, ERROR, CLEAR, BLOCK, SET_ROOT } from './actions';
+import { LOADING, SUCCESS, ERROR, CLEAR_NOTIFICATIONS, BLOCK, SET_ROOT, CLEAR_FILE } from './actions';
 
 export const initialState = {
     loading: false,
@@ -27,6 +27,12 @@ export default (state = initialState, action) => {
                 data: action.data,
                 error: null,
             };
+        case CLEAR_FILE:
+            return {
+                loading: false,
+                data: null,
+                error: null,
+            }
         case BLOCK:
             return {
                 ...state,
@@ -45,7 +51,7 @@ export default (state = initialState, action) => {
                     ...action.data.dependant,
                 },
             };
-        case CLEAR:
+        case CLEAR_NOTIFICATIONS:
             return {
                 ...state,
                 error: null,

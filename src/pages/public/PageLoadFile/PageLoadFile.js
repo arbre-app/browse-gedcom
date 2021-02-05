@@ -233,12 +233,12 @@ export class PageLoadFile extends Component {
                         <Row className="justify-content-center mt-3">
                             <LoadFileSample loading={loading} onUrlSubmit={this.handleUrlSubmit}/>
                         </Row>
-                        <p className="text-center mb-5">
+                        <p className="text-center mb-0">
                             <small><FormattedMessage id="page.load.samples_constraints"/></small>
                         </p>
                         {SENTRY_ENABLED && !isSentryEnabled && (
                             <Form>
-                                <Form.Group controlId="crashes" className="text-center mb-0">
+                                <Form.Group controlId="crashes" className="text-center mb-0 mt-5">
                                     <FormattedMessage id="page.load.crashes">
                                         {text => (
                                             <Form.Check type="checkbox" label={text} checked={isSentryRequested} onChange={event => this.setState({ isSentryRequested: event.target.checked })} disabled={loading}/>
