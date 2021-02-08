@@ -200,12 +200,19 @@ export class PageIndividual extends Component {
         const value = event.value().option();
         const date = !event.getDate().isEmpty() && displayDate(event.getDate());
         const place = event.getPlace().value().map(place => place.split(',').map(s => s.trim()).filter(s => s)).map(parts => parts.join(', ')).option();
+        const type = event.tag().one() === Tag.EVENT && event.getType().value().option();
         return (
             <li key={i}>
                 <div>
                     <span className="small-header">
                         <FormattedMessage id={`common.event.title.${translationKey}`}/>
                     </span>
+                    {type && (
+                        <>
+                            {' - '}
+                            {type}
+                        </>
+                    )}
                     {date && (
                         <span className="text-muted">
                             {', '}
@@ -253,7 +260,7 @@ export class PageIndividual extends Component {
             [Tag.RETIREMENT]: 'retirement',
             [Tag.OCCUPATION]: 'occupation', // While originally defined as an attribute it is used as an event
             [Tag.RESIDENCE]: 'residence', // Same here
-            [Tag.EVENT]: 'other_event',
+            [Tag.EVENT]: 'event',
         };
         const events = individual.children().filter(node => eventsWithKeys[node.tag().one()] !== undefined).as(IndividualEvent);
         if(events.isEmpty() || !events.array().some(event => ![Tag.BIRTH, Tag.DEATH, Tag.OCCUPATION].includes(event.tag().one()))) {

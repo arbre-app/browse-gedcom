@@ -53,3 +53,49 @@ export function isEventEmpty(eventGedcom, withDate = true, withPlace = true) {
         || (eventGedcom.getPlace().value().option() && withPlace)
     );
 }
+
+export function displayDateExact(dateGedcom, withTime) {
+    const date = dateGedcom.valueAsExactDate().option();
+    const time = dateGedcom.getTime().valueAsTime().option();
+    if(date) {
+        const jsDate = new Date(
+            parseInt(date.year),
+            parseInt(date.month) - 1,
+            parseInt(date.day)
+        );
+        if(isValidDate(jsDate)) {
+            if(withTime && time) {
+                jsDate.setHours(
+                    parseInt(time.hours),
+                    parseInt(time.minutes),
+                    time.seconds !== undefined ? parseInt(time.seconds) : 0,
+                    time.centiseconds !== undefined ? parseInt(time.centiseconds) * 10 : 0,
+                );
+                return (
+                    <FormattedDate
+                        value={jsDate}
+                        year="numeric"
+                        month="long"
+                        day="numeric"
+                        hour="numeric"
+                        minute="numeric"
+                        second="numeric"
+                    />
+                );
+            } else {
+                return (
+                    <FormattedDate
+                        value={jsDate}
+                        year="numeric"
+                        month="long"
+                        day="numeric"
+                    />
+                );
+            }
+        } else {
+            return dateGedcom.value().option();
+        }
+    } else {
+        return dateGedcom.value().option();
+    }
+}

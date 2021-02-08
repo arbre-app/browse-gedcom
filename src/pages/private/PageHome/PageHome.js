@@ -10,7 +10,7 @@ import {
 import { FormattedMessage, FormattedNumber } from 'react-intl';
 import { Gedcom, IndividualRecord } from 'read-gedcom';
 import { DebugGedcom, IndividualName } from '../../../components';
-import { displayName } from '../../../util';
+import { displayDateExact, displayName } from '../../../util';
 import { HelmetBase } from '../../HelmetBase';
 import { PrivateLayout } from '../PrivateLayout';
 
@@ -141,6 +141,10 @@ export class PageHome extends Component {
                                     <tr>
                                         <td><FormattedMessage id="page.home.metadata.version"/></td>
                                         <td>{file.getHeader().getSourceSystem().getVersion().value().option()}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><FormattedMessage id="page.home.metadata.date"/></td>
+                                        <td>{!file.getHeader().getFileCreationDate().isEmpty() && displayDateExact(file.getHeader().getFileCreationDate(), true)}</td>
                                     </tr>
                                     </tbody>
                                 </Table>
