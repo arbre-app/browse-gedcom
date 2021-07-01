@@ -1,13 +1,13 @@
 function breadthFirstSearch(root, initialIndividuals, neighboursOf) {
-    const visited = new Set(initialIndividuals.map(individual => individual.pointer().one()));
+    const visited = new Set(initialIndividuals.map(individual => individual.pointer()[0]));
     let current = new Set(initialIndividuals);
     while (current.size > 0) {
         const next = new Set();
         for(const individual of current.values()) {
             neighboursOf(individual)
-                .filter(other => !other.isEmpty())
+                .filter(other => other.length > 0)
                 .forEach(other => {
-                    const id = other.pointer().one();
+                    const id = other.pointer()[0];
                     if(!visited.has(id)) {
                         next.add(other);
                         visited.add(id);
@@ -22,7 +22,7 @@ function breadthFirstSearch(root, initialIndividuals, neighboursOf) {
 const ancestorRelation = individual =>
     individual
         .getFamilyAsChild()
-        .array()
+        .arraySelect()
         .flatMap(ind => [ind.getHusband(), ind.getWife()])
         .map(ref => ref.getIndividualRecord());
 
@@ -31,7 +31,7 @@ const descendantRelation = individual =>
         .getFamilyAsSpouse()
         .getChild()
         .getIndividualRecord()
-        .array();
+        .arraySelect();
 
 export function computeAncestors(root, initialIndividual) {
     return breadthFirstSearch(root, [initialIndividual], ancestorRelation);
@@ -52,12 +52,12 @@ export function topologicalSort(root) {
     const marks = {};
     const nonPermanentlyMarked = new Set();
 
-    root.getIndividualRecord().array().forEach(individual => nonPermanentlyMarked.add(individual.pointer().one()));
+    root.getIndividualRecord().arraySelect().forEach(individual => nonPermanentlyMarked.add(individual.pointer()[0]));
 
     const PERMANENT_MARK = true, TEMPORARY_MARK = false;
 
     function visit(individual) {
-        const id = individual.pointer().one();
+        const id = individual.pointer()[0];
         const mark = marks[id];
         if(mark === PERMANENT_MARK) {
             return
@@ -66,9 +66,9 @@ export function topologicalSort(root) {
         }
         nonPermanentlyMarked.add(id);
         marks[id] = TEMPORARY_MARK;
-        individual.getFamilyAsSpouse().array()
-            .filter(family => [family.getHusband(), family.getWife()].some(ref => marks[ref.value().option()] === undefined))
-            .forEach(family => family.getChild().getIndividualRecord().array().forEach(child => visit(child)));
+        individual.getFamilyAsSpouse().arraySelect()
+            .filter(family => [family.getHusband(), family.getWife()].some(ref => marks[ref.value()[0]] === undefined))
+            .forEach(family => family.getChild().getIndividualRecord().arraySelect().forEach(child => visit(child)));
         nonPermanentlyMarked.delete(id);
         marks[id] = PERMANENT_MARK;
         sorted.push(id);
@@ -99,10 +99,10 @@ function computeCoefficient(root, topologicalOrdering, inbreedingMap, isModeInbr
         }
     }
     function memoizedInbreeding(individual1, individual2) {
-        if(individual1.isEmpty() || individual2.isEmpty()) {
+        if(individual1.length === 0 || individual2.length === 0) {
             return 0.0;
         }
-        const id1 = individual1.pointer().one(), id2 = individual2.pointer().one();
+        const id1 = individual1[0].pointer, id2 = individual2[0].pointer;
         const key = keyFor(id1, id2);
         if(inbreedingMap.has(key)) {
             return inbreedingMap.get(key);

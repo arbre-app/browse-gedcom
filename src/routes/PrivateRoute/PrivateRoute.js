@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Redirect, Route } from 'react-router-dom';
-import { Gedcom } from 'read-gedcom';
+import { GedcomSelection } from 'read-gedcom';
 import { AppRoutes } from '../urls';
 
 export class PrivateRoute extends Component {
@@ -24,7 +24,7 @@ PrivateRoute.propTypes = {
     }),
     component: PropTypes.any.isRequired,
     /* Redux */
-    file: PropTypes.instanceOf(Gedcom),
+    file: PropTypes.instanceOf(GedcomSelection.Gedcom),
     settings: PropTypes.object,
 };
 

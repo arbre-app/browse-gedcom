@@ -1,17 +1,17 @@
 import PropTypes from 'prop-types';
 import { Component } from 'react';
-import { Event as EventFact } from 'read-gedcom';
+import { GedcomSelection } from 'read-gedcom';
 import { displayDate } from '../../util';
 
 export class EventName extends Component {
 
     render() {
         const { event, name, nameAlt, simpleDate, simplePlace, noDate, noPlace } = this.props;
-        if(event.isEmpty()) {
+        if(event.length === 0) {
             throw new Error('Event cannot be empty'); // TODO
         }
-        const eventDate = !noDate && event.getDate().array().map(date => displayDate(date, simpleDate))[0];
-        const eventPlace = !noPlace && event.getPlace().value().map(place => place.split(',').map(s => s.trim()).filter(s => s)).map(parts => simplePlace ? parts[0] : parts.join(', ')).option(); // TODO improve
+        const eventDate = !noDate && event.getDate().arraySelect().map(date => displayDate(date, simpleDate))[0];
+        const eventPlace = !noPlace && event.getPlace().value().map(place => place.split(',').map(s => s.trim()).filter(s => s)).map(parts => simplePlace ? parts[0] : parts.join(', '))[0]; // TODO improve
         const space = name ? ' ' : '';
         let strEvent;
         if (eventDate && eventPlace) {
@@ -45,7 +45,7 @@ export class EventName extends Component {
 }
 
 EventName.propTypes = {
-    event: PropTypes.instanceOf(EventFact).isRequired,
+    event: PropTypes.instanceOf(GedcomSelection.Event).isRequired,
     name: PropTypes.any,
     nameAlt: PropTypes.any,
     simpleDate: PropTypes.bool,

@@ -12,7 +12,7 @@ import {
     ThreeDotsVertical,
 } from 'react-bootstrap-icons';
 import { FormattedMessage, FormattedNumber } from 'react-intl';
-import { Event as EventFact, Gedcom, IndividualEvent, Tag } from 'read-gedcom';
+import { GedcomTag, GedcomSelection, GedcomValue } from 'read-gedcom';
 import { LinkContainer } from 'react-router-bootstrap';
 import { DebugGedcom, EventName, IndividualName, IndividualRich } from '../../../components';
 import { AncestorsTreeChart } from '../../../components';
@@ -33,28 +33,28 @@ import { StatisticsProxy } from './StatisticsProxy';
 export class PageIndividual extends Component {
 
     renderParents = individual => {
-        const familyAsChild = individual.getFamilyAsChild(1); // TODO filter adoptive
+        const familyAsChild = individual.getFamilyAsChild(); // TODO filter adoptive
         return (
             <>
                 <h6><FormattedMessage id="page.individual.parents"/></h6>
                 <ul>
-                    <li><IndividualRich individual={familyAsChild.getHusband(1).getIndividualRecord(1)} /></li>
-                    <li><IndividualRich individual={familyAsChild.getWife(1).getIndividualRecord(1)} /></li>
+                    <li><IndividualRich individual={familyAsChild.getHusband().getIndividualRecord()} /></li>
+                    <li><IndividualRich individual={familyAsChild.getWife().getIndividualRecord()} /></li>
                 </ul>
             </>
         );
     };
 
     renderUnion = (individual, family) => {
-        const otherRef = family.getHusband().value().option() === individual.pointer().one() ? family.getWife() : family.getHusband();
+        const otherRef = family.getHusband().value()[0] === individual[0].pointer ? family.getWife() : family.getHusband();
         const other = otherRef.getIndividualRecord();
         const marriage = family.getEventMarriage();
         const children = family.getChild().getIndividualRecord();
-        const hadChildren = !children.isEmpty();
+        const hadChildren = children.length > 0;
         const spouseData = (
             <>
                 <IndividualRich individual={other} simpleDate noPlace simpleRange />
-                {!marriage.isEmpty() && <>{', '}<EventName event={marriage} name={<FormattedMessage id="common.event.married_plural_lower" />} /></>}
+                {!marriage.length === 0 && <>{', '}<EventName event={marriage} name={<FormattedMessage id="common.event.married_plural_lower" />} /></>}
             </>
         );
         return hadChildren ? (
@@ -66,7 +66,7 @@ export class PageIndividual extends Component {
                     }}
                 />
                 <ul>
-                    {children.array().map((child, i) =>
+                    {children.arraySelect().map((child, i) =>
                         <li key={i}><IndividualRich individual={child} gender simpleDate noPlace simpleRange /></li>)}
                 </ul>
             </>
@@ -74,13 +74,13 @@ export class PageIndividual extends Component {
     };
 
     renderUnions = (individual, familiesFilter = _ => true, title = true) => {
-        const familiesAsSpouse = individual.getFamilyAsSpouse().filter(familiesFilter);
-        const orderIfSpecified = individual.getSpouseFamilyLink().value().all();
-        if (familiesAsSpouse.isEmpty()) {
+        const familiesAsSpouse = individual.getFamilyAsSpouse().filterSelect(familiesFilter);
+        const orderIfSpecified = individual.getSpouseFamilyLink().value();
+        if (familiesAsSpouse.length === 0) {
             return null;
         } else {
             // Sort the families in the order of the FAMS tags (rather than in the order of their ids)
-            const available = Object.fromEntries(familiesAsSpouse.array().map(family => [family.pointer().one(), family]));
+            const available = Object.fromEntries(familiesAsSpouse.arraySelect().map(family => [family[0].pointer, family]));
             const processed = new Set();
             const ordered = [];
             orderIfSpecified.forEach(id => {
@@ -111,12 +111,12 @@ export class PageIndividual extends Component {
 
     renderGeneral = individual => {
         const birth = individual.getEventBirth(), death = individual.getEventDeath();
-        const occupationValue = individual.getAttributeOccupation().value().all().filter(s => s).join(', ');
-        const gender = individual.getSex().value().option();
+        const occupationValue = individual.getAttributeOccupation().value().filter(s => s).join(', ');
+        const gender = individual.getSex().value()[0];
         const events = [
             { event: birth, name: <FormattedMessage id="common.event.born_upper" values={{ gender }}/>, silent: true },
             { event: death, name: <FormattedMessage id="common.event.deceased_upper" values={{ gender }}/> }
-        ].filter(({ event, silent }) => !event.isEmpty() && (!silent || !isEventEmpty(event)));
+        ].filter(({ event, silent }) => event.length > 0 && (!silent || !isEventEmpty(event)));
         return (
             <ul>
                 {events.map(({ event, name, silent }, i) =>
@@ -128,15 +128,15 @@ export class PageIndividual extends Component {
     };
 
     renderSiblings = individual => {
-        const siblings = individual.getFamilyAsChild(1).getChild().getIndividualRecord().filter(s => s.pointer().one() !== individual.pointer().one());
-        if (siblings.isEmpty()) {
+        const siblings = individual.getFamilyAsChild().getChild().getIndividualRecord().filter(s => s.pointer !== individual[0].pointer);
+        if (siblings.length === 0) {
             return null;
         } else {
             return (
                 <>
                     <h6><FormattedMessage id="page.individual.siblings"/></h6>
                     <ul>
-                        {siblings.array().filter(child => child.pointer().one() !== individual.pointer().one()).map((child, i) =>
+                        {siblings.filter(child => child.pointer !== individual[0].pointer).arraySelect().map((child, i) =>
                             <li key={i}><IndividualRich individual={child} gender simpleDate noPlace simpleRange /></li>)}
                     </ul>
                 </>
@@ -145,9 +145,9 @@ export class PageIndividual extends Component {
     };
 
     renderHalfSiblingSide = (individual, parent) => {
-        const originalFamilyId = individual.getFamilyAsChild().pointer().option();
-        const filter = family => family.pointer().one() !== originalFamilyId && !family.getChild().getIndividualRecord().isEmpty();
-        return !parent.getFamilyAsSpouse().filter(filter).isEmpty() && (
+        const originalFamilyId = individual.getFamilyAsChild().pointer()[0];
+        const filter = family => family.pointer()[0] !== originalFamilyId && family.getChild().getIndividualRecord().length > 0;
+        return parent.getFamilyAsSpouse().filterSelect(filter).length > 0 && (
             <Col>
                 <FormattedMessage id="page.individual.on_the_side" values={{ parent: <IndividualName individual={parent} /> }}/>
                 {this.renderUnions(parent, filter, false)}
@@ -157,8 +157,8 @@ export class PageIndividual extends Component {
 
     renderHalfSiblings = individual => {
         const familyAsChild = individual.getFamilyAsChild();
-        const father = familyAsChild.getHusband().getIndividualRecord(1);
-        const mother = familyAsChild.getWife().getIndividualRecord(1);
+        const father = familyAsChild.getHusband().getIndividualRecord();
+        const mother = familyAsChild.getWife().getIndividualRecord();
         const left = this.renderHalfSiblingSide(individual, father),
             right = this.renderHalfSiblingSide(individual, mother);
         return (left || right) && (
@@ -173,7 +173,7 @@ export class PageIndividual extends Component {
     };
 
     renderAncestorsCard = individual => {
-        return !individual.getFamilyAsChild().isEmpty() && (
+        return individual.getFamilyAsChild().length > 0 && (
             <Card className="mt-3">
                 <Card.Body>
                     <h5>
@@ -197,10 +197,10 @@ export class PageIndividual extends Component {
     };
 
     renderTimelineEvent = (event, i, translationKey) => {
-        const value = event.value().option();
-        const date = !event.getDate().isEmpty() && displayDate(event.getDate());
-        const place = event.getPlace().value().map(place => place.split(',').map(s => s.trim()).filter(s => s)).map(parts => parts.join(', ')).option();
-        const type = event.tag().one() === Tag.EVENT && event.getType().value().option();
+        const value = event.value()[0];
+        const date = event.getDate().length > 0 && displayDate(event.getDate());
+        const place = event.getPlace().value().map(place => place.split(',').map(s => s.trim()).filter(s => s)).map(parts => parts.join(', '))[0];
+        const type = event[0].tag === GedcomTag.Event && event.getType().value()[0];
         return (
             <li key={i}>
                 <div>
@@ -220,7 +220,7 @@ export class PageIndividual extends Component {
                         </span>
                     )}
                 </div>
-                {value && value !== EventFact.YES && (
+                {value && value !== GedcomValue.Event.Yes && (
                     <div>
                         {value}
                     </div>
@@ -238,32 +238,32 @@ export class PageIndividual extends Component {
 
     renderTimelineCard = individual => {
         const eventsWithKeys = {
-            [Tag.BIRTH]: 'birth',
-            [Tag.CHRISTENING]: 'christening',
-            [Tag.DEATH]: 'death',
-            [Tag.BURIAL]: 'burial',
-            [Tag.CREMATION]: 'cremation',
-            [Tag.ADOPTION]: 'adoption',
-            [Tag.BAPTISM]: 'baptism',
-            [Tag.BAR_MITZVAH]: 'bar_mitzvah',
-            [Tag.BAT_MITZVAH]: 'bat_mitzvah',
-            [Tag.ADULT_CHRISTENING]: 'adult_christening',
-            [Tag.CONFIRMATION]: 'confirmation',
-            [Tag.FIRST_COMMUNION]: 'first_communion',
-            [Tag.NATURALIZATION]: 'naturalization',
-            [Tag.EMIGRATION]: 'emigration',
-            [Tag.IMMIGRATION]: 'immigration',
-            [Tag.CENSUS]: 'census',
-            [Tag.PROBATE]: 'probate',
-            [Tag.WILL]: 'will',
-            [Tag.GRADUATION]: 'graduation',
-            [Tag.RETIREMENT]: 'retirement',
-            [Tag.OCCUPATION]: 'occupation', // While originally defined as an attribute it is used as an event
-            [Tag.RESIDENCE]: 'residence', // Same here
-            [Tag.EVENT]: 'event',
+            [GedcomTag.Birth]: 'birth',
+            [GedcomTag.Christening]: 'christening',
+            [GedcomTag.Death]: 'death',
+            [GedcomTag.Burial]: 'burial',
+            [GedcomTag.Cremation]: 'cremation',
+            [GedcomTag.Adoption]: 'adoption',
+            [GedcomTag.Baptism]: 'baptism',
+            [GedcomTag.BarMitzvah]: 'bar_mitzvah',
+            [GedcomTag.BatMitzvah]: 'bat_mitzvah',
+            [GedcomTag.AdultChristening]: 'adult_christening',
+            [GedcomTag.Confirmation]: 'confirmation',
+            [GedcomTag.FirstCommunion]: 'first_communion',
+            [GedcomTag.Naturalization]: 'naturalization',
+            [GedcomTag.Emigration]: 'emigration',
+            [GedcomTag.Immigration]: 'immigration',
+            [GedcomTag.Census]: 'census',
+            [GedcomTag.Probate]: 'probate',
+            [GedcomTag.Will]: 'will',
+            [GedcomTag.Graduation]: 'graduation',
+            [GedcomTag.Retirement]: 'retirement',
+            [GedcomTag.Occupation]: 'occupation', // While originally defined as an attribute it is used as an event
+            [GedcomTag.Residence]: 'residence', // Same here
+            [GedcomTag.Event]: 'event',
         };
-        const events = individual.children().filter(node => eventsWithKeys[node.tag().one()] !== undefined).as(IndividualEvent);
-        if(events.isEmpty() || !events.array().some(event => ![Tag.BIRTH, Tag.DEATH, Tag.OCCUPATION].includes(event.tag().one()))) {
+        const events = individual.get().filter(node => eventsWithKeys[node.tag] !== undefined).as(GedcomSelection.IndividualEvent);
+        if(events.length === 0 || !events.array().some(event => ![GedcomTag.Birth, GedcomTag.Death, GedcomTag.Occupation].includes(event.tag))) {
             return null;
         }
         return (
@@ -274,8 +274,8 @@ export class PageIndividual extends Component {
                         <FormattedMessage id="page.individual.events.title"/>
                     </Card.Title>
                     <ul className="timeline">
-                        {events.array().map((event, i) => (
-                            this.renderTimelineEvent(event, i, eventsWithKeys[event.tag().one()])
+                        {events.arraySelect().map((event, i) => (
+                            this.renderTimelineEvent(event, i, eventsWithKeys[event[0].tag])
                         ))}
                     </ul>
                 </Card.Body>
@@ -287,7 +287,7 @@ export class PageIndividual extends Component {
         const { file, ancestors, descendants, related, topologicalOrdering, inbreedingMap, relatednessMap } = this.props;
         const { settings: { rootIndividual } } = this.props;
         const coefficientInbreeding = computeInbreedingCoefficient(file, topologicalOrdering, inbreedingMap, individual);
-        const individualId = individual.pointer().one();
+        const individualId = individual[0].pointer;
         const individualAncestors = computeAncestors(file, individual), individualDescendants = computeDescendants(file, individual), individualRelated = computeRelated(file, individualAncestors);
         individualAncestors.delete(individualId);
         individualDescendants.delete(individualId);
@@ -297,7 +297,7 @@ export class PageIndividual extends Component {
         let commonAncestors = null, commonDescendants = null, commonRelated = null;
         if(rootIndividual !== null) {
             coefficientRelatedness = computeRelatednessCoefficient(file, topologicalOrdering, relatednessMap, individual, rootIndividual);
-            const rootId = rootIndividual.pointer().one();
+            const rootId = rootIndividual[0].pointer;
             individualAncestors.delete(rootId);
             individualDescendants.delete(rootId);
             individualRelated.delete(rootId);
@@ -311,7 +311,7 @@ export class PageIndividual extends Component {
     renderStatisticsContent = individual => ({ coefficientInbreeding, coefficientRelatedness, totalAncestors, totalDescendants, totalRelated, commonAncestors, commonDescendants, commonRelated }) => {
         const { settings: { rootIndividual } } = this.props;
         const computeDegrees = x => -Math.log2(x);
-        const withCommon = rootIndividual !== null && individual.pointer().one() !== rootIndividual.pointer().one();
+        const withCommon = rootIndividual !== null && individual[0].pointer !== rootIndividual[0].pointer;
         return (
             <>
                 <div>
@@ -442,7 +442,7 @@ export class PageIndividual extends Component {
                         <FormattedMessage id="page.individual.statistics.title"/>
                     </Card.Title>
                     <StatisticsProxy
-                        key={individual.pointer().one()}
+                        key={individual[0].pointer}
                         computeData={() => this.computeStatistics(individual)}
                         buttonComponent={({ onClick }) => (
                             <div className="text-center">
@@ -462,7 +462,7 @@ export class PageIndividual extends Component {
     render() {
         const { file, match: { params: { individualId } }, settings: { rootIndividual }, setRootIndividual } = this.props;
         const individualOpt = file.getIndividualRecord(individualId, 1);
-        if (individualOpt.isEmpty()) {
+        if (individualOpt.length === 0) {
             return <PageNotFound/>;
         }
         return (
@@ -474,14 +474,14 @@ export class PageIndividual extends Component {
                             <Person className="icon mr-2"/>
                             <IndividualName individual={individualOpt} gender noLink />
                             <DropdownButton title={<ThreeDotsVertical className="icon" />} variant="outline-secondary" size="sm" style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}>
-                                <Dropdown.Item href="#" disabled={rootIndividual !== null && individualOpt.pointer().one() === rootIndividual.pointer().one()} onClick={() => setRootIndividual(file, individualOpt)}>
+                                <Dropdown.Item href="#" disabled={rootIndividual !== null && individualOpt[0].pointer === rootIndividual[0].pointer} onClick={() => setRootIndividual(file, individualOpt)}>
                                     <HouseDoor className="icon mr-2" />
                                     <FormattedMessage id="page.individual.actions.define_root"/>
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
                                 <LinkContainer to={{
                                     pathname: AppRoutes.print,
-                                    state: { initialIndividualId: individualOpt.pointer().one() },
+                                    state: { initialIndividualId: individualOpt[0].pointer },
                                 }}>
                                     <Dropdown.Item>
                                         <Printer className="icon mr-2" />
@@ -494,7 +494,7 @@ export class PageIndividual extends Component {
                                         <Bug className="icon mr-2" />
                                         <FormattedMessage id="page.individual.actions.debug"/>
                                     </Dropdown.Item>
-                                } node={individualOpt} />
+                                } node={individualOpt[0]} root={file} />
                             </DropdownButton>
                         </Card.Title>
                         <Card.Subtitle className="text-muted text-monospace">
@@ -526,7 +526,7 @@ PageIndividual.propTypes = {
             individualId: PropTypes.string.isRequired,
         }).isRequired,
     }).isRequired,
-    file: PropTypes.instanceOf(Gedcom).isRequired,
+    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
     /* Redux */
     settings: PropTypes.object.isRequired,
     ancestors: PropTypes.instanceOf(Set),

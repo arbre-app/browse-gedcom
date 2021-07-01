@@ -2,7 +2,7 @@ import { drawRectangle } from 'genealogy-visualizations';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Card, Spinner } from 'react-bootstrap';
-import { Gedcom } from 'read-gedcom';
+import { GedcomSelection } from 'read-gedcom';
 import { PrivateLayout } from '../PrivateLayout';
 import { PrintForm } from './PrintForm';
 
@@ -29,31 +29,31 @@ export class PagePrint extends Component {
                     allGenerations.add(id);
 
                     const individualRecord = file.getIndividualRecord(id);
-                    if (individualRecord.isEmpty()) {
+                    if (individualRecord.length === 0) {
                         throw new Error('No matching individual!');
                     }
 
                     const familyData = {};
 
                     const parentFamilyRecord = individualRecord.getFamilyAsChild();
-                    if(!parentFamilyRecord.isEmpty()) {
-                        const husbandId = parentFamilyRecord.getHusband().value().option();
+                    if(parentFamilyRecord.length > 0) {
+                        const husbandId = parentFamilyRecord.getHusband().value()[0];
                         if (husbandId) {
                             familyData.husbandIndividualId = husbandId;
                             nextGeneration.add(husbandId);
                         }
-                        const wifeId = parentFamilyRecord.getWife().value().option();
+                        const wifeId = parentFamilyRecord.getWife().value()[0];
                         if (wifeId) {
                             familyData.wifeIndividualId = wifeId;
                             nextGeneration.add(wifeId);
                         }
 
-                        const familyId = parentFamilyRecord.pointer().one();
+                        const familyId = parentFamilyRecord[0].pointer;
                         familiesData[familyId] = familyData;
                         ascendingData[id] = familyId;
                     }
 
-                    const nameParts = individualRecord.getName().valueAsParts().option([]);
+                    const nameParts = individualRecord.getName().valueAsParts()[0] || [];
 
                     individualsData[id] = {
                         surname: nameParts[1],
@@ -121,7 +121,7 @@ export class PagePrint extends Component {
 }
 
 PagePrint.propTypes = {
-    file: PropTypes.instanceOf(Gedcom).isRequired,
+    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
     location: PropTypes.shape({
         state: PropTypes.shape({
             initialIndividualId: PropTypes.string,

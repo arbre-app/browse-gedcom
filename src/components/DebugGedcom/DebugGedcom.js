@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Node as GedcomNode } from 'read-gedcom';
 import { Modal } from 'react-bootstrap';
+import { GedcomSelection } from 'read-gedcom';
+import { GedcomTreeNodeType } from '../../util';
 import { NodeTree } from './NodeTree';
 
 export class DebugGedcom extends Component {
@@ -20,7 +21,7 @@ export class DebugGedcom extends Component {
     }
 
     render() {
-        const { node, triggerComponent: TriggerComponent, maxDepth, maxNodes, loadMoreCount } = this.props;
+        const { node, root, triggerComponent: TriggerComponent, maxDepth, maxNodes, loadMoreCount } = this.props;
         const { visible } = this.state;
         return (
             <>
@@ -31,7 +32,8 @@ export class DebugGedcom extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <NodeTree
-                            node={node}
+                            nodes={node.children}
+                            root={root}
                             maxDepth={maxDepth}
                             maxNodes={maxNodes}
                             loadMoreCount={loadMoreCount}
@@ -45,7 +47,8 @@ export class DebugGedcom extends Component {
 }
 
 DebugGedcom.propTypes = {
-    node: PropTypes.instanceOf(GedcomNode).isRequired,
+    node: GedcomTreeNodeType.isRequired,
+    root: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
     triggerComponent: PropTypes.any.isRequired,
     maxDepth: PropTypes.number,
     maxNodes: PropTypes.number,

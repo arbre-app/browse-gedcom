@@ -8,7 +8,7 @@ import {
     HouseDoor, Percent, Person,
 } from 'react-bootstrap-icons';
 import { FormattedMessage, FormattedNumber } from 'react-intl';
-import { Gedcom, IndividualRecord } from 'read-gedcom';
+import { GedcomSelection } from 'read-gedcom';
 import { DebugGedcom, IndividualName } from '../../../components';
 import { displayDateExact, displayName } from '../../../util';
 import { HelmetBase } from '../../HelmetBase';
@@ -34,9 +34,9 @@ export class PageHome extends Component {
     renderProvider = () => {
         const { file } = this.props;
         const source = file.getHeader().getSourceSystem();
-        const provider = source.value().option();
+        const provider = source.value()[0];
         const webAltTag = '_ADDR';
-        const url = source.getCorporation().getWebAddress().value().option() || source.getCorporation().get(webAltTag).value().option();
+        const url = source.getCorporation().getWebAddress().value()[0] || source.getCorporation().get(webAltTag).value()[0];
         if(provider && url) {
             return (
                 <a href={url} target="_blank" rel="noreferrer">
@@ -52,8 +52,8 @@ export class PageHome extends Component {
     renderSubmitter = () => {
         const { file } = this.props;
         const submitter = file.getSubmitterRecord(null, 1);
-        const name = displayName(submitter.as(IndividualRecord), '?'); // Same API, but beware of changes
-        const email = submitter.get(['EMAIL', '_MAIL']).value().option();
+        const name = displayName(submitter.as(GedcomSelection.IndividualRecord), '?'); // Same API, but beware of changes
+        const email = submitter.get(['EMAIL', '_MAIL']).value()[0];
         if(email) {
             return (
                 <a href={`mailto:${email}`} target="_blank" rel="noreferrer">
@@ -132,7 +132,7 @@ export class PageHome extends Component {
                                     <tbody>
                                     <tr>
                                         <td><FormattedMessage id="page.home.metadata.name"/></td>
-                                        <td>{file.getHeader().getFilename().value().option()}</td>
+                                        <td>{file.getHeader().getFilename().value()[0]}</td>
                                     </tr>
                                     <tr>
                                         <td><FormattedMessage id="page.home.metadata.provider"/></td>
@@ -140,11 +140,11 @@ export class PageHome extends Component {
                                     </tr>
                                     <tr>
                                         <td><FormattedMessage id="page.home.metadata.version"/></td>
-                                        <td>{file.getHeader().getSourceSystem().getVersion().value().option()}</td>
+                                        <td>{file.getHeader().getSourceSystem().getVersion().value()[0]}</td>
                                     </tr>
                                     <tr>
                                         <td><FormattedMessage id="page.home.metadata.date"/></td>
-                                        <td>{!file.getHeader().getFileCreationDate().isEmpty() && displayDateExact(file.getHeader().getFileCreationDate(), true)}</td>
+                                        <td>{file.getHeader().getFileCreationDate().length > 0 && displayDateExact(file.getHeader().getFileCreationDate(), true)}</td>
                                     </tr>
                                     </tbody>
                                 </Table>
@@ -174,7 +174,7 @@ export class PageHome extends Component {
                                     <Bug className="icon mr-1" />
                                     <FormattedMessage id="page.home.tools.debug"/>
                                 </Button>
-                            } node={file.children()} maxDepth={0} />
+                            } node={file[0]} root={file} maxDepth={0} />
                         </p>
                     </Card.Body>
                 </Card>
@@ -184,7 +184,7 @@ export class PageHome extends Component {
 }
 
 PageHome.propTypes = {
-    file: PropTypes.instanceOf(Gedcom).isRequired,
+    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
     settings: PropTypes.object.isRequired,
     statistics: PropTypes.object.isRequired,
 };

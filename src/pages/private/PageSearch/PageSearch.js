@@ -16,12 +16,12 @@ export class PageSearch extends Component {
     searchFuzzy = query => {
         const { file } = this.props;
         const queryParts = normalize(query).split(/ +/);
-        const individuals = file.getIndividualRecord(null).array();
+        const individuals = file.getIndividualRecord(null).arraySelect();
         const matches = [];
         if(queryParts.length > 0 && queryParts[0]) { // Ignore empty queries
             for(let i = 0; i < individuals.length; i++) {
                 const individual = individuals[i];
-                const names = individual.getName().valueAsParts().option();
+                const names = individual.getName().valueAsParts()[0];
                 if(names) { // Names must not be null nor empty
                     const namesParts = names.filter(v => v !== undefined).map(normalize).flatMap(s => s.split(/ +/));
                     if(queryParts.every(s => namesParts.includes(s))) { // Match
@@ -52,7 +52,7 @@ export class PageSearch extends Component {
                     }}
                 />
                 <ul>
-                    {window.map(individual => (<li key={individual.pointer().one()}><IndividualRich individual={individual} gender simpleDate noPlace simpleRange /></li>))}
+                    {window.map(individual => (<li key={individual[0].pointer}><IndividualRich individual={individual} gender simpleDate noPlace simpleRange /></li>))}
                 </ul>
                 <Paginator
                     pages={totalPages}

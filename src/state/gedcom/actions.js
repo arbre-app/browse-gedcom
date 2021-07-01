@@ -121,7 +121,7 @@ const computeDependantFields = (root, rootIndividual) => {
 };
 
 const computeStatistics = (root, ancestors, descendants, related) => {
-    const totalIndividuals = root.getIndividualRecord().count();
+    const totalIndividuals = root.getIndividualRecord().length;
     const totalAncestors = ancestors !== null ? ancestors.size - 1 : null;
     const totalDescendants = descendants !== null ? descendants.size - 1 : null;
     const totalRelated = related !== null ? related.size - 1 : null;

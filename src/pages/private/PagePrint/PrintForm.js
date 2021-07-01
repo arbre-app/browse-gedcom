@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Form as FinalForm } from 'react-final-form';
-import { Gedcom } from 'read-gedcom';
+import { GedcomSelection } from 'read-gedcom';
 import { IndividualField, NumberField, PaperSizeField } from '../../../components';
 
 export class PrintForm extends Component {
@@ -55,7 +55,7 @@ export class PrintForm extends Component {
 }
 
 PrintForm.propTypes = {
-    file: PropTypes.instanceOf(Gedcom).isRequired,
+    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
     onSubmit: PropTypes.func.isRequired,
     disabled: PropTypes.bool,
     initialIndividualId: PropTypes.string,

@@ -7,7 +7,7 @@ function isValidDate(dateObject){
 
 export function displayDate(dateGedcom, isShort = false) {
     const first = dateGedcom;
-    const obj = first.valueAsDate().one();
+    const obj = first.valueAsDate()[0];
     if (obj !== null) {
         if (obj.isDatePunctual && obj.date.calendar.isGregorian && !obj.date.year.isDual) {
             const date = obj.date;
@@ -36,27 +36,27 @@ export function displayDate(dateGedcom, isShort = false) {
                     </>
                 );
             } else {
-                return first.value().one();
+                return first[0].value;
             }
 
         } else {
-            return first.value().one();
+            return first[0].value;
         }
     } else {
-        return first.value().one();
+        return first[0].value;
     }
 }
 
 export function isEventEmpty(eventGedcom, withDate = true, withPlace = true) {
     return !(
-        (eventGedcom.getDate().value().option() && withDate)
-        || (eventGedcom.getPlace().value().option() && withPlace)
+        (eventGedcom.getDate().value()[0] && withDate)
+        || (eventGedcom.getPlace().value()[0] && withPlace)
     );
 }
 
 export function displayDateExact(dateGedcom, withTime) {
-    const date = dateGedcom.valueAsExactDate().option();
-    const time = dateGedcom.getTime().valueAsTime().option();
+    const date = dateGedcom.valueAsExactDate()[0];
+    const time = dateGedcom.getTime().valueAsTime()[0];
     if(date) {
         const jsDate = new Date(
             parseInt(date.year),
@@ -93,9 +93,9 @@ export function displayDateExact(dateGedcom, withTime) {
                 );
             }
         } else {
-            return dateGedcom.value().option();
+            return dateGedcom.value()[0];
         }
     } else {
-        return dateGedcom.value().option();
+        return dateGedcom.value()[0];
     }
 }

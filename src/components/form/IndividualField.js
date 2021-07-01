@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Button } from 'react-bootstrap';
 import { Person } from 'react-bootstrap-icons';
 import { Field } from 'react-final-form'
-import { Gedcom } from 'read-gedcom';
+import { GedcomSelection } from 'read-gedcom';
 import { displayName } from '../../util';
 
 export class IndividualField extends Component {
@@ -12,7 +12,7 @@ export class IndividualField extends Component {
         const { setValue, file, variant, ...other } = this.props;
         const { value } = input;
         const individual = file.getIndividualRecord(value || '');
-        const isEmpty = individual.isEmpty();
+        const isEmpty = individual.length === 0;
         return (
             <Button variant={variant} disabled {...other}>
                 <Person className="icon mr-2"/>
@@ -32,7 +32,7 @@ export class IndividualField extends Component {
 IndividualField.propTypes = {
     name: PropTypes.string.isRequired,
     setValue: PropTypes.func.isRequired,
-    file: PropTypes.instanceOf(Gedcom).isRequired,
+    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
     variant: PropTypes.string,
 };
 

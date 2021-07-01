@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Node as GedcomNode } from 'read-gedcom';
 import { Badge, Button } from 'react-bootstrap';
 import Linkify from 'react-linkify';
+import { GedcomTreeNodeType } from '../../util';
+import { GedcomSelection } from 'read-gedcom';
 
 class NodeLi extends Component {
     state = {
@@ -24,12 +25,12 @@ class NodeLi extends Component {
     renderTag = () => {
         const { node, synthetic } = this.props;
         return <Badge variant={synthetic ? 'info' : 'secondary'}
-                      className="text-monospace mr-1">{node.tag().option()}</Badge>;
+                      className="text-monospace mr-1">{node.tag}</Badge>;
     };
 
     renderPointer = () => {
         const { node } = this.props;
-        const pointer = node.pointer().option();
+        const pointer = node.pointer;
         return pointer && <Badge variant="success" className="text-monospace mr-1">{pointer}</Badge>;
     };
 
@@ -42,7 +43,7 @@ class NodeLi extends Component {
     renderValue = () => {
         const { node } = this.props;
         const { xRefResolved } = this.state;
-        const value = node.value().option();
+        const value = node.value;
         if (value) {
             let k = 0;
             let cleanedValue = value.split(this.rSpecialCharacters).map((text, i) => {
@@ -80,15 +81,14 @@ class NodeLi extends Component {
     handleResolveXRef = () => this.setState({ xRefResolved: true });
 
     renderResolvedNode = () => {
-        const { node, synthetic, maxDepth, ...otherProps } = this.props;
-        const root = node.getGedcom();
-        const pointer = node.value().option();
+        const { node, root, synthetic, maxDepth, ...otherProps } = this.props;
+        const pointer = node.value;
         const recordOpt = root.getRecord(null, pointer);
-        if (recordOpt.count() === 1) {
+        if (recordOpt.length === 1) {
             return (
-                <NodeLi node={recordOpt} synthetic maxDepth={maxDepth - 1} {...otherProps} />
+                <NodeLi node={recordOpt[0]} root={root} synthetic maxDepth={maxDepth - 1} {...otherProps} />
             );
-        } else if (recordOpt.isEmpty()) {
+        } else if (recordOpt.length === 0) {
             return <li><Badge variant="danger" className="text-monospace mr-1"><FormattedMessage id="component.debug.resolution.not_found" values={{ pointer }}/></Badge></li>;
         } else {
             return <li><Badge variant="danger" className="text-monospace mr-1"><FormattedMessage id="component.debug.resolution.ambiguous" values={{ pointer }}/></Badge></li>;
@@ -96,14 +96,14 @@ class NodeLi extends Component {
     };
 
     render() {
-        const { node, synthetic, maxDepth, ...otherProps } = this.props;
+        const { node, root, synthetic, maxDepth, ...otherProps } = this.props;
         const { xRefResolved } = this.state;
         return (
             <li>
                 {this.renderTag()}
                 {this.renderPointer()}
                 {this.renderValue()}
-                <NodeTree node={node.children()} maxDepth={maxDepth - 1} {...otherProps}>
+                <NodeTree nodes={node.children} root={root} maxDepth={maxDepth - 1} {...otherProps}>
                     {xRefResolved && this.renderResolvedNode()}
                 </NodeTree>
             </li>
@@ -112,7 +112,8 @@ class NodeLi extends Component {
 }
 
 NodeLi.propTypes = {
-    node: PropTypes.instanceOf(GedcomNode).isRequired, // Unit
+    node: GedcomTreeNodeType.isRequired,
+    root: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
     maxDepth: PropTypes.number.isRequired,
     maxNodes: PropTypes.number.isRequired,
     loadMoreCount: PropTypes.number.isRequired,
@@ -150,15 +151,15 @@ export class NodeTree extends Component {
     };
 
     render() {
-        const { node, children, first, ...otherProps } = this.props;
+        const { nodes, root, children, first, ...otherProps } = this.props;
         const { nodesDisplayLimit } = this.state;
-        const allNodes = node.array();
+        const allNodes = nodes;
         const displayableNodes = allNodes.slice(0, nodesDisplayLimit);
         const hiddenNodes = allNodes.length - nodesDisplayLimit;
         return (
             <ul className={`list-style-simple${first ? ' pl-0' : ''}`}>
                 {children}
-                {displayableNodes.map((node, i) => <NodeLi key={i} node={node} {...otherProps}/>)}
+                {displayableNodes.map((node, i) => <NodeLi key={i} node={node} root={root} {...otherProps}/>)}
                 {hiddenNodes > 0 ? this.renderLoadMoreNodes(hiddenNodes) : null}
             </ul>
         );
@@ -166,7 +167,8 @@ export class NodeTree extends Component {
 }
 
 NodeTree.propTypes = {
-    node: PropTypes.instanceOf(GedcomNode).isRequired, // Any
+    nodes: PropTypes.arrayOf(GedcomTreeNodeType).isRequired,
+    root: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
     maxDepth: PropTypes.number.isRequired,
     maxNodes: PropTypes.number.isRequired,
     loadMoreCount: PropTypes.number.isRequired,
