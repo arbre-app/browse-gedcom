@@ -142,7 +142,7 @@ export class PageLoadFile extends Component {
         const environment = process.env.NODE_ENV;
         const isDevelopment = !environment || environment === 'development';
         if(isDevelopment) {
-            loadGedcomUrl('./test.ged');
+//            loadGedcomUrl('./test.ged');
         }
     }
 

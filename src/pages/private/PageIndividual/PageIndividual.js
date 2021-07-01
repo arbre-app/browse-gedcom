@@ -483,7 +483,7 @@ export class PageIndividual extends Component {
                                     pathname: AppRoutes.print,
                                     state: { initialIndividualId: individualOpt.pointer().one() },
                                 }}>
-                                    <Dropdown.Item disabled>
+                                    <Dropdown.Item>
                                         <Printer className="icon mr-2" />
                                         <FormattedMessage id="page.individual.actions.print"/>
                                     </Dropdown.Item>

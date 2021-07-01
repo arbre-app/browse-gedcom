@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Form as FinalForm } from 'react-final-form';
-import { NumberField } from '../../../components';
+import { Gedcom } from 'read-gedcom';
+import { IndividualField, NumberField, PaperSizeField } from '../../../components';
 
 export class PrintForm extends Component {
 
@@ -13,28 +14,40 @@ export class PrintForm extends Component {
     };
 
     renderForm = ({ form: { mutators: { setValue } }, handleSubmit }) => {
-        const { disabled } = this.props;
+        const { disabled, file } = this.props;
         return (
             <Form
                 onSubmit={handleSubmit}
             >
-
+                <IndividualField name="data.individual" setValue={setValue} file={file}/>
+                <PaperSizeField name="size" setValue={setValue}/>
                 <NumberField name="generations.ascending" setValue={setValue} min={1} max={10} />
 
                 <Button variant="primary" type="submit" disabled={disabled} >
-                    Submit
+                    Refresh
                 </Button>
             </Form>
         );
     };
 
     render() {
+        const { initialIndividualId } = this.props;
         return (
             <FinalForm
                 onSubmit={this.submitHandler}
                 mutators={{
                     setValue: ([field, value], state, { changeValue }) => changeValue(state, field, () => value)
                 }}
+                initialValues={{
+                    data: {
+                        individual: initialIndividualId,
+                    },
+                    generations: {
+                        ascending: 4,
+                    }
+                }}
+                //initialValuesEqual={null}
+                keepDirtyOnReinitialize
                 render={this.renderForm}
             />
         );
@@ -42,10 +55,13 @@ export class PrintForm extends Component {
 }
 
 PrintForm.propTypes = {
+    file: PropTypes.instanceOf(Gedcom).isRequired,
     onSubmit: PropTypes.func.isRequired,
     disabled: PropTypes.bool,
+    initialIndividualId: PropTypes.string,
 };
 
 PrintForm.defaultProps = {
     disabled: false,
+    initialIndividualId: '',
 };

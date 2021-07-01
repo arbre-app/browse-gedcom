@@ -12,11 +12,8 @@ export class PagePrint extends Component {
         isLoading: false,
     };
 
-    buildData = (ascendingGenerations, descendingGenerations) => {
-        const { file, location: { state } } = this.props;
-
-        // TODO
-        const rootId = state && state.initialIndividualId ? state.initialIndividualId : '@I0000@';
+    buildData = (rootId, ascendingGenerations, descendingGenerations) => {
+        const { file } = this.props;
 
         // Ascending
 
@@ -84,30 +81,32 @@ export class PagePrint extends Component {
     };
 
     setDivRef = element => {
-        this.setState({ divRef: element }, () => this.updateDrawing({ generations: { ascending: 3 } })); // TODO
+        this.setState({ divRef: element }/*, () => this.updateDrawing({ generations: { ascending: 3 } })*/); // TODO
     }
 
-    updateDrawing = config => {
+    updateDrawing = formConfig => {
         const { divRef } = this.state;
 
-        const data = this.buildData(config.generations.ascending, 0);
+        const data = this.buildData(formConfig.data.individual || '@I0000@', formConfig.generations.ascending, 0); // TODO
+        const { data: _, ...config } = formConfig; // Remove the `data` field, `config` will be the final config
 
         if(divRef) {
             this.setState({ isLoading: true }, () => {
                 drawRectangle(data, config, divRef)
-                    .catch(error => this.setState({ isLoading: false }))
+                    //.catch(error => this.setState({ isLoading: false }))
                     .then(svg => this.setState({ isLoading: false }));
             });
         }
     }
 
     render() {
+        const { file, location: { state } } = this.props;
         const { isLoading } = this.state;
         return (
             <PrivateLayout>
                 <Card>
                     <Card.Body>
-                        <PrintForm onSubmit={this.updateDrawing} disabled={isLoading} />
+                        <PrintForm onSubmit={this.updateDrawing} disabled={isLoading} file={file} initialIndividualId={state && state.initialIndividualId}/>
                         <div style={{ visibility: isLoading ? 'hidden' : 'visible' }} ref={this.setDivRef} />
                         {isLoading && (
                             <Spinner animation="border" role="status">
