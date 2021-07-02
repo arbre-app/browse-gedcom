@@ -1,4 +1,19 @@
 {
+  "0.1.3": {
+    "date": "2021-07-02",
+    "fixes": [
+      {
+        "en": "Upgrade of the Gedcom parsing library, minor fixes",
+        "fr": "Mise à jour de la bibliothèque de lecture des fichiers Gedcom, corrections mineures"
+      }
+    ],
+    "additions": [
+      {
+        "en": "The file loads asynchronously and the progress is reported",
+        "fr": "Le chargement du fichier se fait désormais de manière asynchrone et l'avancement est affiché"
+      }
+    ]
+  },
   "0.1.2": {
     "date": "2021-02-05",
     "fixes": [

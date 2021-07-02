@@ -1,4 +1,4 @@
-name: Node.js Package
+name: Deploy
 
 on:
   release:
@@ -17,7 +17,7 @@ jobs:
       - run: npm run build
       - run: npm test
 
-  publish-npm:
+  deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -29,6 +29,17 @@ jobs:
       - run: npm ci
       - run: npm run setup
       - run: npm run build
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      - name: Deploy
+        uses: burnett01/rsync-deployments@4.1
+        with:
+          switches: -avzr --delete
+          path: build/
+          remote_path: mon.arbre.app
+          remote_host: mon.arbre.app
+          remote_user: github
+          remote_key: ${{ secrets.DEPLOY_KEY }}
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: build
