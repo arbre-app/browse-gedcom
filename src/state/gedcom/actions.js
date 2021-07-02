@@ -1,14 +1,46 @@
-import * as Sentry from "@sentry/react";
-import { readGedcom } from 'read-gedcom';
-import { computeAncestors, computeDescendants, computeRelated, createInitialSettings, topologicalSort } from '../../util';
+import * as Sentry from '@sentry/react';
+import { selectGedcom } from 'read-gedcom';
+import {
+    computeAncestors,
+    computeDescendants,
+    computeRelated,
+    createInitialSettings,
+    topologicalSort,
+} from '../../util';
+import { workerApi } from '../../workerApi';
+import * as Comlink from 'comlink';
 
 export const LOADING = 'gedcomFile/LOADING';
+export const LOADING_PROGRESS = 'gedcomFile/LOADING_PROGRESS';
 export const SUCCESS = 'gedcomFile/SUCCESS';
 export const CLEAR_FILE = 'gedcomFile/CLEAR_FILE';
 export const BLOCK = 'gedcomFile/BLOCK';
 export const SET_ROOT = 'gedcomFile/SET_ROOT';
 export const ERROR = 'gedcomFile/ERROR';
 export const CLEAR_NOTIFICATIONS = 'gedcomFile/CLEAR_NOTIFICATIONS';
+
+const readGedcomFromBuffer = dispatch => buffer => new Promise((resolve, reject) => {
+    let running = true;
+    const progressCallback = (phase, phaseProgress) => {
+        if (running) {
+            dispatch({
+                type: LOADING_PROGRESS,
+                data: {
+                    phase,
+                    phaseProgress,
+                },
+            });
+        }
+    };
+    workerApi.parseGedcom(buffer, Comlink.proxy(progressCallback))
+        .then(node => {
+            running = false;
+            resolve(selectGedcom(node));
+        }, error => {
+            running = false;
+            reject(error);
+        });
+});
 
 export const loadGedcomUrl = (url, isSentryEnabled = false) => async dispatch => {
     dispatch({
@@ -18,7 +50,7 @@ export const loadGedcomUrl = (url, isSentryEnabled = false) => async dispatch =>
     try {
         const result = await fetch(url);
         const buffer = await result.arrayBuffer();
-        root = readGedcom(buffer);
+        root = await readGedcomFromBuffer(dispatch)(buffer);
     } catch (error) {
         console.error(error);
         if(isSentryEnabled) {
@@ -58,7 +90,7 @@ export const loadGedcomFile = (file, isSentryEnabled = false) => async dispatch 
     let root = null;
     try {
         const buffer = await promise;
-        root = readGedcom(buffer);
+        root = await readGedcomFromBuffer(dispatch)(buffer);
     } catch (error) {
         console.error(error);
         if(isSentryEnabled) {

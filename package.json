@@ -19,6 +19,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "bootstrap": "^4.5.2",
+    "comlink": "^4.3.1",
     "final-form": "^4.20.1",
     "genealogy-visualizations": "^0.0.1",
     "prop-types": "^15.7.2",
@@ -35,10 +36,11 @@
     "react-redux": "^7.2.1",
     "react-router-bootstrap": "^0.25.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^4.0.1",
+    "react-scripts": "^4.0.3",
     "read-gedcom": "^0.1.2",
     "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "worker-loader": "^3.0.8"
   },
   "scripts": {
     "start": "react-scripts start",

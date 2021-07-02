@@ -9,8 +9,8 @@ import {
     Form,
     FormControl,
     InputGroup,
-    OverlayTrigger,
-    Row,
+    OverlayTrigger, ProgressBar,
+    Row, Spinner,
     Tooltip,
 } from 'react-bootstrap';
 import {
@@ -158,6 +158,32 @@ export class PageLoadFile extends Component {
         );
     };
 
+    renderProgress = () => {
+        const { loading, loadingPhase, loadingPhaseProgress } = this.props;
+        const firstPhaseWeight = 2 / 3;
+        let progress;
+        if (loadingPhase === 0) {
+            progress = firstPhaseWeight * loadingPhaseProgress;
+        } else if (loadingPhase === 1) {
+            progress = firstPhaseWeight + (1 - firstPhaseWeight) * loadingPhaseProgress;
+        } else {
+            progress = 1;
+        }
+        const loadingState = ['decoding', 'structuring', 'indexing'][loadingPhase];
+        return loading && (
+            <>
+                <div className="d-flex justify-content-center pt-2">
+                    <Spinner animation="border" />
+                </div>
+                <Row className="justify-content-center pt-3 pb-4">
+                    <Col md={8} lg={6}>
+                        <ProgressBar now={progress} max={1} animated={loadingPhaseProgress === null} label={<FormattedMessage id={`page.load.loading_state.${loadingState}`} />} />
+                    </Col>
+                </Row>
+            </>
+        )
+    }
+
     handleSubmit = () => {
         const { activateSentry, isSentryEnabled } = this.props;
         const { isSentryRequested } = this.state;
@@ -196,6 +222,7 @@ export class PageLoadFile extends Component {
                                 {this.renderError()}
                             </Col>
                         </Row>
+                        {this.renderProgress()}
                         <Row className="justify-content-center">
                             <Col md={6} lg={4}>
                                 <LoadFileLocal loading={loading} onFileSubmit={this.handleFileSubmit} />
@@ -306,6 +333,8 @@ export class PageLoadFile extends Component {
 PageLoadFile.propTypes = {
     /* Redux */
     loading: PropTypes.bool.isRequired,
+    loadingPhase: PropTypes.number,
+    loadingPhaseProgress: PropTypes.number,
     error: PropTypes.string,
     isSentryEnabled: PropTypes.bool.isRequired,
     loadGedcomFile: PropTypes.func.isRequired,

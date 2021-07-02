@@ -5,6 +5,8 @@ import { PageLoadFile as PageLoadFileComponent } from './PageLoadFile';
 
 const mapStateToProps = state => ({
     loading: state.gedcomFile.loading,
+    loadingPhase: state.gedcomFile.loadingPhase,
+    loadingPhaseProgress: state.gedcomFile.loadingPhaseProgress,
     error: state.gedcomFile.error,
     isSentryEnabled: state.sentry.enabled,
 });

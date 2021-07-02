@@ -1,4 +1,4 @@
-import { LOADING, SUCCESS, ERROR, CLEAR_NOTIFICATIONS, BLOCK, SET_ROOT, CLEAR_FILE } from './actions';
+import { LOADING, SUCCESS, ERROR, CLEAR_NOTIFICATIONS, BLOCK, SET_ROOT, CLEAR_FILE, LOADING_PROGRESS } from './actions';
 
 export const initialState = {
     loading: false,
@@ -12,6 +12,16 @@ export default (state = initialState, action) => {
         case LOADING:
             return {
                 loading: true,
+                loadingPhase: 0,
+                loadingPhaseProgress: 0,
+                data: null,
+                error: null,
+            };
+        case LOADING_PROGRESS:
+            return {
+                loading: true,
+                loadingPhase: action.data.phase,
+                loadingPhaseProgress: action.data.phaseProgress,
                 data: null,
                 error: null,
             };
