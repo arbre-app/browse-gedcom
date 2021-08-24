@@ -1,55 +1,47 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Badge, Button } from 'react-bootstrap';
 import Linkify from 'react-linkify';
 import { GedcomTreeNodeType } from '../../util';
 import { GedcomSelection } from 'read-gedcom';
 
-class NodeLi extends Component {
-    state = {
-        xRefResolved: false,
-    };
+export function NodeLi({ node, root, maxDepth, maxNodes, loadMoreCount, synthetic }) {
+    const [xRefResolved, setXRefResolved] = useState(false);
 
-    characterSubstitution = {
+    const characterSubstitution = {
         '\r': '\\r',
         '\n': '\\n',
         '\t': '\\t',
     };
-    rSpecialCharacters = new RegExp(`[${Object.keys(this.characterSubstitution).join('')}]`);
+    const rSpecialCharacters = new RegExp(`[${Object.keys(characterSubstitution).join('')}]`);
 
-    rXRef = /^@[A-Za-z0-9]+@$/;
+    const rXRef = /^@[A-Za-z0-9]+@$/;
 
-    rUrl = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/g;
-
-    renderTag = () => {
-        const { node, synthetic } = this.props;
+    const renderTag = () => {
         return <Badge variant={synthetic ? 'info' : 'secondary'}
                       className="text-monospace mr-1">{node.tag}</Badge>;
     };
 
-    renderPointer = () => {
-        const { node } = this.props;
+    const renderPointer = () => {
         const pointer = node.pointer;
         return pointer && <Badge variant="success" className="text-monospace mr-1">{pointer}</Badge>;
     };
 
-    linkComponentDecorator = (decoratedHref, decoratedText, key) => (
+    const linkComponentDecorator = (decoratedHref, decoratedText, key) => (
         <a target="blank" href={decoratedHref} key={key}>
             {decoratedText}
         </a>
     );
 
-    renderValue = () => {
-        const { node } = this.props;
-        const { xRefResolved } = this.state;
+    const renderValue = () => {
         const value = node.value;
         if (value) {
             let k = 0;
-            let cleanedValue = value.split(this.rSpecialCharacters).map((text, i) => {
+            let cleanedValue = value.split(rSpecialCharacters).map((text, i) => {
                 const fragment = (
                     <React.Fragment key={i}>
-                        {i > 0 && (<kbd>{this.characterSubstitution[value[k - 1]]}</kbd>)}
+                        {i > 0 && (<kbd>{characterSubstitution[value[k - 1]]}</kbd>)}
                         {text}
                     </React.Fragment>
                 );
@@ -58,14 +50,14 @@ class NodeLi extends Component {
             });
             const span = (
                 <span className="text-monospace">
-                    <Linkify componentDecorator={this.linkComponentDecorator}>{cleanedValue}</Linkify>
+                    <Linkify componentDecorator={linkComponentDecorator}>{cleanedValue}</Linkify>
                 </span>
             );
-            if (this.rXRef.exec(value) !== null && !xRefResolved) {
+            if (rXRef.exec(value) !== null && !xRefResolved) {
                 return (
                     <u
                         style={{ cursor: 'pointer' }}
-                        onClick={this.handleResolveXRef}
+                        onClick={handleResolveXRef}
                     >
                         {span}
                     </u>
@@ -78,15 +70,14 @@ class NodeLi extends Component {
         }
     };
 
-    handleResolveXRef = () => this.setState({ xRefResolved: true });
+    const handleResolveXRef = () => setXRefResolved(true);
 
-    renderResolvedNode = () => {
-        const { node, root, synthetic, maxDepth, ...otherProps } = this.props;
+    const renderResolvedNode = () => {
         const pointer = node.value;
         const recordOpt = root.getRecord(null, pointer);
         if (recordOpt.length === 1) {
             return (
-                <NodeLi node={recordOpt[0]} root={root} synthetic maxDepth={maxDepth - 1} {...otherProps} />
+                <NodeLi node={recordOpt[0]} root={root} synthetic maxDepth={maxDepth - 1} maxNodes={maxNodes} loadMoreCount={loadMoreCount} />
             );
         } else if (recordOpt.length === 0) {
             return <li><Badge variant="danger" className="text-monospace mr-1"><FormattedMessage id="component.debug.resolution.not_found" values={{ pointer }}/></Badge></li>;
@@ -95,20 +86,16 @@ class NodeLi extends Component {
         }
     };
 
-    render() {
-        const { node, root, synthetic, maxDepth, ...otherProps } = this.props;
-        const { xRefResolved } = this.state;
-        return (
-            <li>
-                {this.renderTag()}
-                {this.renderPointer()}
-                {this.renderValue()}
-                <NodeTree nodes={node.children} root={root} maxDepth={maxDepth - 1} {...otherProps}>
-                    {xRefResolved && this.renderResolvedNode()}
-                </NodeTree>
-            </li>
-        );
-    };
+    return (
+        <li>
+            {renderTag()}
+            {renderPointer()}
+            {renderValue()}
+            <NodeTree nodes={node.children} root={root} maxDepth={maxDepth - 1} maxNodes={maxNodes} loadMoreCount={loadMoreCount}>
+                {xRefResolved && renderResolvedNode()}
+            </NodeTree>
+        </li>
+    );
 }
 
 NodeLi.propTypes = {
@@ -124,46 +111,34 @@ NodeLi.defaultProps = {
     synthetic: false,
 };
 
-export class NodeTree extends Component {
-    constructor(props) {
-        super(props);
-        const { maxNodes, maxDepth } = props;
-        this.state = {
-            nodesDisplayLimit: maxDepth >= 0 ? maxNodes : 0,
-        };
-    }
+export function NodeTree({ nodes, root, maxDepth, maxNodes, loadMoreCount, first, children }) {
+    const [nodesDisplayLimit, setNodesDisplayLimit] = useState(maxDepth >= 0 ? maxNodes : 0);
 
-    handleLoadMore = () => {
-        const { loadMoreCount } = this.props;
-        this.setState(state => {
-            return {
-                nodesDisplayLimit: state.nodesDisplayLimit + loadMoreCount,
-            };
-        });
+    const handleLoadMore = () => {
+        setNodesDisplayLimit(nodesDisplayLimit + loadMoreCount);
     };
 
-    renderLoadMoreNodes = amount => {
+    const renderLoadMoreNodes = amount => {
         return (
-            <Button variant="light" className="btn-load-more" onClick={this.handleLoadMore}>
+            <Button variant="light" className="btn-load-more" onClick={handleLoadMore}>
                 <FormattedMessage id="component.debug.n_more" values={{amount}}/>
             </Button>
         );
     };
 
-    render() {
-        const { nodes, root, children, first, ...otherProps } = this.props;
-        const { nodesDisplayLimit } = this.state;
-        const allNodes = nodes;
-        const displayableNodes = allNodes.slice(0, nodesDisplayLimit);
-        const hiddenNodes = allNodes.length - nodesDisplayLimit;
-        return (
-            <ul className={`list-style-simple${first ? ' pl-0' : ''}`}>
-                {children}
-                {displayableNodes.map((node, i) => <NodeLi key={i} node={node} root={root} {...otherProps}/>)}
-                {hiddenNodes > 0 ? this.renderLoadMoreNodes(hiddenNodes) : null}
-            </ul>
-        );
-    }
+    const allNodes = nodes;
+    const displayableNodes = allNodes.slice(0, nodesDisplayLimit);
+    const hiddenNodes = allNodes.length - nodesDisplayLimit;
+
+    return (
+        <ul className={`list-style-simple${first ? ' pl-0' : ''}`}>
+            {children}
+            {displayableNodes.map((node, i) => (
+                <NodeLi key={i} node={node} root={root} maxDepth={maxDepth} maxNodes={maxNodes} loadMoreCount={loadMoreCount} />
+            ))}
+            {hiddenNodes > 0 ? renderLoadMoreNodes(hiddenNodes) : null}
+        </ul>
+    );
 }
 
 NodeTree.propTypes = {

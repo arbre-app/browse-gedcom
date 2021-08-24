@@ -1,20 +1,18 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
 import { Card } from 'react-bootstrap';
 import { Search, SignpostSplit } from 'react-bootstrap-icons';
 import { FormattedMessage, FormattedNumber } from 'react-intl';
-import { Gedcom } from 'read-gedcom';
-import { IndividualRich, Paginator } from '../../../components';
-import { AppRoutes } from '../../../routes';
-import { normalize } from '../../../util';
-import { HelmetBase } from '../../HelmetBase';
-import { PrivateLayout } from '../PrivateLayout';
+import { GedcomSelection } from 'read-gedcom';
+import { IndividualRich, Paginator } from '../../components';
+import { AppRoutes } from '../../routes';
+import { normalize } from '../../util';
+import { HelmetBase } from '../HelmetBase';
+import { PrivateLayout } from './PrivateLayout';
 import { parse } from 'query-string';
 
-export class PageSearch extends Component {
+export function PageSearch({ file, location: { search } }) {
 
-    searchFuzzy = query => {
-        const { file } = this.props;
+    const searchFuzzy = query => {
         const queryParts = normalize(query).split(/ +/);
         const individuals = file.getIndividualRecord(null).arraySelect();
         const matches = [];
@@ -33,8 +31,8 @@ export class PageSearch extends Component {
         return matches;
     };
 
-    renderResults = (query, page) => { // TODO async
-        const matches = this.searchFuzzy(query);
+    const renderResults = (query, page) => { // TODO async
+        const matches = searchFuzzy(query);
         const pageSize = 100;
         const currentPageIndex = page - 1;
         const offset = currentPageIndex * pageSize;
@@ -71,41 +69,38 @@ export class PageSearch extends Component {
         );
     };
 
-    render() {
-        const { location: { search } } = this.props;
-        const parsed = parse(search);
-        const query = parsed.q ? parsed.q : '';
-        const page = parsed.p;
-        return (
-            <PrivateLayout>
-                <FormattedMessage id="page.search.head.title" values={{ query }}>
-                    {([title]) => <HelmetBase title={title}/>}
-                </FormattedMessage>
-                <Card>
-                    <Card.Body>
-                        <Card.Title>
-                            <Search className="icon mr-2"/>
-                            <FormattedMessage id="page.search.title"/>
-                        </Card.Title>
-                        <p>
-                            <FormattedMessage
-                                id="page.search.searching"
-                                values={{
-                                    b: chunk => <strong>{chunk}</strong>,
-                                    query,
-                                }}
-                            />
-                        </p>
-                        {this.renderResults(query, page)}
-                    </Card.Body>
-                </Card>
-            </PrivateLayout>
-        );
-    }
+    const parsed = parse(search);
+    const query = parsed.q ? parsed.q : '';
+    const page = parsed.p;
+    return (
+        <PrivateLayout>
+            <FormattedMessage id="page.search.head.title" values={{ query }}>
+                {([title]) => <HelmetBase title={title}/>}
+            </FormattedMessage>
+            <Card>
+                <Card.Body>
+                    <Card.Title>
+                        <Search className="icon mr-2"/>
+                        <FormattedMessage id="page.search.title"/>
+                    </Card.Title>
+                    <p>
+                        <FormattedMessage
+                            id="page.search.searching"
+                            values={{
+                                b: chunk => <strong>{chunk}</strong>,
+                                query,
+                            }}
+                        />
+                    </p>
+                    {renderResults(query, page)}
+                </Card.Body>
+            </Card>
+        </PrivateLayout>
+    );
 }
 
 PageSearch.propTypes = {
-    file: PropTypes.instanceOf(Gedcom).isRequired,
+    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
     location: PropTypes.shape({
         search: PropTypes.string.isRequired,
     })

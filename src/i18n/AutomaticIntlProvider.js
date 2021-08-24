@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types';
-import React from 'react';
 import { IntlProvider } from 'react-intl';
-import { getFallbackLanguage } from '../config';
-import languageEN from '../locales/en.json';
-import languageFR from '../locales/fr.json';
+import { useSelector } from 'react-redux';
+import { getFallbackLanguage } from './config';
+import languageEN from './locales/en.json';
+import languageFR from './locales/fr.json';
 
 const DEFAULT_LANGUAGE = 'en';
 
-export function AutomaticIntlProvider({ children, selectedLanguage }) {
+export function AutomaticIntlProvider({ children }) {
+    const { data: selectedLanguage } = useSelector(state => state.language)
     const locale = selectedLanguage || getFallbackLanguage();
 
     function messagesFor(locale) {
@@ -30,6 +31,4 @@ export function AutomaticIntlProvider({ children, selectedLanguage }) {
 
 AutomaticIntlProvider.propTypes = {
     children: PropTypes.any.isRequired,
-    /* Redux */
-    selectedLanguage: PropTypes.string,
 };

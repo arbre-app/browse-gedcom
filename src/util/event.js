@@ -1,4 +1,3 @@
-import React from 'react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
 
 function isValidDate(dateObject){

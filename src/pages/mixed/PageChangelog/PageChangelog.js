@@ -1,4 +1,3 @@
-import React from 'react';
 import { Accordion, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FileDiff, PeopleFill, Pin } from 'react-bootstrap-icons';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
@@ -7,7 +6,7 @@ import { MixedLayout } from '../MixedLayout';
 import { version as currentVersion } from '../../../../package.json';
 import changelog from './changelog.json';
 
-export const PageChangelog = () => {
+export function PageChangelog() {
     const intl = useIntl();
 
     const renderI18n = i18nText => {
@@ -76,4 +75,4 @@ export const PageChangelog = () => {
             </Card>
         </MixedLayout>
     );
-};
+}

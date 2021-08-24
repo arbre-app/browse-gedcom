@@ -1,49 +1,43 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Modal } from 'react-bootstrap';
 import { GedcomSelection } from 'read-gedcom';
 import { GedcomTreeNodeType } from '../../util';
 import { NodeTree } from './NodeTree';
 
-export class DebugGedcom extends Component {
-    state = {
-        visible: false,
-    };
+export function DebugGedcom({ node, root, triggerComponent: TriggerComponent, maxDepth, maxNodes, loadMoreCount }) {
+    const [visible, setVisible] = useState(false);
 
-    handleClose = () => this.setState({ visible: false });
+    const handleClose = () => setVisible(false);
 
-    handleShow = event => {
+    const handleShow = event => {
         event.preventDefault();
         event.stopPropagation();
 
-        this.setState({ visible: true });
+        setVisible(true);
     }
 
-    render() {
-        const { node, root, triggerComponent: TriggerComponent, maxDepth, maxNodes, loadMoreCount } = this.props;
-        const { visible } = this.state;
-        return (
-            <>
-                <TriggerComponent onClick={this.handleShow} />
-                <Modal size="lg" show={visible} onHide={this.handleClose}>
-                    <Modal.Header closeButton>
-                        <Modal.Title><FormattedMessage id="component.debug.title"/></Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <NodeTree
-                            nodes={node.children}
-                            root={root}
-                            maxDepth={maxDepth}
-                            maxNodes={maxNodes}
-                            loadMoreCount={loadMoreCount}
-                            first
-                        />
-                    </Modal.Body>
-                </Modal>
-            </>
-        );
-    }
+    return (
+        <>
+            <TriggerComponent onClick={handleShow} />
+            <Modal size="lg" show={visible} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title><FormattedMessage id="component.debug.title"/></Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <NodeTree
+                        nodes={node.children}
+                        root={root}
+                        maxDepth={maxDepth}
+                        maxNodes={maxNodes}
+                        loadMoreCount={loadMoreCount}
+                        first
+                    />
+                </Modal.Body>
+            </Modal>
+        </>
+    );
 }
 
 DebugGedcom.propTypes = {

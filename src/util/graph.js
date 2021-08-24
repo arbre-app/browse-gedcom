@@ -60,7 +60,7 @@ export function topologicalSort(root) {
         const id = individual.pointer()[0];
         const mark = marks[id];
         if(mark === PERMANENT_MARK) {
-            return
+            return;
         } else if(mark === TEMPORARY_MARK) {
             throw new Error(); // Contains a cycle (illegal)
         }

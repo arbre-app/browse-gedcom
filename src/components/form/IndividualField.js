@@ -1,15 +1,12 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
 import { Button } from 'react-bootstrap';
 import { Person } from 'react-bootstrap-icons';
 import { Field } from 'react-final-form'
 import { GedcomSelection } from 'read-gedcom';
 import { displayName } from '../../util';
 
-export class IndividualField extends Component {
-
-    renderField = ({ input, meta }) => {
-        const { setValue, file, variant, ...other } = this.props;
+export function IndividualField({ name, setValue, file, variant, ...other }) {
+    const renderField = ({ input, meta }) => {
         const { value } = input;
         const individual = file.getIndividualRecord(value || '');
         const isEmpty = individual.length === 0;
@@ -21,12 +18,9 @@ export class IndividualField extends Component {
         );
     };
 
-    render() {
-        const { name } = this.props;
-        return (
-            <Field name={name} render={this.renderField} />
-        );
-    }
+    return (
+        <Field name={name} render={renderField} />
+    );
 }
 
 IndividualField.propTypes = {

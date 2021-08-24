@@ -1,20 +1,16 @@
 import { drawRectangle } from 'genealogy-visualizations';
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { useRef, useState } from 'react';
 import { Card, Spinner } from 'react-bootstrap';
 import { GedcomSelection } from 'read-gedcom';
-import { PrivateLayout } from '../PrivateLayout';
-import { PrintForm } from './PrintForm';
+import { PrivateLayout } from './PrivateLayout';
+import { PrintForm } from '../../components/form/PrintForm';
 
-export class PagePrint extends Component {
-    state = {
-        divRef: null,
-        isLoading: false,
-    };
+export function PagePrint({ file, location: { state } }) {
+    const divRef = useRef();
+    const [isLoading, setLoading] = useState(false);
 
-    buildData = (rootId, ascendingGenerations, descendingGenerations) => {
-        const { file } = this.props;
-
+    const buildData = (rootId, ascendingGenerations, descendingGenerations) => {
         // Ascending
 
         const individualsData = {};
@@ -80,44 +76,36 @@ export class PagePrint extends Component {
         };
     };
 
-    setDivRef = element => {
-        this.setState({ divRef: element }/*, () => this.updateDrawing({ generations: { ascending: 3 } })*/); // TODO
-    }
+    /*, () => this.updateDrawing({ generations: { ascending: 3 } })*/ // TODO
 
-    updateDrawing = formConfig => {
-        const { divRef } = this.state;
-
-        const data = this.buildData(formConfig.data.individual || '@I0000@', formConfig.generations.ascending, 0); // TODO
+    const updateDrawing = formConfig => {
+        const data = buildData(formConfig.data.individual || '@I0000@', formConfig.generations.ascending, 0); // TODO
         const { data: _, ...config } = formConfig; // Remove the `data` field, `config` will be the final config
 
         if(divRef) {
-            this.setState({ isLoading: true }, () => {
-                drawRectangle(data, config, divRef)
-                    //.catch(error => this.setState({ isLoading: false }))
-                    .then(svg => this.setState({ isLoading: false }));
-            });
+            // FIXME
+            setLoading(true);
+            drawRectangle(data, config, divRef)
+                //.catch(error => this.setState({ isLoading: false }))
+                .then(svg => setLoading(false));
         }
     }
 
-    render() {
-        const { file, location: { state } } = this.props;
-        const { isLoading } = this.state;
-        return (
-            <PrivateLayout>
-                <Card>
-                    <Card.Body>
-                        <PrintForm onSubmit={this.updateDrawing} disabled={isLoading} file={file} initialIndividualId={state && state.initialIndividualId}/>
-                        <div style={{ visibility: isLoading ? 'hidden' : 'visible' }} ref={this.setDivRef} />
-                        {isLoading && (
-                            <Spinner animation="border" role="status">
-                                <span className="sr-only">Loading...</span>
-                            </Spinner>
-                        )}
-                    </Card.Body>
-                </Card>
-            </PrivateLayout>
-        );
-    }
+    return (
+        <PrivateLayout>
+            <Card>
+                <Card.Body>
+                    <PrintForm onSubmit={updateDrawing} disabled={isLoading} file={file} initialIndividualId={state && state.initialIndividualId}/>
+                    <div style={{ visibility: isLoading ? 'hidden' : 'visible' }} ref={divRef.current} />
+                    {isLoading && (
+                        <Spinner animation="border" role="status">
+                            <span className="sr-only">Loading...</span>
+                        </Spinner>
+                    )}
+                </Card.Body>
+            </Card>
+        </PrivateLayout>
+    );
 }
 
 PagePrint.propTypes = {

@@ -1,1 +1,0 @@
-export { PageAbout } from './PageAbout';

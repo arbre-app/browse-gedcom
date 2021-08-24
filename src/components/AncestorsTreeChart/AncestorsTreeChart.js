@@ -1,12 +1,10 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
 import { GedcomSelection } from 'read-gedcom';
-import './style.css';
+import './AncestorsTreeChart.css';
 import { IndividualName } from '../IndividualName';
 
-export class AncestorsTreeChart extends Component {
-
-    renderTreeLi = (individual, maxDepth, isRoot = false) => {
+export function AncestorsTreeChart({ individual, maxDepth }) {
+    const renderTreeLi = (individual, maxDepth, isRoot = false) => {
         const familyOpt = individual.getFamilyAsChild();
         let child = null;
         if (maxDepth > 0 && familyOpt.length > 0) {
@@ -16,8 +14,8 @@ export class AncestorsTreeChart extends Component {
             const currentDepth = maxDepth - 1;
             child = (
                 <ul>
-                    {this.renderTreeLi(husband, currentDepth)}
-                    {this.renderTreeLi(wife, currentDepth)}
+                    {renderTreeLi(husband, currentDepth)}
+                    {renderTreeLi(wife, currentDepth)}
                 </ul>
             );
         }
@@ -31,14 +29,11 @@ export class AncestorsTreeChart extends Component {
         );
     };
 
-    render() {
-        const { individual, maxDepth } = this.props;
-        return (
-            <ul className="ascending-tree">
-                {this.renderTreeLi(individual, maxDepth, true)}
-            </ul>
-        );
-    }
+    return (
+        <ul className="ascending-tree">
+            {renderTreeLi(individual, maxDepth, true)}
+        </ul>
+    );
 }
 
 AncestorsTreeChart.propTypes = {

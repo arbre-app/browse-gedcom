@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
-import React from 'react';
 import { Helmet } from 'react-helmet';
 import { useIntl } from 'react-intl';
 import { APP_NAME } from '../config';
 
-export const HelmetBase = ({ title, description }) => {
+export function HelmetBase({ title, description }) {
     const intl = useIntl();
 
     const titleSuffix = APP_NAME;

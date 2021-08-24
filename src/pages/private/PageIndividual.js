@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
 import { Badge, Button, Card, Col, Dropdown, DropdownButton, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import {
     Bug,
@@ -12,11 +11,13 @@ import {
     ThreeDotsVertical,
 } from 'react-bootstrap-icons';
 import { FormattedMessage, FormattedNumber } from 'react-intl';
+import { useDispatch, useSelector } from 'react-redux';
 import { GedcomTag, GedcomSelection, GedcomValue } from 'read-gedcom';
 import { LinkContainer } from 'react-router-bootstrap';
-import { DebugGedcom, EventName, IndividualName, IndividualRich } from '../../../components';
-import { AncestorsTreeChart } from '../../../components';
-import { AppRoutes } from '../../../routes';
+import { DebugGedcom, EventName, IndividualName, IndividualRich } from '../../components';
+import { AncestorsTreeChart } from '../../components';
+import { AppRoutes } from '../../routes';
+import { setRootIndividual } from '../../state/gedcom/actions';
 import {
     computeAncestors,
     computeDescendants,
@@ -24,15 +25,18 @@ import {
     displayDate,
     displayName,
     isEventEmpty, setIntersectionSize,
-} from '../../../util';
-import { HelmetBase } from '../../HelmetBase';
-import { PageNotFound } from '../../mixed';
-import { PrivateLayout } from '../PrivateLayout';
-import { StatisticsProxy } from './StatisticsProxy';
+} from '../../util';
+import { HelmetBase } from '../HelmetBase';
+import { PageNotFound } from '../mixed';
+import { PrivateLayout } from './PrivateLayout';
+import { StatisticsProxy } from '../../components/StatisticsProxy';
 
-export class PageIndividual extends Component {
+export function PageIndividual({ file, match: { params: { individualId } } }) {
+    const { data: { settings: { rootIndividual }, ancestors, descendants, related, topologicalOrdering, inbreedingMap, relatednessMap } } = useSelector(state => state.gedcomFile);
+    const dispatch = useDispatch();
+    const setRootIndividualDispatch = (root, rootIndividual) => dispatch(setRootIndividual(root, rootIndividual));
 
-    renderParents = individual => {
+    const renderParents = individual => {
         const familyAsChild = individual.getFamilyAsChild(); // TODO filter adoptive
         return (
             <>
@@ -45,7 +49,7 @@ export class PageIndividual extends Component {
         );
     };
 
-    renderUnion = (individual, family) => {
+    const renderUnion = (individual, family) => {
         const otherRef = family.getHusband().value()[0] === individual[0].pointer ? family.getWife() : family.getHusband();
         const other = otherRef.getIndividualRecord();
         const marriage = family.getEventMarriage();
@@ -54,7 +58,7 @@ export class PageIndividual extends Component {
         const spouseData = (
             <>
                 <IndividualRich individual={other} simpleDate noPlace simpleRange />
-                {!marriage.length === 0 && <>{', '}<EventName event={marriage} name={<FormattedMessage id="common.event.married_plural_lower" />} /></>}
+                {marriage.length > 0 && <>{', '}<EventName event={marriage} name={<FormattedMessage id="common.event.married_plural_lower" />} /></>}
             </>
         );
         return hadChildren ? (
@@ -73,7 +77,7 @@ export class PageIndividual extends Component {
         ) : spouseData;
     };
 
-    renderUnions = (individual, familiesFilter = _ => true, title = true) => {
+    const renderUnions = (individual, familiesFilter = _ => true, title = true) => {
         const familiesAsSpouse = individual.getFamilyAsSpouse().filterSelect(familiesFilter);
         const orderIfSpecified = individual.getSpouseFamilyLink().value();
         if (familiesAsSpouse.length === 0) {
@@ -102,14 +106,14 @@ export class PageIndividual extends Component {
                     {title && <h6><FormattedMessage id="page.individual.unions_children"/></h6>}
                     <ul>
                         {ordered.map((family, i) =>
-                            <li key={i}>{this.renderUnion(individual, family)}</li>)}
+                            <li key={i}>{renderUnion(individual, family)}</li>)}
                     </ul>
                 </>
             );
         }
     };
 
-    renderGeneral = individual => {
+    const renderGeneral = individual => {
         const birth = individual.getEventBirth(), death = individual.getEventDeath();
         const occupationValue = individual.getAttributeOccupation().value().filter(s => s).join(', ');
         const gender = individual.getSex().value()[0];
@@ -127,7 +131,7 @@ export class PageIndividual extends Component {
         );
     };
 
-    renderSiblings = individual => {
+    const renderSiblings = individual => {
         const siblings = individual.getFamilyAsChild().getChild().getIndividualRecord().filter(s => s.pointer !== individual[0].pointer);
         if (siblings.length === 0) {
             return null;
@@ -144,23 +148,23 @@ export class PageIndividual extends Component {
         }
     };
 
-    renderHalfSiblingSide = (individual, parent) => {
+    const renderHalfSiblingSide = (individual, parent) => {
         const originalFamilyId = individual.getFamilyAsChild().pointer()[0];
         const filter = family => family.pointer()[0] !== originalFamilyId && family.getChild().getIndividualRecord().length > 0;
         return parent.getFamilyAsSpouse().filterSelect(filter).length > 0 && (
             <Col>
                 <FormattedMessage id="page.individual.on_the_side" values={{ parent: <IndividualName individual={parent} /> }}/>
-                {this.renderUnions(parent, filter, false)}
+                {renderUnions(parent, filter, false)}
             </Col>
         );
     };
 
-    renderHalfSiblings = individual => {
+    const renderHalfSiblings = individual => {
         const familyAsChild = individual.getFamilyAsChild();
         const father = familyAsChild.getHusband().getIndividualRecord();
         const mother = familyAsChild.getWife().getIndividualRecord();
-        const left = this.renderHalfSiblingSide(individual, father),
-            right = this.renderHalfSiblingSide(individual, mother);
+        const left = renderHalfSiblingSide(individual, father),
+            right = renderHalfSiblingSide(individual, mother);
         return (left || right) && (
             <>
                 <h6><FormattedMessage id="page.individual.half_siblings"/></h6>
@@ -172,7 +176,7 @@ export class PageIndividual extends Component {
         );
     };
 
-    renderAncestorsCard = individual => {
+    const renderAncestorsCard = individual => {
         return individual.getFamilyAsChild().length > 0 && (
             <Card className="mt-3">
                 <Card.Body>
@@ -196,7 +200,7 @@ export class PageIndividual extends Component {
         );
     };
 
-    renderTimelineEvent = (event, i, translationKey) => {
+    const renderTimelineEvent = (event, i, translationKey) => {
         const value = event.value()[0];
         const date = event.getDate().length > 0 && displayDate(event.getDate());
         const place = event.getPlace().value().map(place => place.split(',').map(s => s.trim()).filter(s => s)).map(parts => parts.join(', '))[0];
@@ -236,7 +240,7 @@ export class PageIndividual extends Component {
         );
     };
 
-    renderTimelineCard = individual => {
+    const renderTimelineCard = individual => {
         const eventsWithKeys = {
             [GedcomTag.Birth]: 'birth',
             [GedcomTag.Christening]: 'christening',
@@ -275,7 +279,7 @@ export class PageIndividual extends Component {
                     </Card.Title>
                     <ul className="timeline">
                         {events.arraySelect().map((event, i) => (
-                            this.renderTimelineEvent(event, i, eventsWithKeys[event[0].tag])
+                            renderTimelineEvent(event, i, eventsWithKeys[event[0].tag])
                         ))}
                     </ul>
                 </Card.Body>
@@ -283,9 +287,7 @@ export class PageIndividual extends Component {
         );
     };
 
-    computeStatistics = individual => {
-        const { file, ancestors, descendants, related, topologicalOrdering, inbreedingMap, relatednessMap } = this.props;
-        const { settings: { rootIndividual } } = this.props;
+    const computeStatistics = individual => {
         const coefficientInbreeding = computeInbreedingCoefficient(file, topologicalOrdering, inbreedingMap, individual);
         const individualId = individual[0].pointer;
         const individualAncestors = computeAncestors(file, individual), individualDescendants = computeDescendants(file, individual), individualRelated = computeRelated(file, individualAncestors);
@@ -308,8 +310,7 @@ export class PageIndividual extends Component {
         return { coefficientInbreeding, coefficientRelatedness, totalAncestors, totalDescendants, totalRelated, commonAncestors, commonDescendants, commonRelated };
     };
 
-    renderStatisticsContent = individual => ({ coefficientInbreeding, coefficientRelatedness, totalAncestors, totalDescendants, totalRelated, commonAncestors, commonDescendants, commonRelated }) => {
-        const { settings: { rootIndividual } } = this.props;
+    const renderStatisticsContent = individual => ({ coefficientInbreeding, coefficientRelatedness, totalAncestors, totalDescendants, totalRelated, commonAncestors, commonDescendants, commonRelated }) => {
         const computeDegrees = x => -Math.log2(x);
         const withCommon = rootIndividual !== null && individual[0].pointer !== rootIndividual[0].pointer;
         return (
@@ -406,8 +407,7 @@ export class PageIndividual extends Component {
                                     }}
                                 />
                             </th>
-                        )
-                        }
+                        )}
                     </tr>
                     </thead>
                     <tbody>
@@ -432,7 +432,7 @@ export class PageIndividual extends Component {
         )
     };
 
-    renderStatisticsCard = individual => {
+    const renderStatisticsCard = individual => {
         // Beware that the component is not remounted if the root changes
         return (
             <Card className="mt-3">
@@ -443,7 +443,7 @@ export class PageIndividual extends Component {
                     </Card.Title>
                     <StatisticsProxy
                         key={individual[0].pointer}
-                        computeData={() => this.computeStatistics(individual)}
+                        computeData={() => computeStatistics(individual)}
                         buttonComponent={({ onClick }) => (
                             <div className="text-center">
                                 <Button onClick={onClick}>
@@ -452,72 +452,69 @@ export class PageIndividual extends Component {
                                 </Button>
                             </div>
                         )}
-                        contentComponent={this.renderStatisticsContent(individual)}
+                        contentComponent={renderStatisticsContent(individual)}
                     />
                 </Card.Body>
             </Card>
         )
     };
 
-    render() {
-        const { file, match: { params: { individualId } }, settings: { rootIndividual }, setRootIndividual } = this.props;
-        const individualOpt = file.getIndividualRecord(individualId, 1);
-        if (individualOpt.length === 0) {
-            return <PageNotFound/>;
-        }
-        return (
-            <PrivateLayout>
-                <HelmetBase title={displayName(individualOpt)}/>
-                <Card>
-                    <Card.Header>
-                        <Card.Title>
-                            <Person className="icon mr-2"/>
-                            <IndividualName individual={individualOpt} gender noLink />
-                            <DropdownButton title={<ThreeDotsVertical className="icon" />} variant="outline-secondary" size="sm" style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}>
-                                <Dropdown.Item href="#" disabled={rootIndividual !== null && individualOpt[0].pointer === rootIndividual[0].pointer} onClick={() => setRootIndividual(file, individualOpt)}>
-                                    <HouseDoor className="icon mr-2" />
-                                    <FormattedMessage id="page.individual.actions.define_root"/>
-                                </Dropdown.Item>
-                                <Dropdown.Divider />
-                                <LinkContainer to={{
-                                    pathname: AppRoutes.print,
-                                    state: { initialIndividualId: individualOpt[0].pointer },
-                                }}>
-                                    <Dropdown.Item disabled>
-                                        <Printer className="icon mr-2" />
-                                        <FormattedMessage id="page.individual.actions.print"/>
-                                    </Dropdown.Item>
-                                </LinkContainer>
-                                <Dropdown.Divider />
-                                <DebugGedcom triggerComponent={({ onClick }) =>
-                                    <Dropdown.Item href="#" onClick={onClick}>
-                                        <Bug className="icon mr-2" />
-                                        <FormattedMessage id="page.individual.actions.debug"/>
-                                    </Dropdown.Item>
-                                } node={individualOpt[0]} root={file} />
-                            </DropdownButton>
-                        </Card.Title>
-                        <Card.Subtitle className="text-muted text-monospace">
-                            {individualId}
-                        </Card.Subtitle>
-                    </Card.Header>
-                    <Card.Body>
-                        {this.renderGeneral(individualOpt)}
-                        {this.renderParents(individualOpt)}
-                        {this.renderUnions(individualOpt)}
-                        {this.renderSiblings(individualOpt)}
-                        {this.renderHalfSiblings(individualOpt)}
-                    </Card.Body>
-                </Card>
-
-                {this.renderAncestorsCard(individualOpt)}
-
-                {this.renderTimelineCard(individualOpt)}
-
-                {this.renderStatisticsCard(individualOpt)}
-            </PrivateLayout>
-        );
+    const individualOpt = file.getIndividualRecord(individualId);
+    if (individualOpt.length === 0) {
+        return <PageNotFound/>;
     }
+    return (
+        <PrivateLayout>
+            <HelmetBase title={displayName(individualOpt)}/>
+            <Card>
+                <Card.Header>
+                    <Card.Title>
+                        <Person className="icon mr-2"/>
+                        <IndividualName individual={individualOpt} gender noLink />
+                        <DropdownButton title={<ThreeDotsVertical className="icon" />} variant="outline-secondary" size="sm" style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}>
+                            <Dropdown.Item href="#" disabled={rootIndividual !== null && individualOpt[0].pointer === rootIndividual[0].pointer} onClick={() => setRootIndividualDispatch(file, individualOpt)}>
+                                <HouseDoor className="icon mr-2" />
+                                <FormattedMessage id="page.individual.actions.define_root"/>
+                            </Dropdown.Item>
+                            <Dropdown.Divider />
+                            <LinkContainer to={{
+                                pathname: AppRoutes.print,
+                                state: { initialIndividualId: individualOpt[0].pointer },
+                            }}>
+                                <Dropdown.Item disabled>
+                                    <Printer className="icon mr-2" />
+                                    <FormattedMessage id="page.individual.actions.print"/>
+                                </Dropdown.Item>
+                            </LinkContainer>
+                            <Dropdown.Divider />
+                            <DebugGedcom triggerComponent={({ onClick }) =>
+                                <Dropdown.Item href="#" onClick={onClick}>
+                                    <Bug className="icon mr-2" />
+                                    <FormattedMessage id="page.individual.actions.debug"/>
+                                </Dropdown.Item>
+                            } node={individualOpt[0]} root={file} />
+                        </DropdownButton>
+                    </Card.Title>
+                    <Card.Subtitle className="text-muted text-monospace">
+                        {individualId}
+                    </Card.Subtitle>
+                </Card.Header>
+                <Card.Body>
+                    {renderGeneral(individualOpt)}
+                    {renderParents(individualOpt)}
+                    {renderUnions(individualOpt)}
+                    {renderSiblings(individualOpt)}
+                    {renderHalfSiblings(individualOpt)}
+                </Card.Body>
+            </Card>
+
+            {renderAncestorsCard(individualOpt)}
+
+            {renderTimelineCard(individualOpt)}
+
+            {renderStatisticsCard(individualOpt)}
+        </PrivateLayout>
+    );
 }
 
 PageIndividual.propTypes = {
@@ -527,14 +524,6 @@ PageIndividual.propTypes = {
         }).isRequired,
     }).isRequired,
     file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
-    /* Redux */
-    settings: PropTypes.object.isRequired,
-    ancestors: PropTypes.instanceOf(Set),
-    descendants: PropTypes.instanceOf(Set),
-    related: PropTypes.instanceOf(Set),
-    topologicalOrdering: PropTypes.object.isRequired,
-    inbreedingMap: PropTypes.instanceOf(Map).isRequired,
-    setRootIndividual: PropTypes.func.isRequired,
 };
 
 PageIndividual.defaultProps = {
