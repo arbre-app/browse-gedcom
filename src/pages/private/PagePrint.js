@@ -82,10 +82,11 @@ export function PagePrint({ file, location: { state } }) {
         const data = buildData(formConfig.data.individual || '@I0000@', formConfig.generations.ascending, 0); // TODO
         const { data: _, ...config } = formConfig; // Remove the `data` field, `config` will be the final config
 
-        if(divRef) {
+        console.log(divRef);
+        if(divRef.current) {
             // FIXME
             setLoading(true);
-            drawRectangle(data, config, divRef)
+            drawRectangle(data, config, divRef.current)
                 //.catch(error => this.setState({ isLoading: false }))
                 .then(svg => setLoading(false));
         }
@@ -96,7 +97,7 @@ export function PagePrint({ file, location: { state } }) {
             <Card>
                 <Card.Body>
                     <PrintForm onSubmit={updateDrawing} disabled={isLoading} file={file} initialIndividualId={state && state.initialIndividualId}/>
-                    <div style={{ visibility: isLoading ? 'hidden' : 'visible' }} ref={divRef.current} />
+                    <div style={{ visibility: isLoading ? 'hidden' : 'visible' }} ref={divRef} />
                     {isLoading && (
                         <Spinner animation="border" role="status">
                             <span className="sr-only">Loading...</span>

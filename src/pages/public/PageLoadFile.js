@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Alert,
     Button,
@@ -128,9 +128,13 @@ export function PageLoadFile() {
 
     const environment = process.env.NODE_ENV;
     const isDevelopment = !environment || environment === 'development';
-    if(isDevelopment) {
-//            loadGedcomUrlDispatch('./test.ged');
-    }
+
+    useEffect(() => { // Development only: file autoload
+        if(isDevelopment) {
+            loadGedcomUrlDispatch('./test.ged');
+        }
+        // eslint-disable-next-line
+    }, []);
 
     const renderError = () => {
         return error !== null && (
