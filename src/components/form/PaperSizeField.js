@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
-import { Field } from 'react-final-form'
+import { Field } from 'react-final-form';
 
 export function PaperSizeField({ name, setValue, ...other }) {
     const paperSizes = {
@@ -33,7 +33,7 @@ export function PaperSizeField({ name, setValue, ...other }) {
     const renderField = ({ input, meta }) => ( // TODO intl
         <Form.Control as="select" custom {...other} {...input}>
             {Object.entries(paperSizes).map(([key, { name, size: [width, height] }]) => (
-                <option key={key}>{name} ({width} x {height})</option>
+                <option key={key}>{name} ({width} &times; {height})</option>
             ))}
         </Form.Control>
     );

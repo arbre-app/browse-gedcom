@@ -10,7 +10,7 @@ export function PaperOrientationField({ name, setValue, ...other }) {
             <Form.Control as="select" custom {...other} {...input}>
                 {/*paperSizes*/}
                 {Object.entries({}).map(([key, { name, size: [width, height] }]) => (
-                    <option key={key}>{name} ({width} x {height})</option>
+                    <option key={key}>{name} ({width} &times; {height})</option>
                 ))}
             </Form.Control>
         );
