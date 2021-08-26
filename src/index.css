@@ -120,3 +120,33 @@ ul.timeline > li:before {
 .small-header {
     font-weight: 500;
 }
+
+.tools {
+    pointer-events: none;
+}
+
+.react-transform-wrapper {
+    width: 100% !important;
+}
+
+.react-transform-component {
+    cursor: move;
+}
+
+.animation-up-down-arrow {
+    animation: action-up-down-arrow 0.5s infinite alternate;
+}
+
+@keyframes action-up-down-arrow {
+    0% { transform: translateY(30); }
+    100% { transform: translateY(-30%); }
+}
+
+.accordion.accordion-clickable > .card > .card-header {
+    cursor: pointer;
+}
+
+.accordion.accordion-clickable > .card > .card-header.disabled {
+    cursor: not-allowed;
+    color: #6c757d !important; /* Text muted */
+}
