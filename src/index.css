@@ -5,8 +5,10 @@ body {
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
 
-    background-color: #f8f9fa;
+body, .bg-light {
+    background-color: #fcfcfd !important;
 }
 
 .icon {
@@ -32,6 +34,14 @@ body {
 
 .flip-horizontal {
     transform: scaleX(-1);
+}
+
+.rotate-clockwise {
+    transform: rotate(90deg);
+}
+
+.rotate-anticlockwise {
+    transform: rotate(-90deg);
 }
 
 .hoverable {
@@ -119,4 +129,39 @@ ul.timeline > li:before {
 
 .small-header {
     font-weight: 500;
+}
+
+.tools {
+    pointer-events: none;
+}
+
+.react-transform-wrapper {
+    width: 100% !important;
+    cursor: move;
+}
+
+.animation-up-down-arrow {
+    animation: action-up-down-arrow 0.5s infinite alternate;
+}
+
+@keyframes action-up-down-arrow {
+    0% { transform: translateY(30); }
+    100% { transform: translateY(-30%); }
+}
+
+.accordion.accordion-clickable > .card > .card-header {
+    cursor: pointer;
+}
+
+.accordion.accordion-clickable > .card > .card-header.disabled {
+    cursor: not-allowed;
+    color: #6c757d !important; /* Text muted */
+}
+
+.container-svg {
+    height: 500px;
+}
+
+.container-svg > svg {
+    height: 100%;
 }
