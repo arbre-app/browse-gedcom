@@ -5,8 +5,10 @@ body {
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
 
-    background-color: #f8f9fa;
+body, .bg-light {
+    background-color: #fcfcfd !important;
 }
 
 .icon {
@@ -32,6 +34,14 @@ body {
 
 .flip-horizontal {
     transform: scaleX(-1);
+}
+
+.rotate-clockwise {
+    transform: rotate(90deg);
+}
+
+.rotate-anticlockwise {
+    transform: rotate(-90deg);
 }
 
 .hoverable {
@@ -127,9 +137,6 @@ ul.timeline > li:before {
 
 .react-transform-wrapper {
     width: 100% !important;
-}
-
-.react-transform-component {
     cursor: move;
 }
 
@@ -149,4 +156,12 @@ ul.timeline > li:before {
 .accordion.accordion-clickable > .card > .card-header.disabled {
     cursor: not-allowed;
     color: #6c757d !important; /* Text muted */
+}
+
+.container-svg {
+    height: 500px;
+}
+
+.container-svg > svg {
+    height: 100%;
 }
