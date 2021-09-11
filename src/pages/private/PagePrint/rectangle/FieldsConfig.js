@@ -23,7 +23,15 @@ export function FieldsConfig({ form: { mutators: { setValue, push, pop } }, disa
                         renderLabel={(fields, name, index) => `Couche #${fields.value[index].key}`}
                         renderField={(fields, name, index) => (
                             <>
-                                <MarginsField name={`${name}.margin`} setValue={setValue} className="my-2" />
+                                <Row>
+                                    <Col xs={12} lg={6}>
+                                        <MarginsField name={`${name}.margin`} setValue={setValue} className="my-2" />
+                                    </Col>
+                                    <Col xs={12} lg={6}>
+
+                                    </Col>
+                                </Row>
+
 
                                 <SortableSubArrayField
                                     name={`${name}.textValues`}

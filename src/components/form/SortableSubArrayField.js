@@ -6,23 +6,24 @@ import { FieldArray } from 'react-final-form-arrays';
 
 export function SortableSubArrayField({ name, push, availableValues }) {
 
-    const variant = 'outline-secondary';
+    const variantButton = 'outline-secondary';
+    const variantItem = null;
 
     const renderField = ({ fields }) => {
         const ArrayItem = ({ id, index, length, sortable }) => (
-            <ListGroup.Item key={id} className="px-3"> {/* className="px-3 py-2" */}
+            <ListGroup.Item key={id} variant={variantItem} className="px-3"> {/* className="px-3 py-2" */}
                 {sortable && (
                     <ButtonGroup className="mr-2">
-                        <Button variant={variant} size="sm" disabled={index === 0} onClick={() => fields.move(index, index - 1)}><ChevronUp className="icon" /></Button>
-                        <Button variant={variant} size="sm" disabled={index === length - 1} onClick={() => fields.move(index, index + 1)}><ChevronDown className="icon" /></Button>
+                        <Button variant={variantButton} size="sm" disabled={index === 0} onClick={() => fields.move(index, index - 1)}><ChevronUp className="icon" /></Button>
+                        <Button variant={variantButton} size="sm" disabled={index === length - 1} onClick={() => fields.move(index, index + 1)}><ChevronDown className="icon" /></Button>
                     </ButtonGroup>
                 )}
                 {!sortable && (
-                    <Button variant={variant} size="sm" className="mr-2" onClick={() => push(name, id)}><ChevronLeft className="icon" /></Button>
+                    <Button variant={variantButton} size="sm" className="mr-2" onClick={() => push(name, id)}><ChevronLeft className="icon" /></Button>
                 )}
                 {availableValues.find(item => item.id === id).label}
                 {sortable && (
-                    <Button variant={variant} size="sm" onClick={() => fields.remove(index)} className="ml-2 float-right"><ChevronRight className="icon" /></Button>
+                    <Button variant={variantButton} size="sm" onClick={() => fields.remove(index)} className="ml-2 float-right"><ChevronRight className="icon" /></Button>
                 )}
             </ListGroup.Item>
         );
@@ -32,7 +33,7 @@ export function SortableSubArrayField({ name, push, availableValues }) {
         return (
             <Row>
                 <Col xs={6}>
-                    <small>Sélection :</small>
+                    <small>Sélection et ordre :</small>
                     {fields.length > 0 ? (
                         <ListGroup>
                             {fields.map((name, index) => (
@@ -41,12 +42,12 @@ export function SortableSubArrayField({ name, push, availableValues }) {
                         </ListGroup>
                     ) : (
                         <div className="text-muted text-center">
-                            Aucun champ sélectionné
+                            Aucun champ sélectionné.
                         </div>
                     )}
                 </Col>
                 <Col xs={6}>
-                    <small>Disponibles :</small>
+                    <small>Données disponibles :</small>
                     {filteredAvailable.length > 0 ? (
                         <ListGroup>
                             {filteredAvailable.map(({ id }, index) => (
@@ -55,7 +56,7 @@ export function SortableSubArrayField({ name, push, availableValues }) {
                         </ListGroup>
                     ) : (
                         <div className="text-muted text-center">
-                            Tous les champs ont été utilisés.
+                            Tous les champs ont été sélectionnés.
                         </div>
                     )}
                 </Col>

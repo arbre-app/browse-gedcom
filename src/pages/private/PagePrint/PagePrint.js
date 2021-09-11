@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import React, { useRef, useState } from 'react';
 import { Accordion, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap';
 import {
-    ArrowDown, BoxArrowUpRight, Braces, CardImage, Diagram2, Download, FileEarmark, ListUl, Pencil,
-    Printer,
+    ArrowDown, BoxArrowUpRight, Braces, CardImage, Diagram2, ListUl, Pencil,
     RecordCircle,
     ZoomIn,
     ZoomOut,
@@ -12,6 +11,8 @@ import {
 import { Form as FinalForm } from 'react-final-form';
 import { GedcomSelection } from 'read-gedcom';
 import { PrivateLayout } from '../PrivateLayout';
+import { FormOnlyDownload } from './FormOnlyDownload';
+import { FormOnlyPrint } from './FormOnlyPrint';
 import { buildConfig, buildData, buildInitialFormValues } from './rectangle';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import arrayMutators from 'final-form-arrays';
@@ -73,42 +74,49 @@ export function PagePrint({ file, location: { state } }) {
         updateDrawing(data);
     };
 
+    const refreshIfNeeded = () => {
+        // TODO
+        return divRef;
+    };
+
     const renderForm = ({ form, handleSubmit }) => (
-        <Form
-            onSubmit={handleSubmit}
-        >
-            <Accordion className="accordion-clickable mt-3" defaultActiveKey="2">
-                <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="0">
-                        <Card.Title className="mb-0"><Diagram2 className="icon mr-2" />Modèle</Card.Title>
-                    </Accordion.Toggle>
-                    <Accordion.Collapse eventKey="0">
-                        <Card.Body>
-                            ...
-                        </Card.Body>
-                    </Accordion.Collapse>
-                </Card>
-                <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey="1">
-                        <Card.Title className="mb-0"><ListUl className="icon mr-2" />Données</Card.Title>
-                    </Accordion.Toggle>
-                    <Accordion.Collapse eventKey="1">
-                        <Card.Body>
-                            <FieldsData form={form} file={file} disabled={isLoading} />
-                        </Card.Body>
-                    </Accordion.Collapse>
-                </Card>
-                <Card>
-                    <Accordion.Toggle as={Card.Header} className="disabled" eventKey="2">
-                        <Card.Title className="mb-0"><Pencil className="icon mr-2" />Personnalisation</Card.Title>
-                    </Accordion.Toggle>
-                    <Accordion.Collapse eventKey="2">
-                        <Card.Body>
-                            <FieldsConfig form={form} file={file} disabled={isLoading} />
-                        </Card.Body>
-                    </Accordion.Collapse>
-                </Card>
-            </Accordion>
+        <>
+            <Form
+                onSubmit={handleSubmit}
+            >
+                <Accordion className="accordion-clickable mt-3" defaultActiveKey="2">
+                    <Card>
+                        <Accordion.Toggle as={Card.Header} eventKey="0">
+                            <Card.Title className="mb-0"><Diagram2 className="icon mr-2" />Modèle</Card.Title>
+                        </Accordion.Toggle>
+                        <Accordion.Collapse eventKey="0">
+                            <Card.Body>
+                                ...
+                            </Card.Body>
+                        </Accordion.Collapse>
+                    </Card>
+                    <Card>
+                        <Accordion.Toggle as={Card.Header} eventKey="1">
+                            <Card.Title className="mb-0"><ListUl className="icon mr-2" />Données</Card.Title>
+                        </Accordion.Toggle>
+                        <Accordion.Collapse eventKey="1">
+                            <Card.Body>
+                                <FieldsData form={form} file={file} disabled={isLoading} />
+                            </Card.Body>
+                        </Accordion.Collapse>
+                    </Card>
+                    <Card>
+                        <Accordion.Toggle as={Card.Header} className="disabled" eventKey="2">
+                            <Card.Title className="mb-0"><Pencil className="icon mr-2" />Personnalisation</Card.Title>
+                        </Accordion.Toggle>
+                        <Accordion.Collapse eventKey="2">
+                            <Card.Body>
+                                <FieldsConfig form={form} file={file} disabled={isLoading} />
+                            </Card.Body>
+                        </Accordion.Collapse>
+                    </Card>
+                </Accordion>
+            </Form>
             <Card className="mt-3">
                 <Card.Header>
                     <Card.Title className="mb-0">
@@ -119,31 +127,22 @@ export function PagePrint({ file, location: { state } }) {
                 <Card.Body>
                     <Row>
                         <Col md={6}>
-                            <h5>
-                                <Printer className="icon mr-2" />
-                                Impression
-                            </h5>
-
-                            <Button className="w-100">
-                                <Printer className="icon mr-2" />
-                                Imprimer
-                            </Button>
+                            <FormOnlyPrint refreshCallback={refreshIfNeeded} disabled={!isDrawn} />
                         </Col>
                         <Col md={6}>
+                            <FormOnlyDownload refreshCallback={refreshIfNeeded} disabled={!isDrawn} />
+                        </Col>
+                        {/*<Col md={6}>
                             <h5>
                                 <FileEarmark className="icon mr-2" />
-                                Fichier
+                                Sauvegarder la configuration
                             </h5>
 
-                            <Button variant="secondary" className="w-100">
-                                <Download className="icon mr-2" />
-                                Télécharger
-                            </Button>
-                        </Col>
+                        </Col>*/}
                     </Row>
                 </Card.Body>
             </Card>
-        </Form>
+        </>
     );
 
     return (

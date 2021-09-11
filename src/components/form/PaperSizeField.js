@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
-import { Field } from 'react-final-form'
+import { Field } from 'react-final-form';
 
 export function PaperSizeField({ name, setValue, ...other }) {
     const paperSizes = {

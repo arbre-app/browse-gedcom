@@ -1,6 +1,6 @@
 export const buildInitialLayerValues = key => ({
     key,
-    textValues: ['surname'],
+    textValues: ['surname', 'given_name'],
 });
 
 export const buildInitialFormValues = ({ initialIndividualId }) => ({
@@ -87,6 +87,14 @@ export const buildData = (file, formConfig) => {
 
 export const buildConfig = form => {
     console.log(form);
-    const { data: _, margin, layers, test, size, ...config } = form; // Remove the `data` field
-    return config;
+    const { data: _, margin, layers, size, ...config } = form; // Remove the `data` field
+    const final = {
+        // TODO
+        layers: Object.fromEntries(layers.map(({ textValues }, index) => [index.toString(), {
+            texts: textValues.map(value => ({ value })),
+        }])),
+        ...config
+    };
+    console.log(final);
+    return final;
 };
