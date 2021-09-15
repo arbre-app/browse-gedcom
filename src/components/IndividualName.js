@@ -3,7 +3,7 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Question, Record2Fill } from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
 import { useSelector } from 'react-redux';
-import { GedcomSelection, GedcomValue } from 'read-gedcom';
+import { SelectionIndividualRecord, ValueSex } from 'read-gedcom';
 import { AppRoutes } from '../routes';
 import { displayName } from '../util';
 import { GenderFemale, GenderMale } from './icons';
@@ -23,7 +23,7 @@ export function IndividualName({ individual, placeholder, gender, noLink, noAnce
     const genderClass = `icon${hasAncestorIcon ? '' : ' mr-1'}`;
     return individual.length === 0 ? content : (
         <>
-            {gender && (genderValue === GedcomValue.Sex.Male ? <GenderMale className={`${genderClass} color-male`} /> : genderValue === GedcomValue.Sex.Female ? <GenderFemale className={`${genderClass} color-female`} /> : <Question className={genderClass} />)}
+            {gender && (genderValue === ValueSex.Male ? <GenderMale className={`${genderClass} color-male`} /> : genderValue === ValueSex.Female ? <GenderFemale className={`${genderClass} color-female`} /> : <Question className={genderClass} />)}
             {hasAncestorIcon && (
                 <OverlayTrigger
                     placement="top"
@@ -52,7 +52,7 @@ export function IndividualName({ individual, placeholder, gender, noLink, noAnce
 }
 
 IndividualName.propTypes = {
-    individual: PropTypes.instanceOf(GedcomSelection.IndividualRecord).isRequired,
+    individual: PropTypes.instanceOf(SelectionIndividualRecord).isRequired,
     placeholder: PropTypes.string,
     gender: PropTypes.bool,
     noLink: PropTypes.bool,

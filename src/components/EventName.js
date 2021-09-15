@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { GedcomSelection } from 'read-gedcom';
+import { SelectionEvent } from 'read-gedcom';
 import { displayDate } from '../util';
 
 export function EventName({ event, name, nameAlt, simpleDate, simplePlace, noDate, noPlace }) {
@@ -40,7 +40,7 @@ export function EventName({ event, name, nameAlt, simpleDate, simplePlace, noDat
 }
 
 EventName.propTypes = {
-    event: PropTypes.instanceOf(GedcomSelection.Event).isRequired,
+    event: PropTypes.instanceOf(SelectionEvent).isRequired,
     name: PropTypes.any,
     nameAlt: PropTypes.any,
     simpleDate: PropTypes.bool,

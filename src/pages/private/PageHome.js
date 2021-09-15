@@ -8,7 +8,7 @@ import {
 } from 'react-bootstrap-icons';
 import { FormattedMessage, FormattedNumber } from 'react-intl';
 import { useSelector } from 'react-redux';
-import { GedcomSelection } from 'read-gedcom';
+import { SelectionIndividualRecord, SelectionGedcom } from 'read-gedcom';
 import { DebugGedcom, IndividualName } from '../../components';
 import { displayDateExact, displayName } from '../../util';
 import { HelmetBase } from '../HelmetBase';
@@ -51,7 +51,7 @@ export function PageHome({ file, settings }) {
 
     const renderSubmitter = () => {
         const submitter = file.getSubmitterRecord(null, 1);
-        const name = displayName(submitter.as(GedcomSelection.IndividualRecord), '?'); // Same API, but beware of changes
+        const name = displayName(submitter.as(SelectionIndividualRecord), '?'); // Same API, but beware of changes
         const email = submitter.get(['EMAIL', '_MAIL']).value()[0];
         if(email) {
             return (
@@ -180,6 +180,6 @@ export function PageHome({ file, settings }) {
 }
 
 PageHome.propTypes = {
-    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
+    file: PropTypes.instanceOf(SelectionGedcom).isRequired,
     settings: PropTypes.object.isRequired,
 };

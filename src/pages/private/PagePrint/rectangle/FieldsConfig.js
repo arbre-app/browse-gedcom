@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { Button, Col, Row } from 'react-bootstrap';
-import { GedcomSelection } from 'read-gedcom';
+import { SelectionGedcom } from 'read-gedcom';
 import { MarginsField, PaperSizeField, SortableSubArrayField, TabArrayField } from '../../../../components';
 import { buildInitialLayerValues } from './builders';
 
@@ -59,7 +59,7 @@ export function FieldsConfig({ form: { mutators: { setValue, push, pop } }, disa
 
 FieldsConfig.propTypes = {
     form: PropTypes.object.isRequired,
-    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
+    file: PropTypes.instanceOf(SelectionGedcom).isRequired,
     disabled: PropTypes.bool,
 };
 
