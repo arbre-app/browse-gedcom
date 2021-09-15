@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 import { Person } from 'react-bootstrap-icons';
 import { Field } from 'react-final-form'
-import { GedcomSelection } from 'read-gedcom';
+import { SelectionGedcom } from 'read-gedcom';
 import { displayName } from '../../util';
 
 export function IndividualField({ name, setValue, file, variant, ...other }) {
@@ -26,7 +26,7 @@ export function IndividualField({ name, setValue, file, variant, ...other }) {
 IndividualField.propTypes = {
     name: PropTypes.string.isRequired,
     setValue: PropTypes.func.isRequired,
-    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
+    file: PropTypes.instanceOf(SelectionGedcom).isRequired,
     variant: PropTypes.string,
 };
 

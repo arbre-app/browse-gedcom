@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Modal } from 'react-bootstrap';
-import { GedcomSelection } from 'read-gedcom';
+import { SelectionGedcom } from 'read-gedcom';
 import { GedcomTreeNodeType } from '../../util';
 import { NodeTree } from './NodeTree';
 
@@ -42,7 +42,7 @@ export function DebugGedcom({ node, root, triggerComponent: TriggerComponent, ma
 
 DebugGedcom.propTypes = {
     node: GedcomTreeNodeType.isRequired,
-    root: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
+    root: PropTypes.instanceOf(SelectionGedcom).isRequired,
     triggerComponent: PropTypes.any.isRequired,
     maxDepth: PropTypes.number,
     maxNodes: PropTypes.number,

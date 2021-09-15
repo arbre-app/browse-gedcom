@@ -9,7 +9,7 @@ import {
     ZoomOut,
 } from 'react-bootstrap-icons';
 import { Form as FinalForm } from 'react-final-form';
-import { GedcomSelection } from 'read-gedcom';
+import { SelectionGedcom } from 'read-gedcom';
 import { PrivateLayout } from '../PrivateLayout';
 import { FormOnlyDownload } from './FormOnlyDownload';
 import { FormOnlyPrint } from './FormOnlyPrint';
@@ -211,7 +211,7 @@ export function PagePrint({ file, location: { state } }) {
 }
 
 PagePrint.propTypes = {
-    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
+    file: PropTypes.instanceOf(SelectionGedcom).isRequired,
     location: PropTypes.shape({
         state: PropTypes.shape({
             initialIndividualId: PropTypes.string,

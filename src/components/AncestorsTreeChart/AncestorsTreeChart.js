@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { GedcomSelection } from 'read-gedcom';
+import { SelectionIndividualRecord } from 'read-gedcom';
 import './AncestorsTreeChart.css';
 import { IndividualName } from '../IndividualName';
 
@@ -37,7 +37,7 @@ export function AncestorsTreeChart({ individual, maxDepth }) {
 }
 
 AncestorsTreeChart.propTypes = {
-    individual: PropTypes.instanceOf(GedcomSelection.IndividualRecord).isRequired,
+    individual: PropTypes.instanceOf(SelectionIndividualRecord).isRequired,
     maxDepth: PropTypes.number,
 };
 

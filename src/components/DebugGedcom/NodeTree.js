@@ -4,7 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { Badge, Button } from 'react-bootstrap';
 import Linkify from 'react-linkify';
 import { GedcomTreeNodeType } from '../../util';
-import { GedcomSelection } from 'read-gedcom';
+import { SelectionGedcom } from 'read-gedcom';
 
 export function NodeLi({ node, root, maxDepth, maxNodes, loadMoreCount, synthetic }) {
     const [xRefResolved, setXRefResolved] = useState(false);
@@ -100,7 +100,7 @@ export function NodeLi({ node, root, maxDepth, maxNodes, loadMoreCount, syntheti
 
 NodeLi.propTypes = {
     node: GedcomTreeNodeType.isRequired,
-    root: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
+    root: PropTypes.instanceOf(SelectionGedcom).isRequired,
     maxDepth: PropTypes.number.isRequired,
     maxNodes: PropTypes.number.isRequired,
     loadMoreCount: PropTypes.number.isRequired,
@@ -143,7 +143,7 @@ export function NodeTree({ nodes, root, maxDepth, maxNodes, loadMoreCount, first
 
 NodeTree.propTypes = {
     nodes: PropTypes.arrayOf(GedcomTreeNodeType).isRequired,
-    root: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
+    root: PropTypes.instanceOf(SelectionGedcom).isRequired,
     maxDepth: PropTypes.number.isRequired,
     maxNodes: PropTypes.number.isRequired,
     loadMoreCount: PropTypes.number.isRequired,
