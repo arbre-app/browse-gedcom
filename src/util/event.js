@@ -55,7 +55,7 @@ export function isEventEmpty(eventGedcom, withDate = true, withPlace = true) {
 
 export function displayDateExact(dateGedcom, withTime) {
     const date = dateGedcom.valueAsExactDate()[0];
-    const time = dateGedcom.getTime().valueAsTime()[0];
+    const time = dateGedcom.getExactTime().valueAsExactTime()[0];
     if(date) {
         const jsDate = new Date(
             parseInt(date.year),

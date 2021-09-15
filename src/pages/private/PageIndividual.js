@@ -12,7 +12,7 @@ import {
 } from 'react-bootstrap-icons';
 import { FormattedMessage, FormattedNumber } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
-import { GedcomTag, GedcomSelection, GedcomValue } from 'read-gedcom';
+import { Tag, ValueEvent, SelectionIndividualEvent, SelectionGedcom } from 'read-gedcom';
 import { LinkContainer } from 'react-router-bootstrap';
 import { DebugGedcom, EventName, IndividualName, IndividualRich } from '../../components';
 import { AncestorsTreeChart } from '../../components';
@@ -204,7 +204,7 @@ export function PageIndividual({ file, match: { params: { individualId } } }) {
         const value = event.value()[0];
         const date = event.getDate().length > 0 && displayDate(event.getDate());
         const place = event.getPlace().value().map(place => place.split(',').map(s => s.trim()).filter(s => s)).map(parts => parts.join(', '))[0];
-        const type = event[0].tag === GedcomTag.Event && event.getType().value()[0];
+        const type = event[0].tag === Tag.Event && event.getType().value()[0];
         return (
             <li key={i}>
                 <div>
@@ -224,7 +224,7 @@ export function PageIndividual({ file, match: { params: { individualId } } }) {
                         </span>
                     )}
                 </div>
-                {value && value !== GedcomValue.Event.Yes && (
+                {value && value !== ValueEvent.Yes && (
                     <div>
                         {value}
                     </div>
@@ -242,32 +242,32 @@ export function PageIndividual({ file, match: { params: { individualId } } }) {
 
     const renderTimelineCard = individual => {
         const eventsWithKeys = {
-            [GedcomTag.Birth]: 'birth',
-            [GedcomTag.Christening]: 'christening',
-            [GedcomTag.Death]: 'death',
-            [GedcomTag.Burial]: 'burial',
-            [GedcomTag.Cremation]: 'cremation',
-            [GedcomTag.Adoption]: 'adoption',
-            [GedcomTag.Baptism]: 'baptism',
-            [GedcomTag.BarMitzvah]: 'bar_mitzvah',
-            [GedcomTag.BatMitzvah]: 'bat_mitzvah',
-            [GedcomTag.AdultChristening]: 'adult_christening',
-            [GedcomTag.Confirmation]: 'confirmation',
-            [GedcomTag.FirstCommunion]: 'first_communion',
-            [GedcomTag.Naturalization]: 'naturalization',
-            [GedcomTag.Emigration]: 'emigration',
-            [GedcomTag.Immigration]: 'immigration',
-            [GedcomTag.Census]: 'census',
-            [GedcomTag.Probate]: 'probate',
-            [GedcomTag.Will]: 'will',
-            [GedcomTag.Graduation]: 'graduation',
-            [GedcomTag.Retirement]: 'retirement',
-            [GedcomTag.Occupation]: 'occupation', // While originally defined as an attribute it is used as an event
-            [GedcomTag.Residence]: 'residence', // Same here
-            [GedcomTag.Event]: 'event',
+            [Tag.Birth]: 'birth',
+            [Tag.Christening]: 'christening',
+            [Tag.Death]: 'death',
+            [Tag.Burial]: 'burial',
+            [Tag.Cremation]: 'cremation',
+            [Tag.Adoption]: 'adoption',
+            [Tag.Baptism]: 'baptism',
+            [Tag.BarMitzvah]: 'bar_mitzvah',
+            [Tag.BatMitzvah]: 'bat_mitzvah',
+            [Tag.AdultChristening]: 'adult_christening',
+            [Tag.Confirmation]: 'confirmation',
+            [Tag.FirstCommunion]: 'first_communion',
+            [Tag.Naturalization]: 'naturalization',
+            [Tag.Emigration]: 'emigration',
+            [Tag.Immigration]: 'immigration',
+            [Tag.Census]: 'census',
+            [Tag.Probate]: 'probate',
+            [Tag.Will]: 'will',
+            [Tag.Graduation]: 'graduation',
+            [Tag.Retirement]: 'retirement',
+            [Tag.Occupation]: 'occupation', // While originally defined as an attribute it is used as an event
+            [Tag.Residence]: 'residence', // Same here
+            [Tag.Event]: 'event',
         };
-        const events = individual.get().filter(node => eventsWithKeys[node.tag] !== undefined).as(GedcomSelection.IndividualEvent);
-        if(events.length === 0 || !events.array().some(event => ![GedcomTag.Birth, GedcomTag.Death, GedcomTag.Occupation].includes(event.tag))) {
+        const events = individual.get().filter(node => eventsWithKeys[node.tag] !== undefined).as(SelectionIndividualEvent);
+        if(events.length === 0 || !events.array().some(event => ![Tag.Birth, Tag.Death, Tag.Occupation].includes(event.tag))) {
             return null;
         }
         return (
@@ -523,7 +523,7 @@ PageIndividual.propTypes = {
             individualId: PropTypes.string.isRequired,
         }).isRequired,
     }).isRequired,
-    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
+    file: PropTypes.instanceOf(SelectionGedcom).isRequired,
 };
 
 PageIndividual.defaultProps = {

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { Card } from 'react-bootstrap';
 import { Search, SignpostSplit } from 'react-bootstrap-icons';
 import { FormattedMessage, FormattedNumber } from 'react-intl';
-import { GedcomSelection } from 'read-gedcom';
+import { SelectionGedcom } from 'read-gedcom';
 import { IndividualRich, Paginator } from '../../components';
 import { AppRoutes } from '../../routes';
 import { normalize } from '../../util';
@@ -100,7 +100,7 @@ export function PageSearch({ file, location: { search } }) {
 }
 
 PageSearch.propTypes = {
-    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
+    file: PropTypes.instanceOf(SelectionGedcom).isRequired,
     location: PropTypes.shape({
         search: PropTypes.string.isRequired,
     })

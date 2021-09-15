@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
-import { GedcomSelection } from 'read-gedcom';
+import { SelectionIndividualRecord } from 'read-gedcom';
 import { isEventEmpty } from '../util';
 import { EventName } from './EventName';
 import { IndividualName } from './IndividualName';
@@ -30,7 +30,7 @@ export function IndividualRich({ individual, gender, simpleDate, simplePlace, si
 }
 
 IndividualRich.propTypes = {
-    individual: PropTypes.instanceOf(GedcomSelection.IndividualRecord).isRequired,
+    individual: PropTypes.instanceOf(SelectionIndividualRecord).isRequired,
     gender: PropTypes.bool,
     simpleDate: PropTypes.bool,
     simplePlace: PropTypes.bool,

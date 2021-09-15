@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { Col, Form, Row } from 'react-bootstrap';
-import { GedcomSelection } from 'read-gedcom';
+import { SelectionGedcom } from 'read-gedcom';
 import { IndividualField, NumberField } from '../../../../components';
 
 export function FieldsData({ form: { mutators: { setValue } }, file, disabled }) {
@@ -26,7 +26,7 @@ export function FieldsData({ form: { mutators: { setValue } }, file, disabled })
 
 FieldsData.propTypes = {
     form: PropTypes.object.isRequired,
-    file: PropTypes.instanceOf(GedcomSelection.Gedcom).isRequired,
+    file: PropTypes.instanceOf(SelectionGedcom).isRequired,
     disabled: PropTypes.bool,
 };
 
