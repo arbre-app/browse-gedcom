@@ -31,6 +31,7 @@ export function displayDate(dateGedcom, isShort = false) {
                             year="numeric"
                             month={!date.month || isShort ? undefined : 'long'}
                             day={!date.day || isShort ? undefined : 'numeric'}
+                            timeZone="UTC"
                         />
                     </>
                 );
@@ -79,6 +80,7 @@ export function displayDateExact(dateGedcom, withTime) {
                         hour="numeric"
                         minute="numeric"
                         second="numeric"
+                        timeZone="UTC"
                     />
                 );
             } else {
@@ -88,6 +90,7 @@ export function displayDateExact(dateGedcom, withTime) {
                         year="numeric"
                         month="long"
                         day="numeric"
+                        timeZone="UTC"
                     />
                 );
             }

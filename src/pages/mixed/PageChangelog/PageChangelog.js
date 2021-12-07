@@ -61,7 +61,7 @@ export function PageChangelog() {
                                 </Accordion.Toggle>
                                 <Accordion.Collapse eventKey={version}>
                                     <Card.Body>
-                                        <p><em><FormattedDate value={changes.date}/></em></p>
+                                        <p><em><FormattedDate value={changes.date} timeZone="UTC"/></em></p>
                                         {changes.description && <p>{renderI18n(changes.description)}</p>}
                                         {renderSection(changes.additions, "page.changelog.features")}
                                         {renderSection(changes.fixes, "page.changelog.fixes")}
