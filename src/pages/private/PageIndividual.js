@@ -481,7 +481,7 @@ export function PageIndividual({ file, match: { params: { individualId } } }) {
                                 pathname: AppRoutes.print,
                                 state: { initialIndividualId: individualOpt[0].pointer },
                             }}>
-                                <Dropdown.Item>
+                                <Dropdown.Item disabled>
                                     <Printer className="icon mr-2" />
                                     <FormattedMessage id="page.individual.actions.print"/>
                                 </Dropdown.Item>

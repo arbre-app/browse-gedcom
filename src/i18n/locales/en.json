@@ -14,6 +14,7 @@
   "page.about.head.title": "About",
   "page.about.about.title": "About",
   "page.about.about.description": "This app is being developed by {name} as a free-time hobby, with the hope that it will be useful to some.",
+  "page.about.about.translations": "Translations :",
   "page.about.contact.title": "Contact",
   "page.about.contact.description": "Write us at: {email}",
   "page.about.contribute.title": "Contribute",

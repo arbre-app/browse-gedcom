@@ -1,4 +1,4 @@
-import { Fr, Gb } from 'react-flags-select';
+import { Fr, Gb, Nl } from 'react-flags-select';
 
 export const DEFAULT_LANGUAGE = 'en';
 
@@ -13,6 +13,7 @@ export function getFallbackLanguage() {
 export const AVAILABLE_LANGUAGES = [
     { locale: 'en', name: 'English', iconComponent: Gb },
     { locale: 'fr', name: 'Français', iconComponent: Fr },
+    { locale: 'nl', name: 'Nederlands', iconComponent: Nl, authors: ['Bart Kummel'] }
 ];
 
 export const AVAILABLE_SAMPLE_FILES = [

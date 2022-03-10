@@ -1,6 +1,8 @@
-import { Card } from 'react-bootstrap';
+import { Fragment } from 'react';
+import { Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { CodeSlash, Envelope, InfoCircle, People } from 'react-bootstrap-icons';
 import { FormattedMessage } from 'react-intl';
+import { AVAILABLE_LANGUAGES } from '../../i18n';
 import { HelmetBase } from '../HelmetBase';
 import { MixedLayout } from './MixedLayout';
 import { name } from '../../../package.json';
@@ -26,6 +28,30 @@ export function PageAbout() {
                     <p>
                         <FormattedMessage id="page.about.about.description" values={{ name: <strong><a href="https://florian.cassayre.me" target="_blank" rel="noreferrer">Florian Cassayre</a></strong> }}/>
                     </p>
+                        <FormattedMessage id="page.about.about.translations" />
+                    <ul>
+                        {AVAILABLE_LANGUAGES
+                            .filter(({ authors }) => authors && authors.length > 0)
+                            .map(({ locale, name, authors, iconComponent: IconComponent }) => (
+                                <li key={locale}>
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={props => (
+                                            <Tooltip id={`tooltip-${locale}`} {...props}>
+                                                {name} ({locale.toUpperCase()})
+                                            </Tooltip>
+                                        )}
+                                    >
+                                        <IconComponent className="icon mr-2" />
+                                    </OverlayTrigger>
+                                    {authors.map((author, i) => (
+                                        <Fragment key={i}>
+                                            {author}
+                                        </Fragment>
+                                    ))}
+                                </li>
+                            ))}
+                    </ul>
 
                     <Card.Title>
                         <Envelope className="icon mr-2"/>

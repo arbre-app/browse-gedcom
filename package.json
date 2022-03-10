@@ -41,7 +41,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.3",
     "react-zoom-pan-pinch": "^2.0.2",
-    "read-gedcom": "^0.2.1",
+    "read-gedcom": "^0.3.1",
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
     "worker-loader": "^3.0.8"

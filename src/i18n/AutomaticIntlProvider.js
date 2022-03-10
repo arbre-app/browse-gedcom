@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { getFallbackLanguage } from './config';
 import languageEN from './locales/en.json';
 import languageFR from './locales/fr.json';
+import languageNL from './locales/nl.json';
 
 const DEFAULT_LANGUAGE = 'en';
 
@@ -17,6 +18,8 @@ export function AutomaticIntlProvider({ children }) {
             return languageEN;
         } else if(languageCode === 'fr') {
             return languageFR;
+        } else if(languageCode === 'nl') {
+            return languageNL;
         } else {
             return null;
         }

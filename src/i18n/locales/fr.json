@@ -14,6 +14,7 @@
   "page.about.head.title": "À propos",
   "page.about.about.title": "À propos",
   "page.about.about.description": "Cette application est développée par {name} pendant son temps libre, dans l'espoir qu'elle sera utile à certains.",
+  "page.about.about.translations": "Traductions :",
   "page.about.contact.title": "Contact",
   "page.about.contact.description": "Écrivez-nous à : {email}",
   "page.about.contribute.title": "Contribuer",
