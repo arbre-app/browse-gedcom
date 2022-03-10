@@ -7,7 +7,7 @@ import { Form as FinalForm } from 'react-final-form';
 export function FormOnlyPrint({ disabled, refreshCallback }) {
 
     const submitHandler = data => {
-        const ref = refreshCallback();
+        const ref = refreshCallback(); // eslint-disable-line
         console.log('submitted');
     };
 

@@ -1,6 +1,4 @@
-import createDecorator from 'final-form-calculate';
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import {
     AlignBottom,
@@ -8,7 +6,7 @@ import {
     AlignStart,
     AlignTop,
 } from 'react-bootstrap-icons';
-import { Field, useForm } from 'react-final-form';
+import { Field } from 'react-final-form';
 import { NumberField } from './NumberField';
 
 const DIRECTION_LEFT = 'left';
