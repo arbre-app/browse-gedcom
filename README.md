@@ -6,4 +6,4 @@ A modern Gedcom file viewer app built in the browser.
 
 ### Sponsors
 
-Many thanks to [Crowdin](https://crowdin.com/) and [Sentry](https://sentry.io/) for providing us with their services.
+Many thanks to [Crowdin](https://crowdin.com/) and [Sentry](https://sentry.io/) for providing their services.
