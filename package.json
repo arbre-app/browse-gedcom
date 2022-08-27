@@ -23,10 +23,22 @@
   "dependencies": {
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
+    "@fontsource/roboto": "^4.5.8",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/lab": "^5.0.0-alpha.94",
     "@mui/material": "^5.10.0",
+    "comlink": "^4.3.1",
+    "dexie": "^3.2.2",
+    "dexie-react-hooks": "^1.1.1",
     "gatsby": "^4.20.0",
+    "gatsby-material-ui-components": "^5.3.0",
+    "jotai": "^1.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-use": "^17.4.0",
     "read-gedcom": "^0.3.2"
+  },
+  "devDependencies": {
+    "babel-preset-gatsby": "^2.20.0"
   }
 }
