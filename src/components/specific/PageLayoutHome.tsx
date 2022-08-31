@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useAsync } from 'react-use';
 import { db, ModelGedcomFile } from '../../db';
 import { BrandedResponsiveDrawer } from './BrandedResponsiveDrawer';
+import { PageLayout } from './PageLayout';
 
 interface Props {
   pathname: string;
@@ -17,40 +18,42 @@ export function PageLayoutHome({ pathname, title, children }: Props) {
   });
 
   return (
-    <BrandedResponsiveDrawer
-      pathname={pathname}
-      menu={[
-        {
-          children: [
-            {
-              title: 'Accueil',
-              icon: Home,
-              url: '/',
-            },
-            {
-              title: 'Charger Gedcom',
-              icon: Publish,
-              url: '/load',
-            }
-          ]
-        },
-        ...(familyTrees ? [{
-          title: 'Arbres généalogiques',
-          children: familyTrees ? familyTrees.map(familyTree => ({
-            title: familyTree.gedcomFile.fileMeta.name,
-            icon: Spa,
-            url: `/tree/${familyTree.displayId}`,
-          })) : [],
-        }] : []),
-        {
-          children: [
-            { title: 'À propos', icon: Info, url: '/about' },
-          ],
-        },
-      ]}
-      title={title}
-    >
-      {children}
-    </BrandedResponsiveDrawer>
+    <PageLayout>
+      <BrandedResponsiveDrawer
+        pathname={pathname}
+        menu={[
+          {
+            children: [
+              {
+                title: 'Accueil',
+                icon: Home,
+                url: '/',
+              },
+              {
+                title: 'Charger Gedcom',
+                icon: Publish,
+                url: '/load',
+              }
+            ]
+          },
+          ...(familyTrees && familyTrees.length > 0 ? [{
+            title: 'Arbres généalogiques',
+            children: familyTrees ? familyTrees.map(familyTree => ({
+              title: familyTree.name,
+              icon: Spa,
+              url: `/tree/${familyTree.displayId}`,
+            })) : [],
+          }] : []),
+          {
+            children: [
+              { title: 'À propos', icon: Info, url: '/about' },
+            ],
+          },
+        ]}
+        title={title}
+      >
+        {children}
+      </BrandedResponsiveDrawer>
+    </PageLayout>
   );
 }

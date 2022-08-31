@@ -1,11 +1,12 @@
+import { Publish } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Alert, Box, CircularProgress, CircularProgressProps, Typography } from '@mui/material';
+import { Alert, Box, CircularProgress, CircularProgressProps, Grid, Typography } from '@mui/material';
 import * as Comlink from 'comlink';
 import * as React from 'react';
-import { ChangeEventHandler, useState } from 'react';
+import { ChangeEventHandler, useRef, useState } from 'react';
 import { useAsyncFn } from 'react-use';
-import { PageLayoutTree } from '../components/specific';
-import { PageLayoutHome } from '../components/specific/PageLayoutHome';
+import { PageLayoutFamilyTree } from '../components/specific';
+import { PageLayoutHome } from '../components/specific';
 import { db, ModelFamilyTree } from '../db';
 import { workerApi } from '../workerApi';
 import { navigate } from 'gatsby';
@@ -49,6 +50,8 @@ function IndexPage({ location: { pathname } }: Props) {
     async (file: File, progressCallback: (phase: number, progress: number | null) => void) => await workerApi.createFamilyTree(file, progressCallback),
   );
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const [progress, setProgress] = useState<[number, number] | null>(null);
 
   const progressToValue = ([phase, progress]: [number, number]) => {
@@ -86,20 +89,33 @@ function IndexPage({ location: { pathname } }: Props) {
 
   return (
     <PageLayoutHome pathname={pathname} title="Charger un fichier Gedcom">
-      {error && (
-        <Alert severity="error"><strong>{error.name}</strong>: {error.message}</Alert>
-      )}
-      <LoadingButton variant="contained" component="label" disabled={loading} loading={loading}>
-        Charger un fichier Gedcom
-        <input hidden type="file" accept=".ged,.gedcom,application/x-gedcom" name="gedcomFile"
-               onChange={handleFileChange} />
-      </LoadingButton>
-      {progress !== null && (
-        <>
-          {phasesNames[progress[0]]}
-          <CircularProgressWithLabel value={progressToValue(progress) * 100} />
-        </>
-      )}
+      <Grid container>
+        <Grid item xs={0} md={3} />
+        <Grid item xs={12} md={6}>
+          {error && (
+            <Alert severity="error"><strong>{error.name}</strong>: {error.message}</Alert>
+          )}
+          <Box component="span" sx={{ p: 2, py: 5, border: '2px dashed lightgrey', display: 'flex', flexDirection: 'column', textAlign: 'center', color: 'rgba(0, 0, 0, 0.8)', cursor: loading ? 'default' : 'pointer' }} onClick={() => !loading && (inputRef.current as HTMLInputElement).click()}>
+            <Box>
+              {progress !== null ? (
+                <CircularProgressWithLabel value={progressToValue(progress) * 100} />
+              ) : (
+                <Publish fontSize="large" />
+              )}
+            </Box>
+            <Box>
+              {progress !== null ? (
+                phasesNames[progress[0]]
+              ) : (
+                <>
+                  Charger un fichier Gedcom...
+                </>
+              )}
+            </Box>
+            <input ref={inputRef} hidden type="file" accept=".ged,.gedcom,application/x-gedcom" name="gedcomFile" onChange={handleFileChange} />
+          </Box>
+        </Grid>
+      </Grid>
     </PageLayoutHome>
   );
 }

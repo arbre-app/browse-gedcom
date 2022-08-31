@@ -1,6 +1,6 @@
 import * as Comlink from 'comlink';
 import { GedcomReadingPhase, parseGedcom, Tag, TreeNode } from 'read-gedcom';
-import { db, FamilyRelationType, ModelGedcomFamilyIndex, ModelGedcomNode } from '../db';
+import { db, FamilyRelationType, ModelFamilyTree, ModelGedcomFamilyIndex, ModelGedcomNode } from '../db';
 import { randomBase32Id } from '../util';
 
 // TODO duplicate pointer: not handled (will raise a db add error)
@@ -9,6 +9,8 @@ const api = {
   async createFamilyTree(file: File, progressCallback?: (phase: number, progress: number | null) => void) {
     const BULK_BATCH_SIZE = 1000;
     const INDEXEDDB_PHASE = GedcomReadingPhase.TokenizationAndStructuring + 2;
+
+    const time = new Date().getTime();
 
     const { name, size, lastModified, type } = file;
     const promise: Promise<number> = new Promise(async (resolve, reject) => {
@@ -34,7 +36,8 @@ const api = {
           }
           const familyTreeId = await db.transaction("rw", db.familyTrees, db.gedcomFiles, db.gedcomNodes, db.gedcomFamilyIndex, async () => {
             const gedcomFileId = await db.gedcomFiles.add({
-              fileMeta: { name, size, lastModified, type }
+              fileMeta: { name, size, lastModified, type },
+              createdAt: time,
             });
             let displayId: string;
             while (true) {
@@ -46,6 +49,10 @@ const api = {
             const familyTreeId = await db.familyTrees.add({
               displayId,
               gedcomFileId,
+              createdAt: time,
+              accessedAt: time,
+              gedcomFileUpdates: 1,
+              name: name.replace(/\.ged$/, ''),
             });
             const linesBatches: ModelGedcomNode[][] = [[]];
             let currentLineBatch = linesBatches[0];
@@ -126,6 +133,21 @@ const api = {
       reader.readAsArrayBuffer(file);
     });
     return await promise;
+  },
+  deleteFamilyTree(familyTreeId: number, progressCallback?: (progress: number) => void) {
+    return db.transaction("rw", db.familyTrees, db.gedcomFiles, db.gedcomNodes, db.gedcomFamilyIndex, async () => {
+      const familyTree = await db.familyTrees.get(familyTreeId) as ModelFamilyTree;
+      const [gedcomNodes, gedcomFamilyIndex] = await Promise.all([
+        db.gedcomNodes.where('[gedcomFileId+lineNumber]').between([familyTree.gedcomFileId, Number.MIN_SAFE_INTEGER], [familyTree.gedcomFileId, Number.MAX_SAFE_INTEGER]).keys(),
+        db.gedcomFamilyIndex.where('[gedcomFileId+individualPointer+relationType+familyPointer]').between([familyTree.gedcomFileId, '', 0, ''], [familyTree.gedcomFileId, '~', 0, '']).keys(),
+      ]);
+      return Promise.all([
+        db.familyTrees.delete(familyTreeId),
+        db.gedcomFiles.delete(familyTreeId),
+        db.gedcomNodes.bulkDelete(gedcomNodes as any),
+        db.gedcomFamilyIndex.bulkDelete(gedcomFamilyIndex as any),
+      ]);
+    });
   },
   parseGedcom(buffer: Buffer, progressCallback: (phase: GedcomReadingPhase, progress: null | number) => void) {
     return parseGedcom(buffer, { progressCallback });

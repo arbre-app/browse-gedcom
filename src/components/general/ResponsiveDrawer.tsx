@@ -65,7 +65,7 @@ export function ResponsiveDrawer({ children, pathname, menu, icon: Icon, title, 
             <Divider />
           )}
           <List>
-            {categoryTitle && <ListSubheader>{categoryTitle}</ListSubheader>}
+            {categoryTitle && <ListSubheader><Typography variant="inherit" noWrap>{categoryTitle}</Typography></ListSubheader>}
             {categoryChildren.map(({ title, icon: Icon, url }, j) => (
               <ListItem key={j} disablePadding sx={{ display: 'block' }}>
                 <ListItemButton selected={url === pathname} to={url}> {/* TODO split `?` */}
@@ -145,7 +145,7 @@ export function ResponsiveDrawer({ children, pathname, menu, icon: Icon, title, 
       </Box>
       <Box
         component="main"
-        sx={{ flexGrow: 1, height: '100vh', width: { sm: `calc(100% - ${drawerWidth}px)` }, p: 3, backgroundColor: '#f5f5f5' }}
+        sx={{ flexGrow: 1, height: '100vh', width: { sm: `calc(100% - ${drawerWidth}px)` }, p: { xs: 1, sm: 3 }, py: { xs: 2, sm: 3 }, backgroundColor: '#f5f5f5' }}
       >
         <Toolbar />
         {children}

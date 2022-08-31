@@ -26,6 +26,12 @@ export interface ModelFamilyTree {
 
   displayId: string;
   gedcomFileId: number;
+
+  createdAt: number;
+  accessedAt: number;
+  name: string;
+  gedcomFileUpdates: number;
+  rootIndividualPointer?: string;
 }
 
 export interface PartFileMeta {
@@ -39,6 +45,7 @@ export interface ModelGedcomFile {
   id?: number; // (autoincremented)
 
   fileMeta: PartFileMeta;
+  createdAt: number;
 }
 
 export interface ModelGedcomNode {

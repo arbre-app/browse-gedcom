@@ -1,5 +1,7 @@
 import { Collection } from 'dexie';
-import { db, ModelGedcomNode } from './store';
+import { Tag } from 'read-gedcom';
+import { GedcomFile } from './gedcom';
+import { db, FamilyRelationType, ModelGedcomNode } from './store';
 
 export const queryGedcom = (options: { tag?: string, limit?: number, offset?: number, pointer?: string } & ({ gedcomFileId?: number } | { node?: Pick<ModelGedcomNode, 'gedcomFileId' | 'lineNumber'> }) = {}): Collection<ModelGedcomNode> => {
   const node = (options as any).node as ModelGedcomNode | undefined;
@@ -26,11 +28,8 @@ export const queryGedcom = (options: { tag?: string, limit?: number, offset?: nu
     const { pointer } = options;
     return withPagination(db.gedcomNodes
       .where('[gedcomFileId+parentLineNumber+pointer]')
-      .between(
-        [gedcomFileId, parentLineNumber, pointer, Number.MIN_SAFE_INTEGER],
-        [gedcomFileId, parentLineNumber, pointer, Number.MAX_SAFE_INTEGER],
-      ))
-      .filter(({ tag }) => options.tag === undefined || tag === options.tag);
+      .equals([gedcomFileId, parentLineNumber, pointer])
+    ).filter(({ tag }) => options.tag === undefined || tag === options.tag);
   } else if (options.tag === undefined) {
     return withPagination(db.gedcomNodes
       .where('[gedcomFileId+parentLineNumber+lineNumber]')
@@ -78,20 +77,33 @@ export class GedcomSelection {
     return new GedcomSelection(gedcomFileId, null, promise, null);
   }
 
-  static async getRecord(gedcomFileId: number, pointer: string, tag?: string): Promise<GedcomSelection> {
+  static getRecord(gedcomFileId: number, pointer: string, tag?: string): GedcomSelection {
     const promise = queryGedcom({ node: { gedcomFileId, lineNumber: 0 }, pointer, tag }).toArray();
     return new GedcomSelection(gedcomFileId, null, promise, null);
+  }
+
+  // TODO annoying that this has to be async
+  static async getFamilyRecordByRelation(gedcomFileId: number, pointer: string, relation: FamilyRelationType): Promise<GedcomSelection> {
+    const result = await db.gedcomFamilyIndex.where('[gedcomFileId+individualPointer+relationType+familyPointer]')
+      .between([gedcomFileId, pointer, relation, ''], [gedcomFileId, pointer, relation, '~' /* FIXME ASCII hack! */]).toArray();
+    const familyPointers = result.map(({ familyPointer }) => familyPointer);
+    const nodes = await Promise.all(familyPointers.map(familyPointer => GedcomSelection.getRecord(gedcomFileId, familyPointer, Tag.Family).collect()));
+    return GedcomSelection.fromArray(gedcomFileId, nodes.flat())
   }
 
   get(tag?: string, options: { limit?: number, offset?: number } = {}): GedcomSelection {
     return new GedcomSelection(this.gedcomFileId, { ...options, parent: this, tag }, null, null);
   }
 
-  async collect(): Promise<ModelGedcomNode[]> {
+  async collect(): Promise<ModelGedcomNode[]>;
+  async collect<T>(f: (result: ModelGedcomNode[]) => T): Promise<T>;
+
+  async collect<T>(f?: (result: ModelGedcomNode[]) => T): Promise<T> {
+    const mapResult = (result: ModelGedcomNode[]) => f ? f(result) : result as any as T;
     if (this.result) { // Result already computed: return it
-      return this.result;
+      return mapResult(this.result);
     } else if (this.promise) { // Result being computed: wait for that
-      return await this.promise;
+      return mapResult(await this.promise);
     } else { // Not yet computed: compute it
       const promise = async () => {
         if (this.query) { // Query the children
@@ -107,8 +119,16 @@ export class GedcomSelection {
       this.result = await this.promise;
       this.promise = null;
       this.query = null; // GC
-      return this.result;
+      return mapResult(this.result);
     }
+  }
+
+  async collectOne(): Promise<ModelGedcomNode | undefined>;
+  async collectOne<T>(f: (result: ModelGedcomNode) => T): Promise<T | undefined>;
+
+  async collectOne<T>(f?: (result: ModelGedcomNode) => T): Promise<T | undefined> {
+    const result = await this.collect();
+    return result.length > 0 ? (f ? f(result[0]) : result[0] as any as T) : undefined;
   }
 
   async count(): Promise<number> { // TODO optimize this method
